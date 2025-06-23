@@ -1,20 +1,11 @@
-import { expect, afterEach, vi } from 'vitest'
+import { expect, afterEach, vi, beforeEach } from 'vitest'
 import { cleanup } from '@testing-library/react'
 import * as matchers from '@testing-library/jest-dom/matchers'
 
 // Extend Vitest's expect with testing-library matchers
 expect.extend(matchers)
 
-// Add global types for testing-library matchers
-declare global {
-  namespace Vi {
-    interface JestAssertion<T = any>
-      extends jest.Matchers<void, T>,
-        matchers.TestingLibraryMatchers<T, void> {}
-  }
-}
-
-// Mock window.matchMedia
+// Mock window properties and methods
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
   value: vi.fn().mockImplementation(query => ({
@@ -27,6 +18,25 @@ Object.defineProperty(window, 'matchMedia', {
     removeEventListener: vi.fn(),
     dispatchEvent: vi.fn(),
   })),
+})
+
+Object.defineProperty(window, 'innerWidth', {
+  writable: true,
+  configurable: true,
+  value: 1024,
+})
+
+Object.defineProperty(window, 'innerHeight', {
+  writable: true,
+  configurable: true,
+  value: 768,
+})
+
+// Mock console methods to reduce noise in tests
+beforeEach(() => {
+  vi.spyOn(console, 'log').mockImplementation(() => {})
+  vi.spyOn(console, 'warn').mockImplementation(() => {})
+  vi.spyOn(console, 'error').mockImplementation(() => {})
 })
 
 // Mock IntersectionObserver
@@ -46,4 +56,5 @@ global.ResizeObserver = vi.fn().mockImplementation(() => ({
 // Clean up after each test
 afterEach(() => {
   cleanup()
+  vi.restoreAllMocks()
 })

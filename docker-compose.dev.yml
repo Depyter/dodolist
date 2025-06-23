@@ -7,6 +7,7 @@ services:
       - pb_data:/pb/pb_data
       - ./backend/pb_migrations:/pb/pb_migrations
       - ./backend/pb_hooks:/pb/pb_hooks
+      - ./backend/migrations:/pb/migrations
     ports:
       - "8080:8080"
     restart: unless-stopped
