@@ -829,11 +829,11 @@ export default function DodoListApp() {
     return (
       <Card
         key={todo.id}
-        className={`p-3 transition-all duration-300 hover:shadow-md will-change-transform ${
-          isCompleted
-            ? "bg-slate-50/50 border-slate-200/50 opacity-60"
-            : "bg-white/80 border-slate-200 hover:bg-white hover:shadow-lg"
-        } backdrop-blur-sm ${isDueTodayTask && !isCompleted ? "border-red-500 border-2" : ""}`}
+        className={`p-3 transition-all duration-300 hover:shadow-md will-change-transform 
+          ${isCompleted
+            ? `${activeColor.light} ${activeColor.border} border opacity-60`
+            : `${activeColor.light} ${activeColor.border} border backdrop-blur-sm`}
+          ${isDueTodayTask && !isCompleted ? "border-red-500 border-2" : ""}`}
       >
         <div className="flex items-start gap-3">
           <button
@@ -1060,7 +1060,7 @@ export default function DodoListApp() {
           </header>
 
           {/* Main Content */}
-          <div className="flex-1 p-6 overflow-y-auto relative" key={activeListId}>
+          <div className="flex-1 p-6 overflow-y-auto relative bg-slate-50" key={activeListId}>
             <div className="absolute inset-0 noise-texture-subtle opacity-10"></div>
             <div className="transition-opacity duration-300 ease-out w-full relative z-10" style={{ transitionDelay: "150ms" }}>
             {activeList && (

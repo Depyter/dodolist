@@ -387,7 +387,7 @@ const AppSidebar = memo(({
       <SidebarHeader className="relative z-10">
         <div className="px-2 py-4">
           <h1 className={`text-xl font-semibold ${activeColor.darkText}`}>DodoList</h1>
-          <p className={`text-sm mb-4 ${activeColor.darkText} opacity-80`}>No Dodo hurts were hurt.</p>
+          <p className={`text-sm mb-4 ${activeColor.darkText} opacity-80`}>No Dodos were hurt.</p>
 
           {/* New List Creation */}
           {isCreatingList ? (
