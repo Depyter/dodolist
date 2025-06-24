@@ -29,7 +29,10 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - VITE_API_URL=http://localhost:8080
+      - VITE_API_URL=http://backend:8080
+      - VITE_ADMIN_URL=http://backend:8080/_/
+      - PUBLIC_API_URL=http://${HOST_IP:-localhost}:8080
+      - HOST_IP=${HOST_IP:-localhost}
     depends_on:
       - backend
     networks:

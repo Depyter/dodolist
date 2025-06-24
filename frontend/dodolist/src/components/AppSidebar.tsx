@@ -26,12 +26,13 @@ import {
   Copy,
   Palette,
   Trash2,
-  User,
   Settings,
 } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { useNavigate } from 'react-router-dom'
+import AuthService from '@/services/authService'
 
 interface Color {
   name: string;
@@ -280,6 +281,7 @@ interface AppSidebarProps {
   saveProfile: () => void;
   editingListId: string | null;
   setEditingListId: (id: string | null) => void;
+  onLogout?: () => void;
 }
 
 const AppSidebar = memo(({
@@ -306,7 +308,29 @@ const AppSidebar = memo(({
   saveProfile,
   editingListId,
   setEditingListId,
+  onLogout,
 }: AppSidebarProps) => {
+  const navigate = useNavigate()
+  const [authService] = useState(() => new AuthService())
+  const [currentUser, setCurrentUser] = useState(authService.getCurrentUser())
+  
+  // Get authenticated user on component mount
+  useEffect(() => {
+    const user = authService.getCurrentUser()
+    if (user) {
+      setCurrentUser(user)
+    }
+  }, [authService])
+  
+  const handleLogout = () => {
+    if (onLogout) {
+      onLogout()
+    } else {
+      authService.logout()
+      navigate('/login')
+    }
+  }
+
   const activeList = todoLists.find((list) => list.id === activeListId);
   const activeColor = colors.find((color) => color.value === activeList?.color) || colors[0];
 
@@ -501,13 +525,36 @@ const AppSidebar = memo(({
             <Dialog open={isEditingProfile} onOpenChange={setIsEditingProfile}>
               <DialogTrigger asChild>
                 <SidebarMenuButton
-                  onClick={() => setTempProfile(userProfile)}
+                  onClick={() => {
+                    // If we have a current user, use their data for the temp profile
+                    if (currentUser) {
+                      setTempProfile({
+                        name: currentUser.username,
+                        email: currentUser.email,
+                        avatar: currentUser.avatar
+                      })
+                    } else {
+                      setTempProfile(userProfile)
+                    }
+                  }}
                   className={`${activeColor.darkText} bg-white/10 hover:bg-white/20 focus:bg-white/20 focus:ring-2 focus:ring-white/30`}
                 >
-                  <User className="w-4 h-4" />
-                  <div className="flex flex-col items-start">
-                    <span className="text-sm font-medium">{userProfile.name}</span>
-                    <span className={`text-xs ${activeColor.darkText} opacity-80`}>{userProfile.email}</span>
+                  {currentUser && currentUser.avatar ? (
+                    <div className="w-8 h-8 rounded-full overflow-hidden bg-white/20 flex-shrink-0">
+                      <img src={currentUser.avatar} alt={currentUser.username} className="w-full h-full object-cover" />
+                    </div>
+                  ) : (
+                    <div className={`w-8 h-8 rounded-full ${activeColor.value} flex items-center justify-center flex-shrink-0`}>
+                      <span className="text-white font-medium">
+                        {currentUser ? currentUser.username.charAt(0).toUpperCase() : 'U'}
+                      </span>
+                    </div>
+                  )}
+                  
+                  <div className="flex flex-col items-start ml-2">
+                    <span className="text-sm font-medium truncate max-w-[120px]">
+                      {currentUser ? currentUser.username : userProfile.name}
+                    </span>
                   </div>
                   <Settings className="w-4 h-4 ml-auto" />
                 </SidebarMenuButton>
@@ -518,7 +565,7 @@ const AppSidebar = memo(({
                 </DialogHeader>
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="name">Name</Label>
+                    <Label htmlFor="name">Username</Label>
                     <Input
                       id="name"
                       value={tempProfile.name}
@@ -532,6 +579,7 @@ const AppSidebar = memo(({
                       type="email"
                       value={tempProfile.email}
                       onChange={(e) => setTempProfile({ ...tempProfile, email: e.target.value })}
+                      disabled={!!currentUser} // Disable email editing if using real auth
                     />
                   </div>
                   <div className="flex gap-2 pt-4">
@@ -545,6 +593,22 @@ const AppSidebar = memo(({
                 </div>
               </DialogContent>
             </Dialog>
+          </SidebarMenuItem>
+          
+          <SidebarMenuItem>
+            <SidebarMenuButton 
+              onClick={handleLogout}
+              className={`${activeColor.darkText} bg-white/10 hover:bg-white/20 hover:text-red-500`}
+            >
+              <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                  <polyline points="16 17 21 12 16 7"></polyline>
+                  <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+              </div>
+              <span className="ml-2">Logout</span>
+            </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>

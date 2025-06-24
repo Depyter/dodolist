@@ -2,6 +2,9 @@
 
 import type React from "react"
 import { useState, useEffect, useCallback } from "react"
+import { useNavigate } from "react-router-dom"
+import AuthService from "@/services/authService"
+import { usePersistentTodoLists } from "@/services/todoService"
 
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -17,38 +20,33 @@ import {
   ChevronRight,
   Circle,
   Clock,
-  Copy,
-  Edit,
-  Palette,
   Pin,
   Repeat,
   Send,
   Trash2,
   X,
+  Loader2,
+  AlertCircle,
+  Database,
+  AlertTriangle
 } from "lucide-react"
 
 import AppSidebar from "@/components/AppSidebar"
 import TexturedBackground from "@/components/TexturedBackground"
 
+// We're using the Todo and TodoList interfaces from todoService.ts,
+// but we'll still define them here to maintain type safety without refactoring the whole file
 interface Todo {
   id: string
   text: string
+  description?: string
   completed: boolean
   createdAt: Date
   completedAt?: Date
   deadline?: Date
   reminder?: Date
   recurring?: "none" | "daily" | "weekly" | "monthly"
-}
-
-interface TodoList {
-  id: string
-  name: string
-  color: string
-  todos: Todo[]
-  createdAt: Date
-  pinned?: boolean
-  archived?: boolean
+  listId: string
 }
 
 interface UserProfile {
@@ -141,18 +139,63 @@ const colors = [
 ]
 
 export default function DodoListApp() {
-  const [todoLists, setTodoLists] = useState<TodoList[]>([
-    {
-      id: "1",
-      name: "Personal Tasks",
-      color: "bg-blue-500",
-      todos: [],
-      createdAt: new Date(),
-      pinned: false,
-      archived: false,
-    },
-  ])
-  const [activeListId, setActiveListId] = useState("1")
+  const navigate = useNavigate()
+  const authService = new AuthService()
+  
+  // Logout function
+  const handleLogout = () => {
+    authService.logout()
+    navigate('/login')
+  }
+  
+  // State for persistence notification
+  const [showPersistenceWarning, setShowPersistenceWarning] = useState(false);
+  const [persistenceType, setPersistenceType] = useState<'memory' | 'indexeddb' | 'opfs' | null>(null);
+  const [persistenceError, setPersistenceError] = useState<string | null>(null);
+  
+  // Persistence detection
+  useEffect(() => {
+    // Listen for messages from dbService about persistence type
+    const handleStorageInfo = (event: any) => {
+      if (event.detail?.type === 'persistence-info') {
+        setPersistenceType(event.detail.storageType);
+        setShowPersistenceWarning(event.detail.storageType === 'memory');
+        setPersistenceError(event.detail.error || null);
+        
+        // Log detailed info for debugging
+        console.log('Storage persistence info:', {
+          type: event.detail.storageType,
+          persistent: event.detail.persistent,
+          error: event.detail.error
+        });
+      }
+    };
+    
+    // Add event listener for custom event
+    window.addEventListener('dodolist-storage-info', handleStorageInfo);
+    
+    // Cleanup
+    return () => {
+      window.removeEventListener('dodolist-storage-info', handleStorageInfo);
+    };
+  }, []);
+  
+  // Use the SQLite persistence hook
+  const {
+    todoLists,
+    loading,
+    error,
+    activeListId,
+    setActiveListId,
+    createNewList,
+    updateList,
+    deleteList,
+    addTodo,
+    updateTodo: updateTodoItem,
+    toggleTodo,
+    deleteTodo
+  } = usePersistentTodoLists();
+  
   const [inputValue, setInputValue] = useState("")
   const [newListName, setNewListName] = useState("")
   const [isCreatingList, setIsCreatingList] = useState(false)
@@ -216,230 +259,158 @@ export default function DodoListApp() {
     }
   }, [activeCount, totalCount])
 
-  const addTodo = () => {
-    if (inputValue.trim() && activeList) {
-      const newTodo: Todo = {
-        id: Date.now().toString(),
-        text: inputValue.trim(),
-        completed: false,
-        createdAt: new Date(),
-        recurring: "none",
+  // Handle adding a new todo (updated to use our persistence service)
+  const handleAddTodo = async () => {
+    if (inputValue.trim() && activeListId) {
+      try {
+        await addTodo(inputValue.trim(), activeListId);
+        setInputValue("");
+      } catch (err) {
+        console.error("Error adding todo:", err);
       }
-
-      setTodoLists(
-        todoLists.map((list) => (list.id === activeListId ? { ...list, todos: [...list.todos, newTodo] } : list)),
-      )
-      setInputValue("")
     }
   }
 
-  const createRecurringTask = (originalTodo: Todo) => {
-    if (!originalTodo.recurring || originalTodo.recurring === "none") return
+  // Create recurring task functionality is now handled in the todoService's toggleTodo method
+  // No need to implement it here anymore
 
-    const newTodo: Todo = {
-      id: Date.now().toString(),
-      text: originalTodo.text,
-      completed: false,
-      createdAt: new Date(),
-      recurring: originalTodo.recurring,
-    }
-
-    // Calculate next deadline if original had one
-    if (originalTodo.deadline) {
-      const nextDeadline = new Date(originalTodo.deadline)
-      switch (originalTodo.recurring) {
-        case "daily":
-          nextDeadline.setDate(nextDeadline.getDate() + 1)
-          break
-        case "weekly":
-          nextDeadline.setDate(nextDeadline.getDate() + 7)
-          break
-        case "monthly":
-          nextDeadline.setMonth(nextDeadline.getMonth() + 1)
-          break
+  // Handle task toggle (updated to use our persistence service)
+  const handleToggleTodo = async (todoId: string) => {
+    if (activeListId) {
+      try {
+        await toggleTodo(todoId, activeListId);
+      } catch (err) {
+        console.error("Error toggling todo:", err);
       }
-      newTodo.deadline = nextDeadline
     }
+  }
 
-    // Calculate next reminder if original had one
-    if (originalTodo.reminder) {
-      const nextReminder = new Date(originalTodo.reminder)
-      switch (originalTodo.recurring) {
-        case "daily":
-          nextReminder.setDate(nextReminder.getDate() + 1)
-          break
-        case "weekly":
-          nextReminder.setDate(nextReminder.getDate() + 7)
-          break
-        case "monthly":
-          nextReminder.setMonth(nextReminder.getMonth() + 1)
-          break
+  // Handle task deletion (updated to use our persistence service)
+  const handleDeleteTodo = async (todoId: string) => {
+    if (activeListId) {
+      try {
+        await deleteTodo(todoId, activeListId);
+      } catch (err) {
+        console.error("Error deleting todo:", err);
       }
-      newTodo.reminder = nextReminder
-    }
-
-    setTodoLists(
-      todoLists.map((list) => (list.id === activeListId ? { ...list, todos: [...list.todos, newTodo] } : list)),
-    )
-  }
-
-  const toggleTodo = (todoId: string) => {
-    const todo = activeList?.todos.find((t) => t.id === todoId)
-
-    setTodoLists(
-      todoLists.map((list) =>
-        list.id === activeListId
-          ? {
-              ...list,
-              todos: list.todos.map((todo) =>
-                todo.id === todoId
-                  ? {
-                      ...todo,
-                      completed: !todo.completed,
-                      completedAt: !todo.completed ? new Date() : undefined,
-                    }
-                  : todo,
-              ),
-            }
-          : list,
-      ),
-    )
-
-    // Create recurring task if this task was just completed and has recurrence
-    if (todo && !todo.completed && todo.recurring && todo.recurring !== "none") {
-      setTimeout(() => createRecurringTask(todo), 100) // Small delay to ensure state update
     }
   }
 
-  const deleteTodo = (todoId: string) => {
-    setTodoLists(
-      todoLists.map((list) =>
-        list.id === activeListId ? { ...list, todos: list.todos.filter((todo) => todo.id !== todoId) } : list,
-      ),
-    )
+  // Handle task update (updated to use our persistence service)
+  const handleUpdateTodo = async (todoId: string, updates: Partial<Todo>) => {
+    if (activeListId) {
+      try {
+        await updateTodoItem(todoId, activeListId, updates);
+      } catch (err) {
+        console.error("Error updating todo:", err);
+      }
+    }
   }
 
-  const updateTodo = (todoId: string, updates: Partial<Todo>) => {
-    setTodoLists(
-      todoLists.map((list) =>
-        list.id === activeListId
-          ? {
-              ...list,
-              todos: list.todos.map((todo) => (todo.id === todoId ? { ...todo, ...updates } : todo)),
-            }
-          : list,
-      ),
-    )
-  }
-
-  const createNewList = () => {
+  // Handle creating a new list (updated to use our persistence service)
+  const handleCreateNewList = async () => {
     if (newListName.trim()) {
-      const newList: TodoList = {
-        id: Date.now().toString(),
-        name: newListName.trim(),
-        color: colors[Math.floor(Math.random() * colors.length)].value,
-        todos: [],
-        createdAt: new Date(),
-        pinned: false,
-        archived: false,
+      try {
+        const color = colors[Math.floor(Math.random() * colors.length)].value;
+        await createNewList(newListName.trim(), color);
+        setNewListName("");
+        setIsCreatingList(false);
+      } catch (err) {
+        console.error("Error creating list:", err);
       }
-      setTodoLists([...todoLists, newList])
-      setActiveListId(newList.id)
-      setNewListName("")
-      setIsCreatingList(false)
     }
   }
 
-  const cloneList = (listId: string) => {
+  // Clone a list (updated to use our persistence service)
+  const cloneList = async (listId: string) => {
     const listToClone = todoLists.find((list) => list.id === listId)
     if (!listToClone) return
 
-    const clonedList: TodoList = {
-      id: Date.now().toString(),
-      name: `${listToClone.name} (Copy)`,
-      color: listToClone.color,
-      todos: listToClone.todos.map((todo) => ({
-        ...todo,
-        id: `${Date.now()}-${Math.random()}`,
-        completed: false,
-        completedAt: undefined,
-        createdAt: new Date(),
-      })),
-      createdAt: new Date(),
-      pinned: false,
-      archived: false,
+    try {
+      // Create a new list with a copy name
+      const newListId = await createNewList(`${listToClone.name} (Copy)`, listToClone.color);
+      
+      // Add all the todos from the original list to the new list
+      if (newListId) {
+        for (const todo of listToClone.todos) {
+          await addTodo(todo.text, newListId);
+          // If we want to copy more properties, we would need to update the new todo
+        }
+      }
+    } catch (err) {
+      console.error("Error cloning list:", err);
     }
-
-    setTodoLists([...todoLists, clonedList])
-    setActiveListId(clonedList.id)
   }
 
-  const deleteList = (listId: string) => {
-    if (todoLists.length > 1) {
-      const newLists = todoLists.filter((list) => list.id !== listId)
-      setTodoLists(newLists)
-      if (activeListId === listId) {
-        // Find the first non-archived list to switch to
-        const nextActiveList = newLists.find((list) => !list.archived) || newLists[0]
-        setActiveListId(nextActiveList.id)
+  // Handle deleting a list (updated to use our persistence service)
+  const handleDeleteList = async (listId: string) => {
+    try {
+      await deleteList(listId);
+    } catch (err) {
+      console.error("Error deleting list:", err);
+    }
+  }
+
+  // Update list name (updated to use our persistence service)
+  const updateListName = useCallback(async (listId: string, newName: string) => {
+    // Only update if the new name is not empty
+    if (newName.trim()) {
+      try {
+        await updateList(listId, { name: newName.trim() });
+      } catch (err) {
+        console.error("Error updating list name:", err);
+      }
+    }
+    setEditingListId(null)
+  }, [updateList])
+
+  // Update list color (updated to use our persistence service)
+  const updateListColor = async (listId: string, newColor: string) => {
+    try {
+      await updateList(listId, { color: newColor });
+    } catch (err) {
+      console.error("Error updating list color:", err);
+    }
+  }
+
+  // Toggle pin list (updated to use our persistence service)
+  const togglePinList = async (listId: string) => {
+    const list = todoLists.find(l => l.id === listId);
+    if (list) {
+      try {
+        await updateList(listId, { pinned: !list.pinned });
+      } catch (err) {
+        console.error("Error toggling list pin:", err);
       }
     }
   }
 
-  const updateListName = useCallback((listId: string, newName: string) => {
-    // Only update if the new name is not empty
-    if (newName.trim()) {
-      setTodoLists((prevLists) =>
-        prevLists.map((list) => (list.id === listId ? { ...list, name: newName.trim() } : list)),
-      )
-    }
-    setEditingListId(null)
-  }, [])
-
-  const updateListColor = (listId: string, newColor: string) => {
-    setTodoLists(todoLists.map((list) => (list.id === listId ? { ...list, color: newColor } : list)))
-  }
-
-  const togglePinList = (listId: string) => {
-    setTodoLists(todoLists.map((list) => (list.id === listId ? { ...list, pinned: !list.pinned } : list)))
-  }
-
-  const toggleArchiveList = (listId: string) => {
+  // Toggle archive list (updated to use our persistence service)
+  const toggleArchiveList = async (listId: string) => {
     const listToArchive = todoLists.find((list) => list.id === listId)
     if (!listToArchive) return
 
-    const activeLists = todoLists.filter((list) => !list.archived)
-
-    setTodoLists(todoLists.map((list) => (list.id === listId ? { ...list, archived: !list.archived } : list)))
-
-    // If archiving the active list, switch to another non-archived list
-    if (listId === activeListId && !listToArchive.archived) {
-      const nextActiveList = activeLists.find((list) => list.id !== listId)
-      if (nextActiveList) {
-        setActiveListId(nextActiveList.id)
-      } else {
-        // If no non-archived lists remain, create a new one
-        const newList: TodoList = {
-          id: Date.now().toString(),
-          name: "New List",
-          color: colors[0].value,
-          todos: [],
-          createdAt: new Date(),
-          pinned: false,
-          archived: false,
+    try {
+      await updateList(listId, { archived: !listToArchive.archived });
+      
+      // If archiving the active list, switch to another non-archived list
+      if (listId === activeListId && !listToArchive.archived) {
+        const activeLists = todoLists.filter((list) => !list.archived && list.id !== listId);
+        if (activeLists.length > 0) {
+          setActiveListId(activeLists[0].id);
+        } else {
+          // If no non-archived lists remain, create a new one
+          await createNewList("New List", colors[0].value);
         }
-        setTodoLists((prev) => [
-          ...prev.map((list) => (list.id === listId ? { ...list, archived: true } : list)),
-          newList,
-        ])
-        setActiveListId(newList.id)
       }
+    } catch (err) {
+      console.error("Error toggling list archive:", err);
     }
   }
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
-      addTodo()
+      handleAddTodo()
     }
   }
 
@@ -529,7 +500,7 @@ export default function DodoListApp() {
 
                 <select
                   value={todo.recurring || "none"}
-                  onChange={(e) => updateTodo(todo.id, { recurring: e.target.value as Todo["recurring"] })}
+                  onChange={(e) => handleUpdateTodo(todo.id, { recurring: e.target.value as Todo["recurring"] })}
                   className="w-full p-2 border border-slate-200 rounded-md text-sm"
                 >
                   <option value="none">Don't repeat</option>
@@ -567,9 +538,9 @@ export default function DodoListApp() {
                         } else {
                           newDate.setHours(9, 0) // Default to 9 AM if time is enabled
                         }
-                        updateTodo(todo.id, { deadline: newDate })
+                        handleUpdateTodo(todo.id, { deadline: newDate })
                       } else {
-                        updateTodo(todo.id, { deadline: undefined })
+                        handleUpdateTodo(todo.id, { deadline: undefined })
                         setDeadlineHasTime(false)
                       }
                     }}
@@ -588,7 +559,7 @@ export default function DodoListApp() {
                             if (e.target.checked && todo.deadline) {
                               const newDeadline = new Date(todo.deadline)
                               newDeadline.setHours(9, 0) // Default to 9 AM
-                              updateTodo(todo.id, { deadline: newDeadline })
+                              handleUpdateTodo(todo.id, { deadline: newDeadline })
                             }
                           }}
                           className="rounded"
@@ -608,7 +579,7 @@ export default function DodoListApp() {
                                 const newDeadline = new Date(todo.deadline)
                                 const [hours, minutes] = e.target.value.split(":")
                                 newDeadline.setHours(Number.parseInt(hours), Number.parseInt(minutes))
-                                updateTodo(todo.id, { deadline: newDeadline })
+                                handleUpdateTodo(todo.id, { deadline: newDeadline })
                               }
                             }}
                             className="w-full"
@@ -626,7 +597,7 @@ export default function DodoListApp() {
                                     const newDeadline = new Date(todo.deadline)
                                     const [hours, minutes] = time.split(":")
                                     newDeadline.setHours(Number.parseInt(hours), Number.parseInt(minutes))
-                                    updateTodo(todo.id, { deadline: newDeadline })
+                                    handleUpdateTodo(todo.id, { deadline: newDeadline })
                                   }
                                 }}
                                 className="text-xs h-6 px-2"
@@ -681,9 +652,9 @@ export default function DodoListApp() {
                         } else {
                           newDate.setHours(8, 0) // Default to 8 AM if time is enabled
                         }
-                        updateTodo(todo.id, { reminder: newDate })
+                        handleUpdateTodo(todo.id, { reminder: newDate })
                       } else {
-                        updateTodo(todo.id, { reminder: undefined })
+                        handleUpdateTodo(todo.id, { reminder: undefined })
                         setReminderHasTime(false)
                       }
                     }}
@@ -702,7 +673,7 @@ export default function DodoListApp() {
                             if (e.target.checked && todo.reminder) {
                               const newReminder = new Date(todo.reminder)
                               newReminder.setHours(8, 0) // Default to 8 AM
-                              updateTodo(todo.id, { reminder: newReminder })
+                              handleUpdateTodo(todo.id, { reminder: newReminder })
                             }
                           }}
                           className="rounded"
@@ -722,7 +693,7 @@ export default function DodoListApp() {
                                 const newReminder = new Date(todo.reminder)
                                 const [hours, minutes] = e.target.value.split(":")
                                 newReminder.setHours(Number.parseInt(hours), Number.parseInt(minutes))
-                                updateTodo(todo.id, { reminder: newReminder })
+                                handleUpdateTodo(todo.id, { reminder: newReminder })
                               }
                             }}
                             className="w-full"
@@ -740,7 +711,7 @@ export default function DodoListApp() {
                                     const newReminder = new Date(todo.reminder)
                                     const [hours, minutes] = time.split(":")
                                     newReminder.setHours(Number.parseInt(hours), Number.parseInt(minutes))
-                                    updateTodo(todo.id, { reminder: newReminder })
+                                    handleUpdateTodo(todo.id, { reminder: newReminder })
                                   }
                                 }}
                                 className="text-xs h-6 px-2"
@@ -779,7 +750,7 @@ export default function DodoListApp() {
                 <Button
                   variant="outline"
                   onClick={() => {
-                    updateTodo(todo.id, { deadline: undefined, reminder: undefined, recurring: "none" })
+                    handleUpdateTodo(todo.id, { deadline: undefined, reminder: undefined, recurring: "none" })
                     setDeadlineHasTime(false)
                     setReminderHasTime(false)
                   }}
@@ -866,7 +837,7 @@ export default function DodoListApp() {
       >
         <div className="flex items-start gap-3">
           <button
-            onClick={() => toggleTodo(todo.id)}
+            onClick={() => handleToggleTodo(todo.id)}
             className="mt-0.5 text-slate-400 hover:text-slate-600 transition-colors min-w-[20px]"
           >
             {todo.completed ? (
@@ -932,7 +903,7 @@ export default function DodoListApp() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => deleteTodo(todo.id)}
+              onClick={() => handleDeleteTodo(todo.id)}
               className="text-slate-400 hover:text-red-500 hover:bg-red-50 h-7 w-7 p-0"
             >
               <Trash2 className="w-3.5 h-3.5" />
@@ -942,10 +913,6 @@ export default function DodoListApp() {
       </Card>
     )
   }
-
-  // Removed the inline ListMenuItem component definition as it's now part of the AppSidebar component
-
-  // Removed the inline AppSidebar component definition as it's now imported from a separate file
 
   return (
     <div className={`min-h-screen relative overflow-hidden ${activeColor.light}`}>
@@ -959,13 +926,13 @@ export default function DodoListApp() {
           setNewListName={setNewListName}
           isCreatingList={isCreatingList}
           setIsCreatingList={setIsCreatingList}
-          createNewList={createNewList}
+          createNewList={handleCreateNewList}
           updateListName={updateListName}
           togglePinList={togglePinList}
           toggleArchiveList={toggleArchiveList}
           cloneList={cloneList}
           updateListColor={updateListColor}
-          deleteList={deleteList}
+          deleteList={handleDeleteList}
           colors={colors}
           userProfile={userProfile}
           tempProfile={tempProfile}
@@ -975,8 +942,85 @@ export default function DodoListApp() {
           saveProfile={saveProfile}
           editingListId={editingListId}
           setEditingListId={setEditingListId}
+          onLogout={handleLogout}
         />
         <SidebarInset className="h-svh flex flex-col">
+          {/* Loading indicator */}
+          {loading && (
+            <div className="fixed inset-0 flex items-center justify-center bg-white/50 z-50">
+              <div className="text-center">
+                <Loader2 className="w-10 h-10 animate-spin text-blue-500 mx-auto mb-2" />
+                <p className="text-slate-600">Loading your tasks...</p>
+              </div>
+            </div>
+          )}
+          
+          {/* Error message */}
+          {error && (
+            <div className="fixed inset-0 flex items-center justify-center bg-white/50 z-50">
+              <div className="bg-white p-6 rounded-lg shadow-lg max-w-md">
+                <div className="flex items-center gap-3 text-red-500 mb-4">
+                  <AlertCircle className="w-6 h-6" />
+                  <h3 className="text-lg font-semibold">Error Loading Data</h3>
+                </div>
+                <p className="text-slate-600 mb-4">{error.message || "Failed to load your tasks. Please try refreshing the page."}</p>
+                <Button 
+                  onClick={() => window.location.reload()} 
+                  className="w-full"
+                >
+                  Refresh Page
+                </Button>
+              </div>
+            </div>
+          )}
+          
+          {/* Persistence Warning */}
+          {showPersistenceWarning && (
+            <div className="px-4 py-2 bg-amber-50 border-b border-amber-200">
+              <div className="flex items-start gap-2">
+                <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-amber-800">Your data is not being saved permanently</p>
+                  <p className="text-xs text-amber-700 mt-0.5">
+                    {persistenceError ? 
+                      `Database error: ${persistenceError}` : 
+                      "Your browser doesn't support persistent storage. Your tasks will be lost when you close this tab or refresh the page."}
+                  </p>
+                  {persistenceType === 'memory' && !persistenceError && (
+                    <div className="mt-1 text-xs text-amber-700">
+                      <p>For persistent storage, try:</p>
+                      <ul className="list-disc list-inside mt-0.5">
+                        <li>Using a modern browser like Chrome or Firefox</li>
+                        <li>Enable third-party cookies in your browser settings</li>
+                        <li>Try using a private/incognito window if storage is restricted</li>
+                      </ul>
+                    </div>
+                  )}
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowPersistenceWarning(false)}
+                  className="h-6 w-6 p-0 text-amber-600"
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Storage Type Indicator */}
+          {persistenceType && !showPersistenceWarning && (
+            <div className="px-4 py-1 bg-slate-50 border-b border-slate-200 flex items-center gap-2">
+              <Database className="w-4 h-4 text-slate-500" />
+              <span className="text-xs text-slate-600">
+                {persistenceType === 'opfs' ? 'Using Origin Private File System for storage' : 
+                 persistenceType === 'indexeddb' ? 'Using IndexedDB for storage' : 
+                 'Using in-memory storage (data will be lost when page is closed)'}
+              </span>
+            </div>
+          )}
+
           {/* Task Schedule Overlay */}
           {showTaskOptions && (
             <TaskScheduleOverlay
@@ -1125,12 +1169,12 @@ export default function DodoListApp() {
                       onKeyPress={handleKeyPress}
                       placeholder={`Add a task to ${activeList?.name}...`}
                       className="border-slate-200 focus:border-slate-300 focus:ring-slate-200 bg-white/80"
-                      disabled={activeList?.archived}
+                      disabled={activeList?.archived || loading}
                     />
                   </div>
                   <Button
-                    onClick={addTodo}
-                    disabled={!inputValue.trim() || activeList?.archived}
+                    onClick={handleAddTodo}
+                    disabled={!inputValue.trim() || activeList?.archived || loading}
                     className={`${activeList?.color} hover:opacity-90 text-white px-4`}
                   >
                     <Send className="w-4 h-4" />

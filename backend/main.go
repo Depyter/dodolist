@@ -25,6 +25,14 @@ func main() {
 		Automigrate: isGoRun,
 	})
 
+	if !isGoRun {
+		// Production: bind to all interfaces
+		app.RootCmd.SetArgs([]string{"serve", "--http=0.0.0.0:8080"})
+	} else {
+		// Development: you can still use localhost or bind to all
+		app.RootCmd.SetArgs([]string{"serve", "--http=0.0.0.0:8080"})
+	}
+
 	if err := app.Start(); err != nil {
 		log.Fatal(err)
 	}

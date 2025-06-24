@@ -1,5 +1,5 @@
 // API configuration
-const API_URL = import.meta.env.VITE_API_URL || '/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 // PocketBase configuration
 export const PB_URL = API_URL;

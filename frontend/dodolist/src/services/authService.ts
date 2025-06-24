@@ -6,7 +6,6 @@ export interface User {
   email: string
   username: string
   verified: boolean
-  name?: string
   avatar?: string
 }
 
@@ -20,7 +19,6 @@ export interface RegisterData {
   password: string
   passwordConfirm: string
   username: string
-  name?: string
 }
 
 export interface LoginData {
@@ -44,7 +42,6 @@ class AuthService {
         email: record.email,
         username: record.username,
         verified: record.verified,
-        name: record.name,
         avatar: record.avatar
       }
     } catch (error) {
@@ -67,7 +64,6 @@ class AuthService {
           email: authData.record.email,
           username: authData.record.username,
           verified: authData.record.verified,
-          name: authData.record.name,
           avatar: authData.record.avatar
         }
       }
@@ -97,7 +93,6 @@ class AuthService {
       email: model.email,
       username: model.username,
       verified: model.verified,
-      name: model.name,
       avatar: model.avatar
     }
   }
@@ -164,7 +159,6 @@ class AuthService {
         email: record.email,
         username: record.username,
         verified: record.verified,
-        name: record.name,
         avatar: record.avatar
       }
     } catch (error) {

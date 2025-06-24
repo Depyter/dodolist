@@ -23,7 +23,7 @@ COPY ./go.sum /pb/
 
 # Build custom PocketBase with migrations
 WORKDIR /pb
-RUN apk add --no-cache go
+RUN apk add go
 RUN go build -o pocketbase-custom main.go
 
 EXPOSE 8080

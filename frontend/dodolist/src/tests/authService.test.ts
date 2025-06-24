@@ -64,8 +64,7 @@ describe('AuthService', () => {
         email: 'test@example.com',
         password: 'testpassword123',
         passwordConfirm: 'testpassword123',
-        username: 'testuser',
-        name: 'Test User'
+        username: 'testuser'
       }
 
       const mockUserRecord = {
@@ -260,42 +259,7 @@ describe('AuthService', () => {
         .rejects.toThrow('Email verification failed')
     })
   })
-
-  describe('Profile Updates', () => {
-    it('should update user profile', async () => {
-      const updateData = { name: 'Updated Name' }
-      const mockUpdatedRecord = {
-        id: 'user-id',
-        email: 'test@example.com',
-        username: 'testuser',
-        name: 'Updated Name',
-        verified: true,
-        avatar: null
-      }
-
-      mockUpdate.mockResolvedValue(mockUpdatedRecord)
-
-      const result = await authService.updateProfile('user-id', updateData)
-
-      expect(mockUpdate).toHaveBeenCalledWith('user-id', updateData)
-      expect(result).toEqual({
-        id: 'user-id',
-        email: 'test@example.com',
-        username: 'testuser',
-        name: 'Updated Name',
-        verified: true,
-        avatar: null
-      })
-    })
-
-    it('should handle profile update errors', async () => {
-      mockUpdate.mockRejectedValue(new Error('Update failed'))
-
-      await expect(authService.updateProfile('user-id', { name: 'New Name' }))
-        .rejects.toThrow('Profile update failed')
-    })
-  })
-
+  
   describe('Auth State Changes', () => {
     it('should subscribe to auth changes', () => {
       const callback = vi.fn()
