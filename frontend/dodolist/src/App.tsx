@@ -12,15 +12,18 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         
-        {/* Protected routes */}
+        {/* Protected dynamic list route */}
         <Route 
-          path="/list" 
+          path="/list/:listId" 
           element={
             <ProtectedRoute>
               <TodoListPage />
             </ProtectedRoute>
           } 
         />
+        
+        {/* Redirect /list to first available list (optional, fallback) */}
+        <Route path="/list" element={<TodoListPage />} />
         
         {/* Redirect to /list by default */}
         <Route path="*" element={<Navigate to="/list" replace />} />
@@ -30,4 +33,3 @@ function App() {
 }
 
 export default App
-               

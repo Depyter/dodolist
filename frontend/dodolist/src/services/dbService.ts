@@ -28,6 +28,7 @@ class DbService {
   private dbId: string | null = null;
   private initPromise: Promise<void> | null = null;
   private storageType: 'opfs' | 'indexeddb' | 'memory' = 'memory';
+  private pendingOperations: any[] = []; // Track pending operations
 
   constructor() {
     this.initPromise = this.initDb();
@@ -226,6 +227,11 @@ class DbService {
       console.error(`${errorMessage}:`, error);
       return fallback;
     }
+  }
+
+  // Add a method to check for pending operations
+  hasPendingOperations(): boolean {
+    return this.pendingOperations.length > 0;
   }
 
   // Todo Lists Methods

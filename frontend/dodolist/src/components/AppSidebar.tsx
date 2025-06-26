@@ -1,4 +1,4 @@
-import { memo, useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState, useCallback } from "react";
 import { useSidebar } from "@/components/ui/sidebar";
 import {
   Sidebar,
@@ -101,6 +101,9 @@ const ListMenuItem = memo(
     const [currentName, setCurrentName] = useState(list.name);
     const [renameIntent, setRenameIntent] = useState(false);
     const [dropdownOpen, setDropdownOpen] = useState(false);
+    const { isMobile, setOpenMobile } = useSidebar(); // Use the hook
+    const navigate = useNavigate();
+    const lastNavRef = useRef<number>(0);
 
     // Sync local state if the prop changes from parent
     useEffect(() => {
@@ -109,17 +112,21 @@ const ListMenuItem = memo(
 
     const listColor = colors.find((color) => color.value === list.color) || colors[0];
     const activeTaskCount = list.todos.filter((todo) => !todo.completed).length;
-    const { isMobile, setOpenMobile } = useSidebar();
 
-    const handleListClick = () => {
-      if (editingListId !== list.id) {
-        onListClick(list.id);
-        // Close sidebar on mobile when a list is clicked
-        if (isMobile) {
-          setOpenMobile(false);
-        }
+    // Memoized navigation handler with guards
+    const handleListClick = useCallback(() => {
+      if (editingListId === list.id) return;
+      // Prevent rapid successive navigations (e.g., double click)
+      const now = Date.now();
+      if (now - lastNavRef.current < 400) return;
+      lastNavRef.current = now;
+      // Only navigate if not already on this list
+      if (window.location.pathname !== `/list/${list.id}`) {
+        navigate(`/list/${list.id}`, { replace: true });
       }
-    };
+      onListClick(list.id);
+      if (isMobile) setOpenMobile(false);
+    }, [editingListId, list.id, navigate, onListClick, isMobile, setOpenMobile]);
 
     const handleRename = () => {
       setRenameIntent(true);
@@ -177,79 +184,82 @@ const ListMenuItem = memo(
           </span>
         </SidebarMenuButton>
 
-        <SidebarMenuAction showOnHover>
-          <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                aria-label="More list options"
-                className={`h-6 w-6 p-0 ${activeColor.darkText} hover:bg-white/20 focus:bg-white/20 focus:ring-2 focus:ring-white/30`}
-              >
-                <MoreHorizontal className="w-3 h-3" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align="end"
-              className="bg-white/95 backdrop-blur-sm"
-              onCloseAutoFocus={(e) => {
-                if (renameIntent) {
-                  e.preventDefault();
-                  if (inputRef.current) {
-                    const len = inputRef.current.value.length;
-                    inputRef.current.focus();
-                    inputRef.current.setSelectionRange(len, len);
+        {/* Hide menu actions on mobile */}
+        {!isMobile && (
+          <SidebarMenuAction showOnHover>
+            <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  aria-label="More list options"
+                  className={`h-6 w-6 p-0 ${activeColor.darkText} hover:bg-white/20 focus:bg-white/20 focus:ring-2 focus:ring-white/30`}
+                >
+                  <MoreHorizontal className="w-3 h-3" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="end"
+                className="bg-white/95 backdrop-blur-sm"
+                onCloseAutoFocus={(e) => {
+                  if (renameIntent) {
+                    e.preventDefault();
+                    if (inputRef.current) {
+                      const len = inputRef.current.value.length;
+                      inputRef.current.focus();
+                      inputRef.current.setSelectionRange(len, len);
+                    }
+                    setRenameIntent(false);
                   }
-                  setRenameIntent(false);
-                }
-              }}
-            >
-              {!isArchived && (
-                <DropdownMenuItem onClick={() => togglePinList(list.id)}>
-                  {list.pinned ? <PinOff className="w-4 h-4 mr-2" /> : <Pin className="w-4 h-4 mr-2" />}
-                  {list.pinned ? "Unpin" : "Pin"} List
-                </DropdownMenuItem>
-              )}
-              <DropdownMenuItem onClick={() => toggleArchiveList(list.id)}>
-                {list.archived ? <ArchiveRestore className="w-4 h-4 mr-2" /> : <Archive className="w-4 h-4 mr-2" />}
-                {list.archived ? "Unarchive" : "Archive"} List
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleRename}>
-                <Edit3 className="w-4 h-4 mr-2" />
-                Rename
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => cloneList(list.id)}>
-                <Copy className="w-4 h-4 mr-2" />
-                Clone List
-              </DropdownMenuItem>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <DropdownMenuItem>
-                    <Palette className="w-4 h-4 mr-2" />
-                    Change Color
+                }}
+              >
+                {!isArchived && (
+                  <DropdownMenuItem onClick={() => togglePinList(list.id)}>
+                    {list.pinned ? <PinOff className="w-4 h-4 mr-2" /> : <Pin className="w-4 h-4 mr-2" />}
+                    {list.pinned ? "Unpin" : "Pin"} List
                   </DropdownMenuItem>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent side="right">
-                  <div className="grid grid-cols-4 gap-2 p-2">
-                    {colors.map((color) => (
-                      <button
-                        key={color.value}
-                        className={`w-6 h-6 rounded-full ${color.value} hover:scale-110 transition-transform`}
-                        onClick={() => handleColorSelect(color.value)}
-                      />
-                    ))}
-                  </div>
-                </DropdownMenuContent>
-              </DropdownMenu>
-              {todoLists.length > 1 && (
-                <DropdownMenuItem onClick={() => deleteList(list.id)} className="text-red-600">
-                  <Trash2 className="w-4 h-4 mr-2" />
-                  Delete
+                )}
+                <DropdownMenuItem onClick={() => toggleArchiveList(list.id)}>
+                  {list.archived ? <ArchiveRestore className="w-4 h-4 mr-2" /> : <Archive className="w-4 h-4 mr-2" />}
+                  {list.archived ? "Unarchive" : "Archive"} List
                 </DropdownMenuItem>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </SidebarMenuAction>
+                <DropdownMenuItem onClick={handleRename}>
+                  <Edit3 className="w-4 h-4 mr-2" />
+                  Rename
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => cloneList(list.id)}>
+                  <Copy className="w-4 h-4 mr-2" />
+                  Clone List
+                </DropdownMenuItem>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <DropdownMenuItem>
+                      <Palette className="w-4 h-4 mr-2" />
+                      Change Color
+                    </DropdownMenuItem>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent side="right">
+                    <div className="grid grid-cols-4 gap-2 p-2">
+                      {colors.map((color) => (
+                        <button
+                          key={color.value}
+                          className={`w-6 h-6 rounded-full ${color.value} hover:scale-110 transition-transform`}
+                          onClick={() => handleColorSelect(color.value)}
+                        />
+                      ))}
+                    </div>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                {todoLists.length > 1 && (
+                  <DropdownMenuItem onClick={() => deleteList(list.id)} className="text-red-600">
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Delete
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </SidebarMenuAction>
+        )}
       </SidebarMenuItem>
     );
   }
@@ -340,9 +350,12 @@ const AppSidebar = memo(({
   const pinnedLists = activeLists.filter((list) => list.pinned);
   const unpinnedLists = activeLists.filter((list) => !list.pinned);
 
-  const handleListClick = (listId: string) => {
+  // Memoized sidebar navigation handler with guards
+  const handleSidebarListClick = useCallback((listId: string) => {
+    // Prevent rapid navigation and unnecessary state updates
+    if (activeListId === listId) return;
     setActiveListId(listId);
-  };
+  }, [activeListId, setActiveListId]);
 
   // Track the previous list ids to detect when a new list is added
   const prevListIdsRef = useRef<string[]>(todoLists.map(list => list.id));
@@ -446,7 +459,7 @@ const AppSidebar = memo(({
                     updateListColor={updateListColor}
                     deleteList={deleteList}
                     todoLists={todoLists}
-                    onListClick={handleListClick}
+                    onListClick={handleSidebarListClick}
                     colors={colors}
                   />
                 ))}
@@ -478,7 +491,7 @@ const AppSidebar = memo(({
                     updateListColor={updateListColor}
                     deleteList={deleteList}
                     todoLists={todoLists}
-                    onListClick={handleListClick}
+                    onListClick={handleSidebarListClick}
                     colors={colors}
                   />
                 ))}
@@ -509,7 +522,7 @@ const AppSidebar = memo(({
                     updateListColor={updateListColor}
                     deleteList={deleteList}
                     todoLists={todoLists}
-                    onListClick={handleListClick}
+                    onListClick={handleSidebarListClick}
                     colors={colors}
                   />
                 ))}
