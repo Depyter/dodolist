@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Loader } from "@/components/ui/loader";
 import {
   MoreHorizontal,
   Plus,
@@ -27,12 +28,16 @@ import {
   Palette,
   Trash2,
   Settings,
+  Cloud,
+  CloudOff,
+  Loader2
 } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { useNavigate } from 'react-router-dom'
 import AuthService from '@/services/authService'
+import type { TodoList } from '@/services/todoService';
 
 interface Color {
   name: string;
@@ -43,16 +48,6 @@ interface Color {
   dark: string;
   darkText: string;
   texture: string;
-}
-
-interface TodoList {
-  id: string;
-  name: string;
-  color: string;
-  todos: any[];
-  createdAt: Date;
-  pinned?: boolean;
-  archived?: boolean;
 }
 
 interface UserProfile {
@@ -101,26 +96,30 @@ const ListMenuItem = memo(
     const [currentName, setCurrentName] = useState(list.name);
     const [renameIntent, setRenameIntent] = useState(false);
     const [dropdownOpen, setDropdownOpen] = useState(false);
-    const { isMobile, setOpenMobile } = useSidebar(); // Use the hook
+    const { isMobile, setOpenMobile } = useSidebar();
     const navigate = useNavigate();
     const lastNavRef = useRef<number>(0);
 
-    // Sync local state if the prop changes from parent
     useEffect(() => {
       setCurrentName(list.name);
     }, [list.name]);
 
+    useEffect(() => {
+      if (editingListId === list.id && inputRef.current) {
+        inputRef.current.focus();
+        const len = inputRef.current.value.length;
+        inputRef.current.setSelectionRange(len, len);
+      }
+    }, [editingListId, list.id]);
+
     const listColor = colors.find((color) => color.value === list.color) || colors[0];
     const activeTaskCount = list.todos.filter((todo) => !todo.completed).length;
 
-    // Memoized navigation handler with guards
     const handleListClick = useCallback(() => {
       if (editingListId === list.id) return;
-      // Prevent rapid successive navigations (e.g., double click)
       const now = Date.now();
       if (now - lastNavRef.current < 400) return;
       lastNavRef.current = now;
-      // Only navigate if not already on this list
       if (window.location.pathname !== `/list/${list.id}`) {
         navigate(`/list/${list.id}`, { replace: true });
       }
@@ -137,7 +136,7 @@ const ListMenuItem = memo(
       if (currentName.trim()) {
         updateListName(list.id, currentName.trim());
       } else {
-        setCurrentName(list.name); // Revert if the name is empty
+        setCurrentName(list.name);
       }
     };
 
@@ -177,16 +176,23 @@ const ListMenuItem = memo(
               className="flex-1 h-6 text-sm border-none p-0 focus:ring-0 focus:outline-none bg-transparent selection:bg-white/30"
             />
           ) : (
-            <span className="flex-1 truncate">{list.name}</span>
+            <span
+              className="flex-1 truncate"
+              onDoubleClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                handleRename();
+              }}
+            >
+              {list.name}
+            </span>
           )}
           <span className={`text-xs ml-auto font-medium ${isActive ? listColor.text : `${activeColor.darkText} opacity-60`}`}>
             {activeTaskCount}
           </span>
         </SidebarMenuButton>
 
-        {/* Hide menu actions on mobile */}
-        {!isMobile && (
-          <SidebarMenuAction showOnHover>
+        <SidebarMenuAction showOnHover>
             <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -223,14 +229,6 @@ const ListMenuItem = memo(
                   {list.archived ? <ArchiveRestore className="w-4 h-4 mr-2" /> : <Archive className="w-4 h-4 mr-2" />}
                   {list.archived ? "Unarchive" : "Archive"} List
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleRename}>
-                  <Edit3 className="w-4 h-4 mr-2" />
-                  Rename
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => cloneList(list.id)}>
-                  <Copy className="w-4 h-4 mr-2" />
-                  Clone List
-                </DropdownMenuItem>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <DropdownMenuItem>
@@ -259,7 +257,6 @@ const ListMenuItem = memo(
               </DropdownMenuContent>
             </DropdownMenu>
           </SidebarMenuAction>
-        )}
       </SidebarMenuItem>
     );
   }
@@ -273,8 +270,9 @@ interface AppSidebarProps {
   setActiveListId: (id: string) => void;
   newListName: string;
   setNewListName: (name: string) => void;
-  isCreatingList: boolean;
-  setIsCreatingList: (creating: boolean) => void;
+  showNewListInput: boolean;
+  setShowNewListInput: (show: boolean) => void;
+  isAddingList: boolean;
   createNewList: () => void;
   updateListName: (listId: string, newName: string) => void;
   togglePinList: (listId: string) => void;
@@ -300,8 +298,9 @@ const AppSidebar = memo(({
   setActiveListId,
   newListName,
   setNewListName,
-  isCreatingList,
-  setIsCreatingList,
+  showNewListInput,
+  setShowNewListInput,
+  isAddingList,
   createNewList,
   updateListName,
   togglePinList,
@@ -324,7 +323,6 @@ const AppSidebar = memo(({
   const [authService] = useState(() => new AuthService())
   const [currentUser, setCurrentUser] = useState(authService.getCurrentUser())
   
-  // Get authenticated user on component mount
   useEffect(() => {
     const user = authService.getCurrentUser()
     if (user) {
@@ -344,36 +342,25 @@ const AppSidebar = memo(({
   const activeList = todoLists.find((list) => list.id === activeListId);
   const activeColor = colors.find((color) => color.value === activeList?.color) || colors[0];
 
-  // Separate lists by status
   const activeLists = todoLists.filter((list) => !list.archived);
   const archivedLists = todoLists.filter((list) => list.archived);
   const pinnedLists = activeLists.filter((list) => list.pinned);
   const unpinnedLists = activeLists.filter((list) => !list.pinned);
 
-  // Memoized sidebar navigation handler with guards
   const handleSidebarListClick = useCallback((listId: string) => {
-    // Prevent rapid navigation and unnecessary state updates
     if (activeListId === listId) return;
     setActiveListId(listId);
   }, [activeListId, setActiveListId]);
 
-  // Track the previous list ids to detect when a new list is added
   const prevListIdsRef = useRef<string[]>(todoLists.map(list => list.id));
   
-  // Focus on the newly created list when it's added
   useEffect(() => {
-    // Get current list ids
     const currentListIds = todoLists.map(list => list.id);
-    
-    // If we have more lists than before, find the newly added list id
     if (currentListIds.length > prevListIdsRef.current.length) {
-      // Find the id that is in the current list but not in the previous list
       const newListId = currentListIds.find(id => !prevListIdsRef.current.includes(id));
-      
       if (newListId) {
-        // Use a small timeout to ensure the DOM has updated
+        navigate(`/list/${newListId}`);
         setTimeout(() => {
-          // Find the button for the newly created list and focus it
           const newListButton = document.querySelector(`[data-list-id="${newListId}"]`) as HTMLButtonElement;
           if (newListButton) {
             newListButton.focus();
@@ -381,20 +368,15 @@ const AppSidebar = memo(({
         }, 50);
       }
     }
-    
-    // Update the previous list ids
     prevListIdsRef.current = currentListIds;
-  }, [todoLists]);
+  }, [todoLists, navigate]);
+
+  
 
   return (
     <Sidebar className="border-r-0 overflow-hidden">
-      {/* Base solid color background for the sidebar */}
       <div className={`absolute inset-0 ${activeColor.dark}`} />
-      
-      {/* Direct noise texture instead of using the component */}
       <div className="absolute inset-0 noise-texture-subtle" style={{ opacity: 0.13, mixBlendMode: 'screen' }} />
-      
-      {/* Add a slight overlay for better contrast */}
       <div className="absolute inset-0 bg-black/5" />
       
       <SidebarHeader className="relative z-10">
@@ -402,15 +384,14 @@ const AppSidebar = memo(({
           <h1 className={`text-xl font-semibold ${activeColor.darkText}`}>DodoList</h1>
           <p className={`text-sm mb-4 ${activeColor.darkText} opacity-80`}>No Dodos were hurt.</p>
 
-          {/* New List Creation */}
-          {isCreatingList ? (
+          {showNewListInput ? (
             <div className="flex gap-2">
               <Input
                 value={newListName}
                 onChange={(e) => setNewListName(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") createNewList();
-                  if (e.key === "Escape") setIsCreatingList(false);
+                  if (e.key === "Escape") setShowNewListInput(false);
                 }}
                 placeholder="List name"
                 className="flex-1 h-8 text-sm bg-white/10 border-white/20 text-white placeholder:text-white/60"
@@ -420,6 +401,7 @@ const AppSidebar = memo(({
                 size="sm"
                 onClick={createNewList}
                 className={`h-8 ${activeList?.color} text-white hover:opacity-90`}
+                loading={isAddingList}
               >
                 <Plus className="w-3 h-3" />
               </Button>
@@ -427,7 +409,7 @@ const AppSidebar = memo(({
           ) : (
             <Button
               variant="ghost"
-              onClick={() => setIsCreatingList(true)}
+              onClick={() => setShowNewListInput(true)}
               className={`w-full justify-start ${activeColor.darkText} hover:bg-white/10 border border-white/20`}
             >
               <Plus className="w-4 h-4 mr-2" />
@@ -438,7 +420,6 @@ const AppSidebar = memo(({
       </SidebarHeader>
 
       <SidebarContent className="relative z-10">
-        {/* Pinned Lists Section */}
         {pinnedLists.length > 0 && (
           <SidebarGroup>
             <SidebarGroupLabel className={`${activeColor.darkText} opacity-80`}>Pinned Lists</SidebarGroupLabel>
@@ -468,7 +449,6 @@ const AppSidebar = memo(({
           </SidebarGroup>
         )}
 
-        {/* Active Lists Section */}
         {unpinnedLists.length > 0 && (
           <SidebarGroup>
             <SidebarGroupLabel className={`${activeColor.darkText} opacity-80`}>
@@ -500,7 +480,6 @@ const AppSidebar = memo(({
           </SidebarGroup>
         )}
 
-        {/* Archived Lists Section */}
         {archivedLists.length > 0 && (
           <SidebarGroup>
             <SidebarGroupLabel className={`${activeColor.darkText} opacity-80`}>Archived</SidebarGroupLabel>
@@ -539,7 +518,6 @@ const AppSidebar = memo(({
               <DialogTrigger asChild>
                 <SidebarMenuButton
                   onClick={() => {
-                    // If we have a current user, use their data for the temp profile
                     if (currentUser) {
                       setTempProfile({
                         name: currentUser.username,
@@ -559,7 +537,7 @@ const AppSidebar = memo(({
                   ) : (
                     <div className={`w-8 h-8 rounded-full ${activeColor.value} flex items-center justify-center flex-shrink-0`}>
                       <span className="text-white font-medium">
-                        {currentUser ? currentUser.username.charAt(0).toUpperCase() : 'U'}
+                        {currentUser?.username?.charAt(0)?.toUpperCase() || 'U'}
                       </span>
                     </div>
                   )}
@@ -592,7 +570,7 @@ const AppSidebar = memo(({
                       type="email"
                       value={tempProfile.email}
                       onChange={(e) => setTempProfile({ ...tempProfile, email: e.target.value })}
-                      disabled={!!currentUser} // Disable email editing if using real auth
+                      disabled={!!currentUser}
                     />
                   </div>
                   <div className="flex gap-2 pt-4">

@@ -17,7 +17,6 @@ export default function RegisterPage() {
     passwordConfirm: '',
   })
   
-  // Check if user is already authenticated
   useEffect(() => {
     if (authService.isAuthenticated()) {
       navigate('/list');
@@ -65,12 +64,12 @@ export default function RegisterPage() {
 
     try {
       await authService.register(formData)
-      // After registration, log the user in
       await authService.login({
         identity: formData.email,
         password: formData.password
       })
       navigate('/list')
+      window.location.reload(); // Force a reload to re-initialize services
     } catch (error) {
       setErrors({ 
         general: error instanceof Error ? error.message : 'Registration failed' 
@@ -84,7 +83,6 @@ export default function RegisterPage() {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
     
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }))
     }
@@ -180,6 +178,7 @@ export default function RegisterPage() {
                 type="submit" 
                 disabled={isLoading}
                 className="w-full"
+                loading={isLoading}
               >
                 {isLoading ? 'Creating Account...' : 'Create Account'}
               </Button>

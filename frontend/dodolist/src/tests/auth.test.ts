@@ -1,32 +1,12 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
-import PocketBase from 'pocketbase'
-import { PB_URL } from '../config'
-
-// Create a proper mock implementation
-const mockAuthStore = {
-  isValid: false,
-  model: null,
-  token: null,
-  clear: vi.fn()
-}
-
-// Mock PocketBase with proper structure
-vi.mock('pocketbase', () => {
-  return {
-    default: vi.fn().mockImplementation(() => {
-      return {
-        collection: vi.fn(),
-        authStore: mockAuthStore
-      }
-    })
-  }
-})
+import { describe, it, beforeEach, vi, expect } from 'vitest'
+import { pb, mockAuthStore } from './setup'
 
 describe('PocketBase Authentication', () => {
-  let pb: PocketBase
-  
   beforeEach(() => {
-    pb = new PocketBase(PB_URL)
+    mockAuthStore.isValid = false
+    mockAuthStore.model = null
+    mockAuthStore.token = ''
+    mockAuthStore.clear.mockClear()
     vi.clearAllMocks()
   })
 
@@ -133,8 +113,8 @@ describe('PocketBase Authentication', () => {
         requestPasswordReset: mockRequestPasswordReset
       })
 
-      await pb.collection('users').requestPasswordReset('test@example.com')
-
+      // TypeScript fix: assert the method exists (mock always provides it)
+      await (pb.collection('users').requestPasswordReset! as Function)('test@example.com')
       expect(mockRequestPasswordReset).toHaveBeenCalledWith('test@example.com')
     })
   })

@@ -10,10 +10,8 @@ export default function LoginPage() {
   const location = useLocation()
   const [authService] = useState(() => new AuthService())
 
-  // Check if we were redirected from a protected route
   const from = location.state?.from?.pathname || '/list'
 
-  // Check if user is already authenticated
   useEffect(() => {
     if (authService.isAuthenticated()) {
       navigate(from, { replace: true });
@@ -21,8 +19,8 @@ export default function LoginPage() {
   }, [navigate, authService, from]);
 
   const handleLoginSuccess = () => {
-    // Navigate to the page the user tried to visit before being redirected to login
     navigate(from, { replace: true })
+    window.location.reload(); // Force a reload to re-initialize services
   }
 
   return (

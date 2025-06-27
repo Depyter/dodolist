@@ -1,5 +1,8 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import AuthService, { type LoginData } from '../services/authService'
 
 interface LoginFormProps {
@@ -14,6 +17,7 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [isLoading, setIsLoading] = useState(false)
+  const navigate = useNavigate()
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {}
@@ -64,18 +68,16 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <label htmlFor="identity" className="block text-sm font-medium text-gray-700">
-          Email
-        </label>
-        <input
+      {errors.general && <p className="text-sm text-red-600 text-center">{errors.general}</p>}
+      <div className="space-y-2">
+        <Label htmlFor="identity">Email or Username</Label>
+        <Input
           id="identity"
           name="identity"
-          type="email"
+          type="text"
           value={formData.identity}
           onChange={handleChange}
           disabled={isLoading}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
           aria-describedby={errors.identity ? 'identity-error' : undefined}
         />
         {errors.identity && (
@@ -85,18 +87,15 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
         )}
       </div>
 
-      <div>
-        <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-          Password
-        </label>
-        <input
+      <div className="space-y-2">
+        <Label htmlFor="password">Password</Label>
+        <Input
           id="password"
           name="password"
           type="password"
           value={formData.password}
           onChange={handleChange}
           disabled={isLoading}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
           aria-describedby={errors.password ? 'password-error' : undefined}
         />
         {errors.password && (
@@ -106,16 +105,13 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
         )}
       </div>
 
-      {errors.general && (
-        <p className="text-sm text-red-600">{errors.general}</p>
-      )}
-
       <Button 
         type="submit" 
         disabled={isLoading}
         className="w-full"
+        loading={isLoading}
       >
-        {isLoading ? 'Signing In...' : 'Sign In'}
+        Sign In
       </Button>
     </form>
   )

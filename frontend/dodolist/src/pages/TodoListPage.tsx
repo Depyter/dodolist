@@ -3,8 +3,14 @@
 import type React from "react"
 import { useState, useEffect, useCallback } from "react"
 import { useParams, useNavigate } from "react-router-dom"
-import AuthService from "@/services/authService"
-import { usePersistentTodoLists } from "@/services/todoService"
+import AuthService, { type User } from "@/services/authService"
+
+interface UserProfile {
+  name: string;
+  email: string;
+  avatar?: string;
+}
+import { usePersistentTodoLists, type Todo, type TodoList } from "@/services/todoService"
 import { useIsMobile } from "@/hooks/use-mobile";
 
 import { Button } from "@/components/ui/button"
@@ -49,28 +55,9 @@ import AppSidebar from "@/components/AppSidebar"
 import TexturedBackground from "@/components/TexturedBackground"
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { toast } from "sonner"
-import { Toaster } from "sonner";
+import { Toaster } from "@/components/ui/sonner";
 
-// We're using the Todo and TodoList interfaces from todoService.ts,
-// but we'll still define them here to maintain type safety without refactoring the whole file
-interface Todo {
-  id: string
-  text: string
-  description?: string
-  completed: boolean
-  createdAt: Date
-  completedAt?: Date
-  deadline?: Date
-  reminder?: Date
-  recurring?: "none" | "daily" | "weekly" | "monthly"
-  listId: string
-}
 
-interface UserProfile {
-  name: string
-  email: string
-  avatar?: string
-}
 
 const colors = [
   {
@@ -168,41 +155,11 @@ export default function DodoListApp() {
   }
   
   // State for persistence notification
-  const [showPersistenceWarning, setShowPersistenceWarning] = useState(false);
-  const [persistenceType, setPersistenceType] = useState<'memory' | 'indexeddb' | 'opfs' | null>(null);
-  const [persistenceError, setPersistenceError] = useState<string | null>(null);
   
   // Persistence detection
-  useEffect(() => {
-    // Listen for messages from dbService about persistence type
-    const handleStorageInfo = (event: any) => {
-      if (event.detail?.type === 'persistence-info') {
-        setPersistenceType(event.detail.storageType);
-        setShowPersistenceWarning(event.detail.storageType === 'memory');
-        setPersistenceError(event.detail.error || null);
-        
-        // Log detailed info for debugging
-        console.log('Storage persistence info:', {
-          type: event.detail.storageType,
-          persistent: event.detail.persistent,
-          error: event.detail.error
-        });
-      }
-    };
-    
-    // Add event listener for custom event
-    window.addEventListener('dodolist-storage-info', handleStorageInfo);
-    
-    // Cleanup
-    return () => {
-      window.removeEventListener('dodolist-storage-info', handleStorageInfo);
-    };
-  }, []);
   
-  // State to toggle collaborative mode (for demonstration)
-  const [isCollaborativeMode, setIsCollaborativeMode] = useState(false);
-
-  // Use the persistence hook, passing the collaborative mode flag
+  
+  // Use the persistence hook
   const {
     todoLists,
     loading,
@@ -216,45 +173,32 @@ export default function DodoListApp() {
     updateTodo: updateTodoItem,
     toggleTodo,
     deleteTodo,
-    loadTodoLists
-  } = usePersistentTodoLists(isCollaborativeMode);
+    batchAddTodos
+  } = usePersistentTodoLists();
+
+  
   
   const [inputValue, setInputValue] = useState("")
   const [newListName, setNewListName] = useState("")
-  const [isCreatingList, setIsCreatingList] = useState(false)
+  const [showNewListInput, setShowNewListInput] = useState(false)
+  const [isAddingList, setIsAddingList] = useState(false)
+  const [isAddingTodo, setIsAddingTodo] = useState(false)
   const [editingListName, setEditingListName] = useState<string | null>(null); // New state for editing list name
   const [showTaskOptions, setShowTaskOptions] = useState<string | null>(null)
   const [progressAnimating, setProgressAnimating] = useState(false)
   const [userProfile, setUserProfile] = useState<UserProfile>({
-    name: "John Doe",
-    email: "john@example.com",
+    name: "",
+    email: "",
   })
   const [isEditingProfile, setIsEditingProfile] = useState(false)
   const [tempProfile, setTempProfile] = useState<UserProfile>(userProfile)
   const [showCompleted, setShowCompleted] = useState(true)
 
   const [editingListId, setEditingListId] = useState<string | null>(null)
+  const [isEditingHeader, setIsEditingHeader] = useState(false);
 
   const activeList = todoLists.find((list) => list.id === activeListId)
   const activeColor = colors.find((color) => color.value === activeList?.color) || colors[0]
-
-  // --- COLLABORATIVE TODO STATE --- (Removed as Yjs is handled in the hook)
-  // const [collabTodos, setCollabTodos] = useState<Todo[]>([])
-  // const [yTodos, setYTodos] = useState<Y.Array<any> | null>(null)
-  // const [provider, setProvider] = useState<YjsTodoListProvider | null>(null)
-  // const [yDoc, setYDoc] = useState<Y.Doc | null>(null)
-
-  // --- Helper: are we in collaborative mode? ---
-  const isCollaborative = isCollaborativeMode; // Use the state variable
-
-  // --- Collaborative todo handlers --- (Removed as handled in the hook)
-  // const handleAddTodoCollab = (text: string) => { ... }
-  // const handleToggleTodoCollab = (todoId: string) => { ... }
-  // const handleDeleteTodoCollab = (todoId: string) => { ... }
-  // const handleUpdateTodoCollab = (todoId: string, updates: Partial<Todo>) => { ... }
-
-  // --- Yjs integration --- (Removed as handled in the hook)
-  // useEffect(() => { ... }, [activeListId])
 
   const todosToUse = activeList?.todos || []; // Use todos directly from the hook's state
   const activeTodos = todosToUse.filter((todo) => !todo.completed)
@@ -270,8 +214,7 @@ export default function DodoListApp() {
   useEffect(() => {
     console.log("Active List ID:", activeListId)
     console.log("Active List Todos:", activeList?.todos)
-    console.log("Is Collaborative Mode:", isCollaborativeMode) // Use isCollaborativeMode
-  }, [activeListId, activeList?.todos, isCollaborativeMode]) // Use isCollaborativeMode dependency
+  }, [activeListId, activeList?.todos])
 
   const totalCount = activeList?.todos.length || 0
   const activeCount = activeTodos.length
@@ -287,11 +230,14 @@ export default function DodoListApp() {
   // Handle adding a new todo (updated to directly use the hook's function)
   const handleAddTodo = async () => {
     if (inputValue.trim() && activeListId) {
+      setIsAddingTodo(true);
       try {
-        await addTodo(inputValue.trim(), activeListId) // Directly call the hook's function
+        await addTodo({ text: inputValue.trim(), listId: activeListId });
         setInputValue("")
       } catch (err) {
         console.error("Error adding todo:", err)
+      } finally {
+        setIsAddingTodo(false);
       }
     }
   }
@@ -335,13 +281,16 @@ export default function DodoListApp() {
   // Handle creating a new list (updated to use our persistence service)
   const handleCreateNewList = async () => {
     if (newListName.trim()) {
+      setIsAddingList(true);
       try {
         const color = colors[Math.floor(Math.random() * colors.length)].value;
         await createNewList(newListName.trim(), color);
         setNewListName("");
-        setIsCreatingList(false);
+        setShowNewListInput(false);
       } catch (err) {
         console.error("Error creating list:", err);
+      } finally {
+        setIsAddingList(false);
       }
     }
   }
@@ -353,27 +302,22 @@ export default function DodoListApp() {
 
     try {
       // Create a new list with a copy name
-      await createNewList(`${listToClone.name} (Copy)`, listToClone.color);
-      // Reload lists to get the new list (ensure up-to-date state)
-      await loadTodoLists();
-      // Wait for the new list to appear in todoLists (max 1.5s)
-      let newList: typeof listToClone | undefined;
-      for (let i = 0; i < 15; i++) {
-        newList = todoLists.find(list => list.name === `${listToClone.name} (Copy)`);
-        if (newList) break;
-        await new Promise(res => setTimeout(res, 100));
-      }
-      // If not found, fallback to most recent list with the copy name
-      if (!newList) {
-        newList = [...todoLists].reverse().find(list => list.name === `${listToClone.name} (Copy)`);
-      }
-      // Add all the todos from the original list to the new list
-      if (newList) {
-        for (const todo of listToClone.todos) {
-          // Add todo and then update with all fields except id and listId
-          await addTodo(todo.text, newList.id);
-          // Optionally, update the new todo with more fields if needed
-        }
+      const newListId = await createNewList(`${listToClone.name} (Copy)`, listToClone.color);
+      
+      // If the new list was created, clone the todos
+      if (newListId) {
+        const todosToClone = listToClone.todos.map(todo => ({
+          listId: newListId,
+          text: todo.text,
+          description: todo.description,
+          completed: false, // Cloned tasks are active by default
+          createdAt: new Date(),
+          deadline: todo.deadline,
+          reminder: todo.reminder,
+          recurring: todo.recurring,
+        }));
+        await batchAddTodos(todosToClone);
+        
       }
     } catch (err) {
       console.error("Error cloning list:", err);
@@ -390,15 +334,26 @@ export default function DodoListApp() {
   }
 
   // Update list name (updated to use our persistence service)
-  const updateListName = useCallback(async (listId: string, newName: string) => {
-    // newName is guaranteed to be non-empty and trimmed by the calling UI logic
+  const handleUpdateListName = useCallback(async (listId: string, newName: string | null) => {
+    const trimmedName = newName?.trim();
+    if (!trimmedName) {
+      toast.error("List name cannot be empty.", {
+        description: "Please enter a valid name for your list.",
+      });
+      return;
+    }
     try {
-      await updateList(listId, { name: newName }); // Use newName directly, it's already trimmed
+      await updateList(listId, { name: trimmedName });
+      setEditingListId(null);
+      setEditingListName(null);
+      (document.activeElement as HTMLElement)?.blur();
     } catch (err) {
       console.error("Error updating list name:", err);
+      toast.error("Failed to update list name.", {
+        description: "Please try again.",
+      });
     }
-    // We don't reset editingListId here to allow for continuous editing
-  }, [updateList])
+  }, [updateList]);
 
   // Update list color (updated to use our persistence service)
   const updateListColor = async (listId: string, newColor: string) => {
@@ -875,6 +830,7 @@ export default function DodoListApp() {
           <button
             onClick={() => handleToggleTodo(todo.id)}
             className="mt-0.5 text-slate-400 hover:text-slate-600 transition-colors min-w-[20px]"
+            aria-label="Toggle completion"
           >
             {todo.completed ? (
               <CheckCircle2 className={`w-4 h-4 ${activeList?.color.replace("bg-", "text-")}`} />
@@ -941,6 +897,7 @@ export default function DodoListApp() {
               size="sm"
               onClick={() => handleDeleteTodo(todo.id)}
               className="text-slate-400 hover:text-red-500 hover:bg-red-50 h-7 w-7 p-0"
+              title="Delete task"
             >
               <Trash2 className="w-3.5 h-3.5" />
             </Button>
@@ -950,21 +907,13 @@ export default function DodoListApp() {
     )
   }
 
-  const handleRenameListFromHeader = (listId: string) => {
-    const listToRename = todoLists.find((list) => list.id === listId);
-    if (!listToRename) return;
-
-    setEditingListId(listId);
-    setEditingListName(listToRename.name); // Initialize editingListName when starting edit
-  };
-
   // Only set activeListId from the URL param if it changes
   useEffect(() => {
     if (listId && listId !== activeListId) {
       setActiveListId(listId);
     }
     // Do NOT navigate here
-  }, [listId, activeListId, setActiveListId]);
+  }, [listId, setActiveListId]);
 
   // Only redirect to the first available list if there is no listId in the URL (on initial mount)
   useEffect(() => {
@@ -976,7 +925,7 @@ export default function DodoListApp() {
     }
     // Only run on mount or when lists change
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [listId, todoLists.length, activeListId]);
+  }, [listId, todoLists.length, navigate]);
 
   return (
     <div className={`min-h-screen relative overflow-hidden ${activeColor.light}`}>
@@ -988,10 +937,11 @@ export default function DodoListApp() {
           setActiveListId={setActiveListId}
           newListName={newListName}
           setNewListName={setNewListName}
-          isCreatingList={isCreatingList}
-          setIsCreatingList={setIsCreatingList}
+          showNewListInput={showNewListInput}
+          setShowNewListInput={setShowNewListInput}
+          isAddingList={isAddingList}
           createNewList={handleCreateNewList}
-          updateListName={updateListName}
+          updateListName={handleUpdateListName}
           togglePinList={togglePinList}
           toggleArchiveList={toggleArchiveList}
           cloneList={cloneList}
@@ -1038,52 +988,7 @@ export default function DodoListApp() {
             </div>
           )}
           
-          {/* Persistence Warning */}
-          {showPersistenceWarning && (
-            <div className="px-4 py-2 bg-amber-50 border-b border-amber-200">
-              <div className="flex items-start gap-2">
-                <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-amber-800">Your data is not being saved permanently</p>
-                  <p className="text-xs text-amber-700 mt-0.5">
-                    {persistenceError ? 
-                      `Database error: ${persistenceError}` : 
-                      "Your browser doesn't support persistent storage. Your tasks will be lost when you close this tab or refresh the page."}
-                  </p>
-                  {persistenceType === 'memory' && !persistenceError && (
-                    <div className="mt-1 text-xs text-amber-700">
-                      <p>For persistent storage, try:</p>
-                      <ul className="list-disc list-inside mt-0.5">
-                        <li>Using a modern browser like Chrome or Firefox</li>
-                        <li>Enable third-party cookies in your browser settings</li>
-                        <li>Try using a private/incognito window if storage is restricted</li>
-                      </ul>
-                    </div>
-                  )}
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowPersistenceWarning(false)}
-                  className="h-6 w-6 p-0 text-amber-600"
-                >
-                  <X className="w-4 h-4" />
-                </Button>
-              </div>
-            </div>
-          )}
-
-          {/* Storage Type Indicator */}
-          {persistenceType && !showPersistenceWarning && (
-            <div className="px-4 py-1 bg-slate-50 border-b border-slate-200 flex items-center gap-2">
-              <Database className="w-4 h-4 text-slate-500" />
-              <span className="text-xs text-slate-600">
-                {persistenceType === 'opfs' ? 'Using Origin Private File System for storage' : 
-                 persistenceType === 'indexeddb' ? 'Using IndexedDB for storage' : 
-                 'Using in-memory storage (data will be lost when page is closed)'}
-              </span>
-            </div>
-          )}
+          
 
           {/* Task Schedule Overlay */}
           {showTaskOptions && (
@@ -1111,50 +1016,35 @@ export default function DodoListApp() {
 
                 {/* List Name (Editable) */}
                 <div className="flex-1 min-w-0 max-w-xs md:max-w-md">
-                  {editingListId === activeList.id ? (
+                  {isEditingHeader ? (
                     <Input
                       value={editingListName !== null ? editingListName : activeList.name} // Use editingListName
                       onChange={(e) => setEditingListName(e.target.value)} // Update editingListName
                       onKeyDown={(e) => {
                         if (e.key === 'Enter') {
                           e.preventDefault();
-                          const trimmedName = editingListName?.trim();
-                          if (!trimmedName) {
-                            toast.error("List name cannot be empty.", {
-                              description: "Please enter a valid name for your list.",
-                            });
-                            return; // Prevent further action
-                          }
-                          updateListName(activeList.id, trimmedName);
-                            setEditingListId(null); // Unfocus by clearing the editing state
-                            setEditingListName(null); // Clear editing state
-                            (document.activeElement as HTMLElement)?.blur(); // Explicitly remove focus
+                          handleUpdateListName(activeList.id, editingListName);
+                          setIsEditingHeader(false); // Exit edit mode
                         } else if (e.key === 'Escape') {
-                          setEditingListId(null);
-                          setEditingListName(null); // Clear editing state
-                          (document.activeElement as HTMLElement)?.blur(); // Explicitly remove focus
+                          setEditingListName(null); // Reset temp name
+                          setIsEditingHeader(false); // Exit edit mode
+                          (document.activeElement as HTMLElement)?.blur();
                         }
                       }}
-                      onBlur={() => { // On blur, save the name if valid
-                        const trimmedName = editingListName?.trim();
-                        if (!trimmedName) {
-                            toast.error("List name cannot be empty.", {
-                              description: "Please enter a valid name for your list.",
-                            });
-                            // Do not clear editingListId here, let user correct or press escape
-                            return;
-                          }
-                          updateListName(activeList.id, trimmedName);
-                          setEditingListId(null); // Clear editing state on successful blur
-                          setEditingListName(null); // Clear editing state
+                      onBlur={() => {
+                        handleUpdateListName(activeList.id, editingListName);
+                        setIsEditingHeader(false); // Exit edit mode
                       }}
                       autoFocus
-                      className="text-lg font-semibold text-slate-800 border-none focus:ring-0 focus:outline-none bg-transparent w-full p-0 h-auto"
+                      className="text-lg font-semibold text-slate-800 border-none focus:ring-0 focus:outline-none bg-transparent w-full p-0 !h-auto !text-lg"
                     />
                   ) : (
                     <h2
                       className="text-lg font-semibold text-slate-800 cursor-pointer truncate"
-                      onClick={() => handleRenameListFromHeader(activeList.id)}
+                      onClick={() => {
+                        setEditingListName(activeList.name); // Set initial name for editing
+                        setIsEditingHeader(true);
+                      }}
                     >
                       {activeList.name}
                     </h2>
@@ -1171,83 +1061,73 @@ export default function DodoListApp() {
                   />
                 )}
 
-                {/* Mobile List Options Menu */}
-                {isMobile && (
-                  <div className="flex items-center gap-1">
-                    {/* Collaborative mode toggle button */}
-                    <Button
-                      variant={isCollaborative ? "secondary" : "ghost"}
+                {/* List Options Menu */}
+                <div className="ml-auto flex items-center gap-1">
+                  {/* Clone List Button */}
+                  <Button
+                      variant="ghost"
                       size="icon"
-                      aria-label={isCollaborative ? "Disable Collaboration" : "Enable Collaboration"}
-                      onClick={() => setIsCollaborativeMode(v => !v)}
-                      className={`h-8 w-8 p-0 ${isCollaborative ? 'text-blue-600 bg-blue-100' : 'text-slate-600'}`}
-                      title={isCollaborative ? "Disable Collaboration" : "Enable Collaboration"}
-                    >
-                      {isCollaborative ? <Users className="w-4 h-4" /> : <UserX className="w-4 h-4" />}
-                    </Button>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          aria-label="More list options"
-                          className="h-8 w-8 p-0 text-slate-600 hover:text-slate-800"
-                        >
-                          <MoreVertical className="w-4 h-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="bg-white/95 backdrop-blur-sm">
-                        {!activeList.archived && (
-                          <DropdownMenuItem onClick={() => togglePinList(activeList.id)}>
-                            {activeList.pinned ? <PinOff className="w-4 h-4 mr-2" /> : <Pin className="w-4 h-4 mr-2" />}
-                            {activeList.pinned ? "Unpin" : "Pin"} List
+                      aria-label="Clone List"
+                      className="h-8 w-8 p-0 text-slate-600 hover:text-slate-800"
+                      onClick={() => cloneList(activeList.id)}
+                      title="Clone List"
+                  >
+                      <Copy className="w-4 h-4" />
+                  </Button>
+
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        aria-label="More list options"
+                        className="h-8 w-8 p-0 text-slate-600 hover:text-slate-800"
+                      >
+                        <MoreVertical className="w-4 h-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="bg-white/95 backdrop-blur-sm">
+                      {!activeList.archived && (
+                        <DropdownMenuItem onClick={() => togglePinList(activeList.id)}>
+                          {activeList.pinned ? <PinOff className="w-4 h-4 mr-2" /> : <Pin className="w-4 h-4 mr-2" />}
+                          {activeList.pinned ? "Unpin" : "Pin"} List
+                        </DropdownMenuItem>
+                      )}
+                      <DropdownMenuItem onClick={() => toggleArchiveList(activeList.id)}>
+                        {activeList.archived ? <ArchiveRestore className="w-4 h-4 mr-2" /> : <Archive className="w-4 h-4 mr-2" />}
+                        {activeList.archived ? "Unarchive" : "Archive"} List
+                      </DropdownMenuItem>
+                      <DropdownMenu> {/* Nested Dropdown for Change Color */}
+                        <DropdownMenuTrigger asChild>
+                          <DropdownMenuItem onSelect={(e) => e.preventDefault()}> {/* Prevent closing parent */}
+                            <Palette className="w-4 h-4 mr-2" />
+                            Change Color
                           </DropdownMenuItem>
-                        )}
-                        <DropdownMenuItem onClick={() => toggleArchiveList(activeList.id)}>
-                          {activeList.archived ? <ArchiveRestore className="w-4 h-4 mr-2" /> : <Archive className="w-4 h-4 mr-2" />}
-                          {activeList.archived ? "Unarchive" : "Archive"} List
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent side="right">
+                          <div className="grid grid-cols-4 gap-2 p-2">
+                            {colors.map((color) => (
+                              <button
+                                key={color.value}
+                                className={`w-6 h-6 rounded-full ${color.value} hover:scale-110 transition-transform`}
+                                onClick={() => updateListColor(activeList.id, color.value)}
+                              />
+                            ))}
+                          </div>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                      {todoLists.length > 1 && ( // Only allow deleting if more than one list exists
+                        <DropdownMenuItem onClick={() => deleteList(activeList.id)} className="text-red-600">
+                          <Trash2 className="w-4 h-4 mr-2" />
+                          Delete
                         </DropdownMenuItem>
-                         {/* Rename option - triggers state, actual UI needs modal */}
-                        <DropdownMenuItem onClick={() => handleRenameListFromHeader(activeList.id)}>
-                           <Edit3 className="w-4 h-4 mr-2" />
-                           Rename
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => cloneList(activeList.id)}>
-                          <Copy className="w-4 h-4 mr-2" />
-                          Clone List
-                        </DropdownMenuItem>
-                        <DropdownMenu> {/* Nested Dropdown for Change Color */}
-                          <DropdownMenuTrigger asChild>
-                            <DropdownMenuItem onSelect={(e) => e.preventDefault()}> {/* Prevent closing parent */}
-                              <Palette className="w-4 h-4 mr-2" />
-                              Change Color
-                            </DropdownMenuItem>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent side="right">
-                            <div className="grid grid-cols-4 gap-2 p-2">
-                              {colors.map((color) => (
-                                <button
-                                  key={color.value}
-                                  className={`w-6 h-6 rounded-full ${color.value} hover:scale-110 transition-transform`}
-                                  onClick={() => updateListColor(activeList.id, color.value)}
-                                />
-                              ))}
-                            </div>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                        {todoLists.length > 1 && ( // Only allow deleting if more than one list exists
-                          <DropdownMenuItem onClick={() => deleteList(activeList.id)} className="text-red-600">
-                            <Trash2 className="w-4 h-4 mr-2" />
-                            Delete
-                          </DropdownMenuItem>
-                        )}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                )}
+                      )}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
               </>
             )}
-            <Toaster /> {/* Add Toaster component here */}
+            <Toaster activeColor={activeColor} />
           </header>
 
           {/* Main Content */}
@@ -1353,31 +1233,12 @@ export default function DodoListApp() {
             <div className="max-w-2xl mx-auto">
               <Card className={`p-4 ${activeColor.light} ${activeColor.border} border backdrop-blur-sm`}>
                 <div className="flex gap-3">
-                  <div className="flex-1">
-                    <Input
-                      value={inputValue}
-                      onChange={(e) => setInputValue(e.target.value)}
-                      onKeyPress={handleKeyPress}
-                      placeholder={`Add a task to ${activeList?.name}...`}
-                      className="border-slate-200 focus:border-slate-300 focus:ring-slate-200 bg-white/80"
-                      disabled={activeList?.archived || loading}
-                    />
-                  </div>
-                  <Button
-                    onClick={handleAddTodo}
-                    disabled={!inputValue.trim() || activeList?.archived || loading}
-                    className={`${activeList?.color} hover:opacity-90 text-white px-4`}
-                  >
-                    <Send className="w-4 h-4" />
-                  </Button>
+                  
+                  <Input value={inputValue} onChange={(e) => setInputValue(e.target.value)} onKeyPress={handleKeyPress} placeholder={`Add a task to ${activeList?.name}...`} className="border-slate-200 focus:border-slate-300 focus:ring-slate-200 bg-white/80" disabled={activeList?.archived || loading} />
+                  <Button onClick={handleAddTodo} disabled={!inputValue.trim() || activeList?.archived || isAddingTodo} className={`${activeList?.color} hover:opacity-90 text-white px-4`} loading={isAddingTodo} aria-label="Add task"><Send className="w-4 h-4" /></Button>
                 </div>
-
-                {inputValue.trim() && !activeList?.archived && (
-                  <div className="mt-2 text-xs text-slate-500">Press Enter or click send to add this task</div>
-                )}
-                {activeList?.archived && (
-                  <div className="mt-2 text-xs text-amber-600">Cannot add tasks to archived lists</div>
-                )}
+                {inputValue.trim() && !activeList?.archived && <div className="mt-2 text-xs text-slate-500">Press Enter or click send to add this task</div>}
+                {activeList?.archived && <div className="mt-2 text-xs text-amber-600">Cannot add tasks to archived lists</div>}
               </Card>
             </div>
           </div>

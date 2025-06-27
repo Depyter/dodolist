@@ -1,47 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-
-// Create mock functions first
-const mockCreate = vi.fn()
-const mockAuthWithPassword = vi.fn()
-const mockRequestPasswordReset = vi.fn()
-const mockConfirmPasswordReset = vi.fn()
-const mockRequestVerification = vi.fn()
-const mockConfirmVerification = vi.fn()
-const mockUpdate = vi.fn()
-const mockClear = vi.fn()
-const mockOnChange = vi.fn()
-
-// Create a mutable auth store object
-let mockAuthStore = {
-  isValid: false,
-  model: null as any,
-  token: null as string | null,
-  clear: mockClear,
-  onChange: mockOnChange
-}
-
-// Mock collection function
-const mockCollection = vi.fn(() => ({
-  create: mockCreate,
-  authWithPassword: mockAuthWithPassword,
-  requestPasswordReset: mockRequestPasswordReset,
-  confirmPasswordReset: mockConfirmPasswordReset,
-  requestVerification: mockRequestVerification,
-  confirmVerification: mockConfirmVerification,
-  update: mockUpdate
-}))
-
-// Mock PocketBase before importing AuthService
-vi.mock('pocketbase', () => {
-  return {
-    default: vi.fn(() => ({
-      collection: mockCollection,
-      authStore: mockAuthStore
-    }))
-  }
-})
-
-// Now import AuthService after mocking
+import { pb, mockAuthStore, mockCollectionCreate, mockCollectionAuthWithPassword, mockUsersRequestPasswordReset, mockUsersConfirmPasswordReset, mockUsersRequestVerification, mockUsersConfirmVerification } from './setup'
 import AuthService, { type RegisterData, type LoginData } from '../services/authService'
 
 describe('AuthService', () => {
@@ -53,7 +11,15 @@ describe('AuthService', () => {
     // Reset auth store state
     mockAuthStore.isValid = false
     mockAuthStore.model = null
-    mockAuthStore.token = null
+    mockAuthStore.token = ''
+    mockAuthStore.clear.mockClear()
+    mockAuthStore.onChange.mockClear()
+    mockCollectionCreate.mockClear()
+    mockCollectionAuthWithPassword.mockClear()
+    mockUsersRequestPasswordReset.mockClear()
+    mockUsersConfirmPasswordReset.mockClear()
+    mockUsersRequestVerification.mockClear()
+    mockUsersConfirmVerification.mockClear()
     
     authService = new AuthService()
   })
@@ -71,23 +37,21 @@ describe('AuthService', () => {
         id: 'user-id',
         email: 'test@example.com',
         username: 'testuser',
-        name: 'Test User',
         verified: false,
-        avatar: null
+        avatar: '' // changed from null to empty string
       }
 
-      mockCreate.mockResolvedValue(mockUserRecord)
+      mockCollectionCreate.mockResolvedValue(mockUserRecord)
 
       const result = await authService.register(registerData)
 
-      expect(mockCreate).toHaveBeenCalledWith(registerData)
+      expect(mockCollectionCreate).toHaveBeenCalledWith(registerData)
       expect(result).toEqual({
         id: 'user-id',
         email: 'test@example.com',
         username: 'testuser',
-        name: 'Test User',
         verified: false,
-        avatar: null
+        avatar: ''
       })
     })
 
@@ -99,7 +63,7 @@ describe('AuthService', () => {
         passwordConfirm: 'testpassword123'
       }
 
-      mockCreate.mockRejectedValue(new Error('Validation failed'))
+      mockCollectionCreate.mockRejectedValue(new Error('Validation failed'))
 
       await expect(authService.register(registerData)).rejects.toThrow('Registration failed')
     })
@@ -119,16 +83,15 @@ describe('AuthService', () => {
           email: 'test@example.com',
           username: 'testuser',
           verified: true,
-          name: 'Test User',
-          avatar: null
+          avatar: '' // changed from null to empty string
         }
       }
 
-      mockAuthWithPassword.mockResolvedValue(mockAuthData)
+      mockCollectionAuthWithPassword.mockResolvedValue(mockAuthData)
 
       const result = await authService.login(loginData)
 
-      expect(mockAuthWithPassword).toHaveBeenCalledWith(loginData.identity, loginData.password)
+      expect(mockCollectionAuthWithPassword).toHaveBeenCalledWith(loginData.identity, loginData.password)
       expect(result).toEqual({
         token: 'jwt-token',
         record: {
@@ -136,8 +99,7 @@ describe('AuthService', () => {
           email: 'test@example.com',
           username: 'testuser',
           verified: true,
-          name: 'Test User',
-          avatar: null
+          avatar: ''
         }
       })
     })
@@ -148,7 +110,7 @@ describe('AuthService', () => {
         password: 'wrongpassword'
       }
 
-      mockAuthWithPassword.mockRejectedValue(new Error('Invalid credentials'))
+      mockCollectionAuthWithPassword.mockRejectedValue(new Error('Invalid credentials'))
 
       await expect(authService.login(loginData)).rejects.toThrow('Login failed')
     })
@@ -162,8 +124,7 @@ describe('AuthService', () => {
         email: 'test@example.com',
         username: 'testuser',
         verified: true,
-        name: 'Test User',
-        avatar: null
+        avatar: '' // changed from null to empty string
       }
 
       expect(authService.isAuthenticated()).toBe(true)
@@ -172,8 +133,7 @@ describe('AuthService', () => {
         email: 'test@example.com',
         username: 'testuser',
         verified: true,
-        name: 'Test User',
-        avatar: null
+        avatar: ''
       })
     })
 
@@ -187,7 +147,7 @@ describe('AuthService', () => {
 
     it('should logout user', () => {
       authService.logout()
-      expect(mockClear).toHaveBeenCalled()
+      expect(mockAuthStore.clear).toHaveBeenCalled()
     })
 
     it('should get auth token', () => {
@@ -198,30 +158,30 @@ describe('AuthService', () => {
 
   describe('Password Reset', () => {
     it('should request password reset', async () => {
-      mockRequestPasswordReset.mockResolvedValue(true)
+      mockUsersRequestPasswordReset.mockResolvedValue(true)
 
       await authService.requestPasswordReset('test@example.com')
 
-      expect(mockRequestPasswordReset).toHaveBeenCalledWith('test@example.com')
+      expect(mockUsersRequestPasswordReset).toHaveBeenCalledWith('test@example.com')
     })
 
     it('should handle password reset request errors', async () => {
-      mockRequestPasswordReset.mockRejectedValue(new Error('Email not found'))
+      mockUsersRequestPasswordReset.mockRejectedValue(new Error('Email not found'))
 
       await expect(authService.requestPasswordReset('nonexistent@example.com'))
         .rejects.toThrow('Password reset request failed')
     })
 
     it('should confirm password reset', async () => {
-      mockConfirmPasswordReset.mockResolvedValue(true)
+      mockUsersConfirmPasswordReset.mockResolvedValue(true)
 
       await authService.confirmPasswordReset('token123', 'newpassword', 'newpassword')
 
-      expect(mockConfirmPasswordReset).toHaveBeenCalledWith('token123', 'newpassword', 'newpassword')
+      expect(mockUsersConfirmPasswordReset).toHaveBeenCalledWith('token123', 'newpassword', 'newpassword')
     })
 
     it('should handle password reset confirmation errors', async () => {
-      mockConfirmPasswordReset.mockRejectedValue(new Error('Invalid token'))
+      mockUsersConfirmPasswordReset.mockRejectedValue(new Error('Invalid token'))
 
       await expect(authService.confirmPasswordReset('invalid-token', 'newpassword', 'newpassword'))
         .rejects.toThrow('Password reset confirmation failed')
@@ -230,30 +190,30 @@ describe('AuthService', () => {
 
   describe('Email Verification', () => {
     it('should request email verification', async () => {
-      mockRequestVerification.mockResolvedValue(true)
+      mockUsersRequestVerification.mockResolvedValue(true)
 
       await authService.requestVerification('test@example.com')
 
-      expect(mockRequestVerification).toHaveBeenCalledWith('test@example.com')
+      expect(mockUsersRequestVerification).toHaveBeenCalledWith('test@example.com')
     })
 
     it('should handle verification request errors', async () => {
-      mockRequestVerification.mockRejectedValue(new Error('User not found'))
+      mockUsersRequestVerification.mockRejectedValue(new Error('User not found'))
 
       await expect(authService.requestVerification('nonexistent@example.com'))
         .rejects.toThrow('Verification request failed')
     })
 
     it('should confirm email verification', async () => {
-      mockConfirmVerification.mockResolvedValue(true)
+      mockUsersConfirmVerification.mockResolvedValue(true)
 
       await authService.confirmVerification('verification-token')
 
-      expect(mockConfirmVerification).toHaveBeenCalledWith('verification-token')
+      expect(mockUsersConfirmVerification).toHaveBeenCalledWith('verification-token')
     })
 
     it('should handle verification confirmation errors', async () => {
-      mockConfirmVerification.mockRejectedValue(new Error('Invalid verification token'))
+      mockUsersConfirmVerification.mockRejectedValue(new Error('Invalid verification token'))
 
       await expect(authService.confirmVerification('invalid-token'))
         .rejects.toThrow('Email verification failed')
@@ -266,7 +226,7 @@ describe('AuthService', () => {
       
       authService.onAuthChange(callback)
 
-      expect(mockOnChange).toHaveBeenCalledWith(callback)
+      expect(mockAuthStore.onChange).toHaveBeenCalledWith(callback)
     })
   })
 })

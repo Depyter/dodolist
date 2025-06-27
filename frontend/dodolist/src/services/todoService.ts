@@ -1,65 +1,16 @@
-import { useState, useEffect } from 'react';
-import dbService from './dbService';
-import PocketBase from 'pocketbase';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { generateId } from './dbService';
+import PocketBase, { ClientResponseError } from 'pocketbase';
 import AuthService from './authService';
 import { PB_URL } from '@/config';
 import * as Y from 'yjs';
-import { YjsTodoListProvider } from './yjsProvider';
+import { YjsPocketbaseProvider } from '@/services/YjsPocketbaseProvider';
 
 // Initialize PocketBase and AuthService
 const pb = new PocketBase(PB_URL);
 const authService = new AuthService();
 
-// Helper: convert Todo for PocketBase
-const todoToPbFormat = (todo: Todo) => {
-  // For create, do not send id
-  return {
-    task_list_id: todo.listId,
-    text: todo.text,
-    description: todo.description || '',
-    createdAt: todo.createdAt.toISOString(),
-    completedAt: todo.completedAt ? todo.completedAt.toISOString() : null,
-    deadline: todo.deadline ? todo.deadline.toISOString() : null,
-    reminder: todo.reminder ? todo.reminder.toISOString() : null,
-    completed: !!todo.completed,
-  };
-};
-const pbToTodo = (pbTodo: any): Todo => ({
-  id: pbTodo.id,
-  text: pbTodo.text,
-  description: pbTodo.description,
-  completed: Boolean(pbTodo.completed),
-  createdAt: new Date(pbTodo.createdAt),
-  completedAt: pbTodo.completedAt ? new Date(pbTodo.completedAt) : undefined,
-  deadline: pbTodo.deadline ? new Date(pbTodo.deadline) : undefined,
-  reminder: pbTodo.reminder ? new Date(pbTodo.reminder) : undefined,
-  recurring: pbTodo.recurring as "none" | "daily" | "weekly" | "monthly",
-  listId: pbTodo.task_list_id,
-});
-
-const todoListToPbFormat = (list: TodoList, userId: string) => {
-  // Only include fields allowed by PocketBase schema
-  return {
-    user_id: userId, // required
-    name: list.name, // required
-    color: typeof list.color === 'string' ? list.color : 'test', // always a string, fallback to 'test'
-    createdAt: list.createdAt instanceof Date ? list.createdAt.toISOString() : list.createdAt, // required, string
-    pinned: !!list.pinned, // optional, boolean
-    archived: !!list.archived, // optional, boolean
-    // yjsUpdate: handled elsewhere if needed
-  };
-};
-const pbToTodoList = (pbList: any, todos: Todo[] = []): TodoList => ({
-  id: pbList.id,
-  name: pbList.name,
-  color: pbList.color,
-  todos,
-  createdAt: new Date(pbList.createdAt),
-  pinned: Boolean(pbList.pinned),
-  archived: Boolean(pbList.archived),
-});
-
-// Export interfaces to be used across the application
+// --- Type Definitions ---
 export interface Todo {
   id: string;
   text: string;
@@ -78,376 +29,395 @@ export interface TodoList {
   name: string;
   color: string;
   todos: Todo[];
-  createdAt: Date;
+  createdAt: string;
   pinned?: boolean;
   archived?: boolean;
 }
 
-export const usePersistentTodoLists = (isCollaborative: boolean) => {
+// --- Helper Functions ---
+const yjsToTodo = (yjsTodo: any): Todo => ({
+  ...yjsTodo,
+  createdAt: new Date(yjsTodo.createdAt),
+  completedAt: yjsTodo.completedAt ? new Date(yjsTodo.completedAt) : undefined,
+  deadline: yjsTodo.deadline ? new Date(yjsTodo.deadline) : undefined,
+  reminder: yjsTodo.reminder ? new Date(yjsTodo.reminder) : undefined,
+});
+
+const todoToYjsFormat = (todo: Todo) => ({
+  ...todo,
+  createdAt: todo.createdAt.toISOString(),
+  completedAt: todo.completedAt?.toISOString() || null,
+  deadline: todo.deadline?.toISOString() || null,
+  reminder: todo.reminder?.toISOString() || null,
+});
+
+// --- Main Hook ---
+export const usePersistentTodoLists = () => {
   const [todoLists, setTodoLists] = useState<TodoList[]>([]);
   const [activeListId, setActiveListId] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
-  const [loadedLists, setLoadedLists] = useState<Set<string>>(new Set());
-  const user = authService.getCurrentUser();
+  const [isOnline, setIsOnline] = useState(navigator.onLine && authService.isAuthenticated());
 
-  const [ydoc, setYdoc] = useState<Y.Doc | null>(null);
-  const [provider, setProvider] = useState<YjsTodoListProvider | null>(null);
+  const providers = useRef<Map<string, YjsPocketbaseProvider>>(new Map());
+  const ydocs = useRef<Map<string, Y.Doc>>(new Map());
+  const isFetching = useRef(false); // New ref to prevent concurrent fetches
 
-  // --- Hybrid: Use PocketBase if authenticated, else fallback to local dbService ---
-  const isOnline = !!user && pb.authStore.isValid;
-
-  useEffect(() => {
-    loadInitialLists();
-  }, [user?.id, isOnline]);
-
-  useEffect(() => {
-    if (activeListId && !loadedLists.has(activeListId)) {
-      loadTodosForList(activeListId);
+  // --- List Management (moved up for use in loadInitialData) ---
+  // --- Core Data Loading and Syncing Logic ---
+  const loadInitialData = useCallback(async () => {
+    if (isFetching.current) {
+      console.log("[todoService] loadInitialData already in progress, skipping.");
+      return;
     }
-  }, [activeListId, loadedLists, isOnline]);
+    isFetching.current = true; // Set flag to true
 
-  useEffect(() => {
-    if (isCollaborative && activeListId) {
-      const doc = new Y.Doc();
-      const yProvider = new YjsTodoListProvider(activeListId, doc, PB_URL);
-      setYdoc(doc);
-      setProvider(yProvider);
-
-      // Bind Yjs doc to React state
-      const yTodos = doc.getArray<any>('todos'); // Use any for Yjs data structure
-      const updateReactState = () => {
-        // Convert Yjs data to Todo interface, handling Date objects
-        const todos: Todo[] = yTodos.toArray().map(yTodo => ({
-          id: yTodo.id,
-          text: yTodo.text,
-          description: yTodo.description,
-          completed: yTodo.completed,
-          createdAt: new Date(yTodo.createdAt), // Convert string back to Date
-          completedAt: yTodo.completedAt ? new Date(yTodo.completedAt) : undefined, // Convert string back to Date
-          deadline: yTodo.deadline ? new Date(yTodo.deadline) : undefined, // Convert string back to Date
-          reminder: yTodo.reminder ? new Date(yTodo.reminder) : undefined, // Convert string back to Date
-          recurring: yTodo.recurring,
-          listId: yTodo.listId,
-        }));
-        setTodoLists(current =>
-          current.map(list => (list.id === activeListId ? { ...list, todos } : list))
-        );
-      };
-
-      yTodos.observe(() => updateReactState());
-
-      // Initial sync from Yjs doc
-      updateReactState();
-
-      return () => {
-        // Cleanup Yjs provider and doc
-        yProvider.destroy();
-        setYdoc(null);
-        setProvider(null);
-      };
-    } else if (ydoc || provider) {
-      // Cleanup if switching away from collaborative mode or list
-      provider?.destroy();
-      ydoc?.destroy();
-      setYdoc(null);
-      setProvider(null);
-    }
-  }, [activeListId, isCollaborative, isOnline]); // Added isOnline dependency
-
-  const loadTodosForList = async (listId: string) => {
+    console.log("[todoService] loadInitialData called");
+    setLoading(true);
+    setError(null); // Clear any previous errors
     try {
-      let todos: Todo[] = [];
-      if (isOnline) {
-        const pbTodos = await pb.collection('tasks').getFullList({
-          filter: `task_list_id = "${listId}"`,
-          sort: '-createdAt',
-        });
-        todos = pbTodos.map(pbToTodo);
-      } else {
-        const dbTodos = await dbService.getTodosForList(listId);
-        todos = dbTodos.map((t: any) => ({ ...t, createdAt: new Date(t.createdAt) }));
-      }
-      setTodoLists(current =>
-        current.map(list => (list.id === listId ? { ...list, todos } : list))
-      );
-      setLoadedLists(current => new Set(current).add(listId));
-    } catch (err) {
-      console.error(`Failed to load todos for list ${listId}:`, err);
-    }
-  };
-
-  const loadInitialLists = async () => {
-    try {
-      setLoading(true);
-      let lists: TodoList[] = [];
-      if (isOnline && user) {
-        const pbLists = await pb.collection('task_lists').getFullList({
-          filter: `user_id = "${user.id}"`,
-          sort: '-createdAt',
-        });
-        lists = pbLists.map(pbList => pbToTodoList(pbList, []));
-      } else {
-        await dbService.ready();
-        const dbLists = await dbService.getAllLists();
-        lists = dbLists.map((dbList: any) => ({ ...dbList, createdAt: new Date(dbList.createdAt), todos: [] }));
-      }
-      setTodoLists(lists);
-      if (lists.length > 0) {
-        setActiveListId(lists[0].id);
-      }
-      setError(null);
-    } catch (err) {
-      console.error('Failed to load todo lists:', err);
-      setError(err instanceof Error ? err : new Error('Failed to load todo lists'));
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const loadTodoLists = async () => {
-    setLoadedLists(new Set());
-    await loadInitialLists();
-  };
-
-  const addTodo = async (text: string, listId: string) => {
-    if (!text.trim()) return;
-    const now = new Date();
-    const newTodo: Todo = {
-      id: Date.now().toString(), // Always generate an id
-      text: text.trim(),
-      completed: false,
-      createdAt: now,
-      recurring: 'none',
-      listId,
-    } as Todo;
-
-    // 1. Always update Yjs doc if collaborative
-    if (isCollaborative && ydoc) {
-      const yTodos = ydoc.getArray<any>('todos');
-      const yjsCompatibleTodo = {
-        ...newTodo,
-        createdAt: newTodo.createdAt.toISOString(),
-        completedAt: newTodo.completedAt?.toISOString() || null,
-        deadline: newTodo.deadline?.toISOString() || null,
-        reminder: newTodo.reminder?.toISOString() || null,
-      };
-      yTodos.push([yjsCompatibleTodo]);
-    }
-
-    // 2. Always update local dbService
-    await dbService.createTodo({
-      ...newTodo,
-      createdAt: newTodo.createdAt.toISOString(),
-      completedAt: newTodo.completedAt ? newTodo.completedAt.toISOString() : undefined,
-      deadline: newTodo.deadline ? newTodo.deadline.toISOString() : undefined,
-      reminder: newTodo.reminder ? newTodo.reminder.toISOString() : undefined,
-    });
-
-    // 3. If online, update PocketBase
-    if (isOnline) {
-      try {
-        const data = todoToPbFormat(newTodo);
-        const created = await pb.collection('tasks').create(data);
-        // Optionally update local dbService with PB id
-        await dbService.updateTodo({
-          ...newTodo,
-          id: created.id,
-          createdAt: newTodo.createdAt.toISOString(),
-          completedAt: newTodo.completedAt ? newTodo.completedAt.toISOString() : undefined,
-          deadline: newTodo.deadline ? newTodo.deadline.toISOString() : undefined,
-          reminder: newTodo.reminder ? newTodo.reminder.toISOString() : undefined,
-        });
-      } catch (err) {
-        setError(err instanceof Error ? err : new Error('Failed to add todo to PocketBase'));
-      }
-    }
-
-    // 4. Optimistic UI update
-    setTodoLists(current =>
-      current.map(list =>
-        list.id === listId ? { ...list, todos: [...list.todos, newTodo] } : list
-      )
-    );
-  };
-
-  const updateTodo = async (todoId: string, listId: string, updates: Partial<Todo>) => {
-    const list = todoLists.find(l => l.id === listId);
-    const oldTodo = list?.todos.find(t => t.id === todoId);
-    if (!oldTodo) return;
-    const updatedTodo: Todo = { ...oldTodo, ...updates };
-
-    // 1. Always update Yjs doc if collaborative
-    if (isCollaborative && ydoc) {
-      const yTodos = ydoc.getArray<any>('todos');
-      const index = yTodos.toArray().findIndex(t => t.id === todoId);
-      if (index !== -1) {
-        const yjsCompatibleUpdates: any = {};
-        for (const key in updates) {
-          const value = (updates as any)[key];
-          yjsCompatibleUpdates[key] = value instanceof Date ? value.toISOString() : value;
+        const currentUser = authService.getCurrentUser();
+        if (!currentUser) {
+            console.log("[todoService] No current user, stopping loadInitialData.");
+            setLoading(false);
+            return;
         }
-        const updatedYjsTodo = { ...yTodos.get(index), ...yjsCompatibleUpdates };
-        yTodos.delete(index, 1);
-        yTodos.insert(index, [updatedYjsTodo]);
-      }
-    }
 
-    // 2. Always update local dbService
-    await dbService.updateTodo({
-      ...updatedTodo,
-      createdAt: updatedTodo.createdAt.toISOString(),
-      completedAt: updatedTodo.completedAt ? updatedTodo.completedAt.toISOString() : undefined,
-      deadline: updatedTodo.deadline ? updatedTodo.deadline.toISOString() : undefined,
-      reminder: updatedTodo.reminder ? updatedTodo.reminder.toISOString() : undefined,
+        let pbLists: any[] = []; // Declare and initialize here
+        try {
+            pbLists = await pb.collection('task_lists').getFullList({
+                filter: `user_id = "${currentUser.id}"`,
+                sort: '-createdAt',
+            });
+            console.log(`[todoService] Fetched ${pbLists.length} lists from PocketBase.`);
+        } catch (err: any) {
+            if (err instanceof ClientResponseError && err.status === 400 && err.message.includes("Invalid filter")) {
+                console.warn("[todoService] PocketBase returned 400 'Invalid filter'. Treating as empty lists.");
+                pbLists = []; // Treat as empty list
+            } else {
+                // Re-throw other errors
+                throw err;
+            }
+        }
+
+        const loadedLists: TodoList[] = [];
+        let initialActiveListId = '';
+
+        if (pbLists.length === 0) {
+            console.log("[todoService] No lists found for user. Attempting to create default list and task.");
+            try {
+                // Create a default list if none exist
+                const defaultListName = "My First List";
+                const defaultColor = "bg-blue-500";
+                const newId = generateId();
+
+                // Create the PocketBase record for the default list
+                const pbRecord = await pb.collection('task_lists').create({
+                    id: newId,
+                    user_id: currentUser.id,
+                    name: defaultListName,
+                    color: defaultColor,
+                    createdAt: new Date().toISOString(),
+                    pinned: false,
+                    archived: false,
+                    yjsUpdate: null,
+                });
+                console.log(`[todoService] Successfully created default list record in PocketBase: ${defaultListName} (ID: ${newId})`);
+
+                // Setup Yjs for the new list
+                const doc = new Y.Doc();
+                ydocs.current.set(newId, doc);
+                const provider = new YjsPocketbaseProvider(newId, doc, pb);
+                providers.current.set(newId, provider);
+                await provider.connect(); // Connect the provider immediately
+
+                // Add a default task to the new list's Y.Doc
+                const defaultTaskText = "Welcome to Dodolist! Start by adding your first task.";
+                doc.transact(() => {
+                    doc.getArray('todos').push([todoToYjsFormat({
+                        id: generateId(),
+                        text: defaultTaskText,
+                        completed: false,
+                        createdAt: new Date(),
+                        listId: newId,
+                        recurring: 'none',
+                    })]);
+                });
+                console.log(`[todoService] Added default task to Yjs doc for list ${newId}: "${defaultTaskText}"`);
+
+                // Listen for Yjs doc changes to update React state for this new list
+                doc.on('update', () => {
+                    const yTodos = doc.getArray<any>('todos').toJSON();
+                    const todos = yTodos.map(yjsToTodo);
+                    setTodoLists(currentLists =>
+                        currentLists.map(l => (l.id === newId ? { ...l, todos } : l))
+                    );
+                    console.log(`[todoService] Yjs doc updated for default list ${newId}. Current todos:`, todos);
+                });
+
+                // Get initial todos from Yjs doc (should now include the default task)
+                const initialTodos = doc.getArray<any>('todos').toJSON().map(yjsToTodo);
+                loadedLists.push({
+                    id: pbRecord.id,
+                    name: pbRecord.name,
+                    color: pbRecord.color,
+                    createdAt: pbRecord.createdAt,
+                    pinned: pbRecord.pinned,
+                    archived: pbRecord.archived,
+                    todos: initialTodos,
+                });
+                initialActiveListId = newId;
+                console.log(`[todoService] Default list and task prepared for UI. loadedLists count: ${loadedLists.length}`);
+
+            } catch (createError) {
+                console.error("[todoService] Error creating default list or task:", createError);
+                setError(createError instanceof Error ? createError : new Error("Failed to create default list."));
+            }
+
+        } else {
+            // Process existing lists
+            console.log("[todoService] Existing lists found. Processing them.");
+            for (const pbList of pbLists) {
+                const doc = new Y.Doc();
+                ydocs.current.set(pbList.id, doc);
+                const provider = new YjsPocketbaseProvider(pbList.id, doc, pb);
+                providers.current.set(pbList.id, provider);
+                await provider.connect();
+
+                doc.on('update', () => {
+                    const yTodos = doc.getArray<any>('todos').toJSON();
+                    const todos = yTodos.map(yjsToTodo);
+                    setTodoLists(currentLists =>
+                        currentLists.map(l => (l.id === pbList.id ? { ...l, todos } : l))
+                    );
+                });
+
+                const initialTodos = doc.getArray<any>('todos').toJSON().map(yjsToTodo);
+                loadedLists.push({
+                    id: pbList.id,
+                    name: pbList.name,
+                    color: pbList.color,
+                    createdAt: pbList.createdAt,
+                    pinned: pbList.pinned,
+                    archived: pbList.archived,
+                    todos: initialTodos,
+                });
+            }
+            if (loadedLists.length > 0) {
+                initialActiveListId = loadedLists[0].id;
+            }
+        }
+
+        setTodoLists(loadedLists);
+        if (initialActiveListId && !activeListId) {
+            setActiveListId(initialActiveListId);
+        } else if (activeListId && !loadedLists.some(l => l.id === activeListId)) {
+            // If the previously active list was deleted, set to the first available
+            if (loadedLists.length > 0) {
+                setActiveListId(loadedLists[0].id);
+            } else {
+                setActiveListId(''); // No lists left
+            }
+        }
+        console.log("[todoService] loadInitialData completed.");
+
+    } catch (err) {
+        console.error('[todoService] Failed to load initial data:', err);
+        setError(err instanceof Error ? err : new Error('Failed to load data'));
+    } finally {
+        setLoading(false);
+        isFetching.current = false; // Reset flag after completion (success or error)
+    }
+  }, []);
+
+  // --- List Management ---
+  const createNewList = async (name: string, color: string): Promise<string> => {
+    const user = authService.getCurrentUser();
+    if (!name.trim() || !user) return '';
+
+    const newId = generateId(); // Use your custom ID generator from dbService
+
+    // 1. Create the list record in PocketBase first
+    const pbRecord = await pb.collection('task_lists').create({
+        id: newId,
+        user_id: user.id, // Link to the current user
+        name: name.trim(),
+        color: color,
+        createdAt: new Date().toISOString(),
+        pinned: false,
+        archived: false,
+        yjsUpdate: null, // Initial empty Yjs state (will be updated by provider)
     });
 
-    // 3. If online, update PocketBase
-    if (isOnline) {
-      try {
-        await pb.collection('tasks').update(todoId, updates);
-      } catch (err) {
-        setError(err instanceof Error ? err : new Error('Failed to update todo in PocketBase'));
-      }
-    }
+    // 2. Setup Yjs for the new list
+    const doc = new Y.Doc();
+    ydocs.current.set(newId, doc);
+    const provider = new YjsPocketbaseProvider(newId, doc, pb); // Use new provider
+    providers.current.set(newId, provider);
+    await provider.connect();
 
-    // 4. Optimistic UI update
-    setTodoLists(current =>
-      current.map(list =>
-        list.id === listId
-          ? { ...list, todos: list.todos.map(t => (t.id === todoId ? updatedTodo : t)) }
-          : list
-      )
-    );
-  };
+    // Listen for Yjs doc changes to update React state for this new list
+    doc.on('update', () => {
+        const yTodos = doc.getArray<any>('todos').toJSON();
+        const todos = yTodos.map(yjsToTodo);
+        setTodoLists(currentLists =>
+            currentLists.map(l => (l.id === newId ? { ...l, todos } : l))
+        );
+    });
 
-  const deleteTodo = async (todoId: string, listId: string) => {
-    // 1. Always update Yjs doc if collaborative
-    if (isCollaborative && ydoc) {
-      const yTodos = ydoc.getArray<any>('todos');
-      const index = yTodos.toArray().findIndex(t => t.id === todoId);
-      if (index !== -1) {
-        yTodos.delete(index, 1);
-      }
-    }
-
-    // 2. Always update local dbService
-    await dbService.deleteTodo(todoId);
-
-    // 3. If online, update PocketBase
-    if (isOnline) {
-      try {
-        await pb.collection('tasks').delete(todoId);
-      } catch (err) {
-        setError(err instanceof Error ? err : new Error('Failed to delete todo in PocketBase'));
-      }
-    }
-
-    // 4. Optimistic UI update
-    setTodoLists(current =>
-      current.map(list =>
-        list.id === listId ? { ...list, todos: list.todos.filter(t => t.id !== todoId) } : list
-      )
-    );
-  };
-
-  const toggleTodo = async (todoId: string, listId: string) => {
-    const list = todoLists.find((list) => list.id === listId);
-    const todo = list?.todos.find((todo) => todo.id === todoId);
-    if (!todo) return;
-    const updates = {
-      completed: !todo.completed,
-      completedAt: !todo.completed ? new Date() : undefined,
+    // Add the new list to the local React state
+    const tempList: TodoList = {
+        id: newId,
+        name: name.trim(),
+        color,
+        todos: [], // Initially empty, will be populated by Yjs
+        createdAt: pbRecord.createdAt, // Use PocketBase's createdAt
+        pinned: false,
+        archived: false,
     };
-    await updateTodo(todoId, listId, updates);
+
+    setTodoLists(current => [...current, tempList]);
+    setActiveListId(newId);
+
+    return newId;
+  };
+
+  useEffect(() => {
+    loadInitialData();
+
+    // Keep online/offline listeners if you want to manage UI state based on network
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+        window.removeEventListener('online', handleOnline);
+        window.removeEventListener('offline', handleOffline);
+        // Destroy all Yjs providers and their IndexedDB instances
+        providers.current.forEach(p => p.destroy());
+        providers.current.clear();
+        ydocs.current.clear();
+    };
+  }, [loadInitialData]);
+
+  const updateList = async (listId: string, updates: Partial<Omit<TodoList, 'id' | 'todos'>>) => {
+    setTodoLists(current =>
+      current.map(l => (l.id === listId ? { ...l, ...updates } : l))
+    );
+    // Update metadata in PocketBase
+    await pb.collection('task_lists').update(listId, updates);
   };
 
   const deleteList = async (listId: string) => {
-    try {
-      if (isOnline) {
-        await pb.collection('task_lists').delete(listId);
-      } else {
-        await dbService.deleteList(listId);
-      }
-      setTodoLists(current => current.filter(l => l.id !== listId));
-      if (activeListId === listId) {
-        const nextActiveList = todoLists.find(l => l.id !== listId);
-        setActiveListId(nextActiveList?.id || '');
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Failed to delete list'));
+    setTodoLists(current => current.filter(l => l.id !== listId));
+    if (activeListId === listId) {
+      const nextList = todoLists.find(l => l.id !== listId);
+      setActiveListId(nextList?.id || '');
     }
+    // Delete from PocketBase
+    await pb.collection('task_lists').delete(listId);
+    
+    // Destroy Yjs provider and its IndexedDB instance
+    providers.current.get(listId)?.destroy();
+    providers.current.delete(listId);
+    ydocs.current.delete(listId);
   };
 
-  // Dual write for creating a new list
-  const createNewList = async (name: string, color: string) => {
-    if (!name.trim()) return;
-    const now = new Date();
-    let newListId = Date.now().toString();
-    let pbCreatedId: string | undefined = undefined;
-    const newList: TodoList = {
-      id: newListId,
-      name: name.trim(),
-      color: color || 'test',
-      todos: [],
-      createdAt: now,
-      pinned: false,
-      archived: false,
+  // --- Todo Management (delegated to Yjs) ---
+  const getActiveYDoc = () => ydocs.current.get(activeListId);
+
+  const addTodo = useCallback((todoData: Partial<Todo> & { text: string; listId: string }) => {
+    const doc = getActiveYDoc();
+    if (!doc || !todoData.text.trim()) return;
+
+    const newTodo: Todo = {
+      id: generateId(),
+      completed: false,
+      createdAt: new Date(),
+      recurring: 'none',
+      ...todoData,
+      text: todoData.text.trim(),
     };
-    // 1. Always update Yjs doc if collaborative (optional: sync list metadata)
-    // 2. Always update local dbService
-    await dbService.createList({
-      ...newList,
-      createdAt: now.toISOString(),
-    });
-    // 3. If online, update PocketBase and use PB id as canonical id
-    if (isOnline && user) {
-      try {
-        // Only send allowed fields
-        const data = todoListToPbFormat(newList, user.id);
-        const created = await pb.collection('task_lists').create(data);
-        pbCreatedId = created.id;
-        // Update local/Yjs/dbService with PB id
-        if (pbCreatedId !== newListId) {
-          // Update dbService
-          await dbService.updateList({
-            ...newList,
-            id: pbCreatedId,
-            createdAt: now.toISOString(),
-          });
-          newListId = pbCreatedId;
-        }
-      } catch (err) {
-        setError(err instanceof Error ? err : new Error('Failed to create list in PocketBase'));
-      }
-    }
-    setTodoLists(current => [...current, { ...newList, id: newListId }]);
-    setActiveListId(newListId);
-  };
 
-  // Dual write for updating a list
-  const updateList = async (listId: string, updates: Partial<TodoList>) => {
-    const list = todoLists.find(l => l.id === listId);
-    if (!list) return;
-    const updatedList: TodoList = { ...list, ...updates };
-    // 1. Always update Yjs doc if collaborative (optional: sync list metadata)
-    // 2. Always update local dbService
-    await dbService.updateList({
-      ...updatedList,
-      createdAt: updatedList.createdAt.toISOString(),
+    doc.transact(() => {
+      doc.getArray('todos').push([todoToYjsFormat(newTodo)]);
     });
-    // 3. If online, update PocketBase
-    if (isOnline) {
-      try {
-        await pb.collection('task_lists').update(listId, updates);
-      } catch (err) {
-        setError(err instanceof Error ? err : new Error('Failed to update list in PocketBase'));
-      }
-    }
-    setTodoLists(current => current.map(l => (l.id === listId ? updatedList : l)));
-  };
+  }, [activeListId]);
 
-  // Optionally: Listen for PocketBase realtime changes and update state (not shown here)
+  const updateTodo = useCallback((todoId: string, listId: string, updates: Partial<Todo>) => {
+    const doc = ydocs.current.get(listId);
+    if (!doc) return;
+
+    doc.transact(() => {
+      const yTodos = doc.getArray<any>('todos');
+      const index = yTodos.toArray().findIndex(t => t.id === todoId);
+      if (index > -1) {
+        const oldTodo = yTodos.get(index);
+        const updatedTodo = { ...oldTodo, ...updates };
+        yTodos.delete(index, 1);
+        yTodos.insert(index, [updatedTodo]);
+      }
+    });
+  }, []);
+
+  const toggleTodo = useCallback((todoId: string, listId: string) => {
+    const doc = ydocs.current.get(listId);
+    if (!doc) return;
+
+    doc.transact(() => {
+      const yTodos = doc.getArray<any>('todos');
+      const index = yTodos.toArray().findIndex(t => t.id === todoId);
+      if (index > -1) {
+        const oldTodo = yTodos.get(index);
+        const newCompleted = !oldTodo.completed;
+        const updatedTodo = { 
+            ...oldTodo, 
+            completed: newCompleted,
+            completedAt: newCompleted ? new Date().toISOString() : null
+        };
+        yTodos.delete(index, 1);
+        yTodos.insert(index, [updatedTodo]);
+      }
+    });
+  }, []);
+
+  const deleteTodo = useCallback((todoId: string, listId: string) => {
+    const doc = ydocs.current.get(listId);
+    if (!doc) return;
+
+    doc.transact(() => {
+      const yTodos = doc.getArray<any>('todos');
+      const index = yTodos.toArray().findIndex(t => t.id === todoId);
+      if (index > -1) {
+        yTodos.delete(index, 1);
+      }
+    });
+  }, []);
+
+  const batchAddTodos = useCallback((todosData: (Partial<Todo> & { text: string; listId: string })[]) => {
+    if (todosData.length === 0) return;
+    const doc = ydocs.current.get(todosData[0].listId);
+    if (!doc) return;
+
+    const newTodos = todosData.map(data => todoToYjsFormat({
+        id: generateId(),
+        completed: false,
+        createdAt: new Date(),
+        recurring: 'none',
+        ...data,
+        text: data.text.trim(),
+    }));
+
+    doc.transact(() => {
+        doc.getArray('todos').push(newTodos);
+    });
+  }, []);
+
+  const loadTodoLists = useCallback(() => {
+    loadInitialData();
+  }, [loadInitialData]);
 
   return {
     todoLists,
@@ -455,13 +425,15 @@ export const usePersistentTodoLists = (isCollaborative: boolean) => {
     setActiveListId,
     loading,
     error,
-    addTodo,
-    updateTodo,
-    deleteTodo,
-    toggleTodo,
     createNewList,
     updateList,
     deleteList,
-    loadTodoLists,
+    addTodo,
+    updateTodo,
+    toggleTodo,
+    deleteTodo,
+    batchAddTodos,
   };
 };
+
+
