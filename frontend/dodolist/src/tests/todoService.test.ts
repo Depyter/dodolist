@@ -142,8 +142,20 @@ describe('usePersistentTodoLists', () => {
       doc,
       pb: pbInstance,
       connect: vi.fn(async () => {
-        // Simulate initial data load by triggering the Y.Doc update callback
-        // The actual data for the Y.Doc will be set in the test case itself.
+        const currentYArray = doc.getArray('todos');
+        // Clear existing data in mockYArray to simulate fresh load
+        (currentYArray.toJSON as vi.Mock).mockReturnValue([]);
+        (currentYArray.toArray as vi.Mock).mockReturnValue([]);
+
+        // Simulate applying an initial update if there's data from PocketBase
+        const pbRecord = await pbInstance.collection('task_lists').getOne(listId);
+        if (pbRecord && pbRecord.yjsUpdate) {
+          // Assuming yjsUpdate is a JSON string for simplicity in mock
+          const decodedTodos = JSON.parse(pbRecord.yjsUpdate);
+          // Directly set the internal data of the mockYArray
+          (currentYArray as any)._data = decodedTodos;
+        }
+
         if (yDocUpdateCallback) {
           yDocUpdateCallback(new Uint8Array(), 'mockOrigin'); // Trigger the update callback
         }

@@ -4,15 +4,7 @@ import { sqlite3Worker1Promiser } from '@sqlite.org/sqlite-wasm';
 
 
 // Custom ID generation function to meet PocketBase requirements
-export const generateId = (length: number = 20): string => {
-  let result = '';
-  const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
-  const charactersLength = characters.length;
-  for (let i = 0; i < length; i++) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength));
-  }
-  return result;
-};
+
 
 class DbService {
   private promiser: any = null;

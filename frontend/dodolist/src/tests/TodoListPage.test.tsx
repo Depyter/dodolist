@@ -260,7 +260,8 @@ describe('TodoListPage', () => {
     const moreOptionsButton = within(header).getByRole('button', { name: /more list options/i });
     fireEvent.click(moreOptionsButton);
 
-    const pinMenuItem = screen.getByRole('menuitem', { name: /pin list/i });
+    const menu = await screen.findByRole('menu'); // Wait for the dropdown menu to appear
+    const pinMenuItem = await screen.findByRole('menuitem', { name: /pin list/i });
     fireEvent.click(pinMenuItem);
 
     await waitFor(() => {
@@ -274,7 +275,11 @@ describe('TodoListPage', () => {
     const moreOptionsButton = within(header).getByRole('button', { name: /more list options/i });
     fireEvent.click(moreOptionsButton);
 
-    const archiveMenuItem = screen.getByRole('menuitem', { name: /archive list/i });
+    await waitFor(() => {
+      expect(screen.getByRole('menu')).toBeInTheDocument(); // Wait for the dropdown menu to appear
+    });
+
+    const archiveMenuItem = await screen.findByRole('menuitem', { name: /archive list/i });
     fireEvent.click(archiveMenuItem);
 
     await waitFor(() => {
@@ -288,8 +293,16 @@ describe('TodoListPage', () => {
     const moreOptionsButton = within(header).getByRole('button', { name: /more list options/i });
     fireEvent.click(moreOptionsButton);
 
-    const changeColorMenuItem = screen.getByText('Change Color');
-    fireEvent.click(changeColorMenuItem);
+    await waitFor(() => {
+      expect(screen.getByRole('menu')).toBeInTheDocument(); // Wait for the dropdown menu to appear
+    });
+
+    const changeColorMenuItem = await screen.findByRole('menuitem', { name: /change color/i });
+    fireEvent.click(changeColorMenuItem); // Click to open the nested color menu
+
+    await waitFor(() => {
+      expect(screen.getByRole('menu', { name: /colors/i })).toBeInTheDocument(); // Wait for the color menu to appear
+    });
 
     const emeraldColorButton = screen.getByRole('button', { name: /emerald-500/i }); // Assuming a button for emerald color
     fireEvent.click(emeraldColorButton);
@@ -326,7 +339,11 @@ describe('TodoListPage', () => {
     const moreOptionsButton = within(header).getByRole('button', { name: /more list options/i });
     fireEvent.click(moreOptionsButton);
 
-    const deleteMenuItem = screen.getByText('Delete');
+    await waitFor(() => {
+      expect(screen.getByRole('menu')).toBeInTheDocument(); // Wait for the dropdown menu to appear
+    });
+
+    const deleteMenuItem = await screen.findByRole('menuitem', { name: /delete/i });
     fireEvent.click(deleteMenuItem);
 
     await waitFor(() => {
@@ -336,8 +353,7 @@ describe('TodoListPage', () => {
 
   it('handles logout', async () => {
     renderComponent();
-    const sidebar = screen.getByRole('navigation'); // Assuming AppSidebar has a navigation role
-    const logoutButton = within(sidebar).getByRole('button', { name: /logout/i });
+    const logoutButton = screen.getByRole('button', { name: /logout/i });
     fireEvent.click(logoutButton);
 
     await waitFor(() => {
