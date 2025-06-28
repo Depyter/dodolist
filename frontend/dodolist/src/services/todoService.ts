@@ -154,33 +154,46 @@ export const usePersistentTodoLists = () => {
     };
   }, []); // Only run once on mount
 
+  // --- Add: Effect to subscribe to PocketBase realtime events and trigger sync ---
+  useEffect(() => {
+    const handleRealtimeEvent = (e: any) => {
+      // Always sync on any event (create, update, delete)
+      performSync('realtime_event');
+    };
+    pbRealtimeManager.subscribe('task_lists', handleRealtimeEvent);
+    return () => {
+      pbRealtimeManager.unsubscribe('task_lists');
+    };
+  }, []);
+
   const providers = useRef<Map<string, YjsPocketbaseProvider>>(new Map());
   const ydocs = useRef<Map<string, Y.Doc>>(new Map());
   const isSyncing = useRef(false);
 
   const attachDocUpdateListener = (doc: Y.Doc, listId: string) => {
+    // Always update UI state when Yjs doc changes (local or remote)
     const updateHandler = () => {
-        const yTodos = doc.getArray<any>('todos').toJSON();
-        const todos = yTodos.map(yjsToTodo);
-        const metadata = doc.getMap('metadata').toJSON();
-        setTodoLists(currentLists => {
-            const newLists = currentLists.map(l => {
-                if (l.id === listId) {
-                    return {
-                        ...l,
-                        todos: todos,
-                        name: metadata.name || l.name,
-                        color: metadata.color || l.color,
-                        pinned: typeof metadata.pinned === 'boolean' ? metadata.pinned : l.pinned,
-                        archived: typeof metadata.archived === 'boolean' ? metadata.archived : l.archived,
-                    };
-                }
-                return l;
-            });
-            return newLists;
-        });
+      const yTodos = doc.getArray<any>('todos').toJSON();
+      const todos = yTodos.map(yjsToTodo);
+      const metadata = doc.getMap('metadata').toJSON();
+      setTodoLists(currentLists => {
+        // Update or insert the list in the UI state
+        const idx = currentLists.findIndex(l => l.id === listId);
+        const updatedList: TodoList = {
+          id: listId,
+          name: metadata.name || 'Unnamed List',
+          color: metadata.color || '#000000',
+          todos,
+          createdAt: metadata.createdAt || new Date().toISOString(),
+          pinned: !!metadata.pinned,
+          archived: !!metadata.archived,
+        };
+        if (idx === -1) return [...currentLists, updatedList];
+        const newLists = [...currentLists];
+        newLists[idx] = updatedList;
+        return newLists;
+      });
     };
-
     doc.on('update', updateHandler);
   };
 
@@ -363,18 +376,6 @@ export const usePersistentTodoLists = () => {
     console.log('[todoService] Manual sync triggered');
     performSync('manual_trigger');
   };
-
-  // Periodic connection check (fallback)
-  useEffect(() => {
-    const checkConnection = async () => {
-      if (!isSyncing.current) {
-        await pbRealtimeManager.forceConnectionCheck();
-      }
-    };
-
-    const interval = setInterval(checkConnection, 30000); // Check every 30 seconds
-    return () => clearInterval(interval);
-  }, []);
 
   // Effect to load initial data from local storage (IndexedDB) and set up Yjs docs
   useEffect(() => {
