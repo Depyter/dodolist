@@ -14,7 +14,7 @@ class DbService {
   private pendingOperations: any[] = []; // Track pending operations
 
   constructor() {
-    this.initPromise = this.initDb();
+    // Initialization is deferred until ready() is called
   }
 
   private async initDb(): Promise<void> {
@@ -138,6 +138,10 @@ class DbService {
   }
 
   async ready(): Promise<void> {
+    if (typeof window === 'undefined') {
+      // In non-browser environments, resolve immediately without initializing DB
+      return;
+    }
     if (!this.initPromise) {
       this.initPromise = this.initDb();
     }

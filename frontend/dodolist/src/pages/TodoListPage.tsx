@@ -3,14 +3,8 @@
 import type React from "react"
 import { useState, useEffect, useCallback } from "react"
 import { useParams, useNavigate } from "react-router-dom"
-import AuthService, { type User } from "@/services/authService"
-
-interface UserProfile {
-  name: string;
-  email: string;
-  avatar?: string;
-}
-import { usePersistentTodoLists, type Todo, type TodoList } from "@/services/todoService"
+import AuthService from "@/services/authService"
+import { usePersistentTodoLists } from "@/services/todoService"
 import { useIsMobile } from "@/hooks/use-mobile";
 
 import { Button } from "@/components/ui/button"
@@ -57,7 +51,26 @@ import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/s
 import { toast } from "sonner"
 import { Toaster } from "@/components/ui/sonner";
 
+// We're using the Todo and TodoList interfaces from todoService.ts,
+// but we'll still define them here to maintain type safety without refactoring the whole file
+interface Todo {
+  id: string
+  text: string
+  description?: string
+  completed: boolean
+  createdAt: Date
+  completedAt?: Date
+  deadline?: Date
+  reminder?: Date
+  recurring?: "none" | "daily" | "weekly" | "monthly"
+  listId: string
+}
 
+interface UserProfile {
+  name: string
+  email: string
+  avatar?: string
+}
 
 const colors = [
   {
@@ -155,11 +168,40 @@ export default function DodoListApp() {
   }
   
   // State for persistence notification
+  const [showPersistenceWarning, setShowPersistenceWarning] = useState(false);
+  const [persistenceType, setPersistenceType] = useState<'memory' | 'indexeddb' | 'opfs' | null>(null);
+  const [persistenceError, setPersistenceError] = useState<string | null>(null);
   
   // Persistence detection
+  useEffect(() => {
+    // Listen for messages from dbService about persistence type
+    const handleStorageInfo = (event: any) => {
+      if (event.detail?.type === 'persistence-info') {
+        setPersistenceType(event.detail.storageType);
+        setShowPersistenceWarning(event.detail.storageType === 'memory');
+        setPersistenceError(event.detail.error || null);
+        
+        // Log detailed info for debugging
+        console.log('Storage persistence info:', {
+          type: event.detail.storageType,
+          persistent: event.detail.persistent,
+          error: event.detail.error
+        });
+      }
+    };
+    
+    // Add event listener for custom event
+    window.addEventListener('dodolist-storage-info', handleStorageInfo);
+    
+    // Cleanup
+    return () => {
+      window.removeEventListener('dodolist-storage-info', handleStorageInfo);
+    };
+  }, []);
   
   
-  // Use the persistence hook
+
+  // Use the persistence hook, passing the collaborative mode flag
   const {
     todoLists,
     loading,
@@ -175,8 +217,6 @@ export default function DodoListApp() {
     deleteTodo,
     batchAddTodos
   } = usePersistentTodoLists();
-
-  
   
   const [inputValue, setInputValue] = useState("")
   const [newListName, setNewListName] = useState("")
@@ -187,8 +227,8 @@ export default function DodoListApp() {
   const [showTaskOptions, setShowTaskOptions] = useState<string | null>(null)
   const [progressAnimating, setProgressAnimating] = useState(false)
   const [userProfile, setUserProfile] = useState<UserProfile>({
-    name: "",
-    email: "",
+    name: "John Doe",
+    email: "john@example.com",
   })
   const [isEditingProfile, setIsEditingProfile] = useState(false)
   const [tempProfile, setTempProfile] = useState<UserProfile>(userProfile)
@@ -199,6 +239,23 @@ export default function DodoListApp() {
 
   const activeList = todoLists.find((list) => list.id === activeListId)
   const activeColor = colors.find((color) => color.value === activeList?.color) || colors[0]
+
+  // --- COLLABORATIVE TODO STATE --- (Removed as Yjs is handled in the hook)
+  // const [collabTodos, setCollabTodos] = useState<Todo[]>([])
+  // const [yTodos, setYTodos] = useState<Y.Array<any> | null>(null)
+  // const [provider, setProvider] = useState<YjsTodoListProvider | null>(null)
+  // const [yDoc, setYDoc] = useState<Y.Doc | null>(null)
+
+  
+
+  // --- Collaborative todo handlers --- (Removed as handled in the hook)
+  // const handleAddTodoCollab = (text: string) => { ... }
+  // const handleToggleTodoCollab = (todoId: string) => { ... }
+  // const handleDeleteTodoCollab = (todoId: string) => { ... }
+  // const handleUpdateTodoCollab = (todoId: string, updates: Partial<Todo>) => { ... }
+
+  // --- Yjs integration --- (Removed as handled in the hook)
+  // useEffect(() => { ... }, [activeListId])
 
   const todosToUse = activeList?.todos || []; // Use todos directly from the hook's state
   const activeTodos = todosToUse.filter((todo) => !todo.completed)
@@ -214,7 +271,7 @@ export default function DodoListApp() {
   useEffect(() => {
     console.log("Active List ID:", activeListId)
     console.log("Active List Todos:", activeList?.todos)
-  }, [activeListId, activeList?.todos])
+  }, [activeListId, activeList?.todos]) // Use isCollaborativeMode dependency
 
   const totalCount = activeList?.todos.length || 0
   const activeCount = activeTodos.length
@@ -830,7 +887,6 @@ export default function DodoListApp() {
           <button
             onClick={() => handleToggleTodo(todo.id)}
             className="mt-0.5 text-slate-400 hover:text-slate-600 transition-colors min-w-[20px]"
-            aria-label="Toggle completion"
           >
             {todo.completed ? (
               <CheckCircle2 className={`w-4 h-4 ${activeList?.color.replace("bg-", "text-")}`} />
@@ -897,7 +953,6 @@ export default function DodoListApp() {
               size="sm"
               onClick={() => handleDeleteTodo(todo.id)}
               className="text-slate-400 hover:text-red-500 hover:bg-red-50 h-7 w-7 p-0"
-              title="Delete task"
             >
               <Trash2 className="w-3.5 h-3.5" />
             </Button>
@@ -988,7 +1043,52 @@ export default function DodoListApp() {
             </div>
           )}
           
-          
+          {/* Persistence Warning */}
+          {showPersistenceWarning && (
+            <div className="px-4 py-2 bg-amber-50 border-b border-amber-200">
+              <div className="flex items-start gap-2">
+                <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-amber-800">Your data is not being saved permanently</p>
+                  <p className="text-xs text-amber-700 mt-0.5">
+                    {persistenceError ? 
+                      `Database error: ${persistenceError}` : 
+                      "Your browser doesn't support persistent storage. Your tasks will be lost when you close this tab or refresh the page."}
+                  </p>
+                  {persistenceType === 'memory' && !persistenceError && (
+                    <div className="mt-1 text-xs text-amber-700">
+                      <p>For persistent storage, try:</p>
+                      <ul className="list-disc list-inside mt-0.5">
+                        <li>Using a modern browser like Chrome or Firefox</li>
+                        <li>Enable third-party cookies in your browser settings</li>
+                        <li>Try using a private/incognito window if storage is restricted</li>
+                      </ul>
+                    </div>
+                  )}
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowPersistenceWarning(false)}
+                  className="h-6 w-6 p-0 text-amber-600"
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Storage Type Indicator */}
+          {persistenceType && !showPersistenceWarning && (
+            <div className="px-4 py-1 bg-slate-50 border-b border-slate-200 flex items-center gap-2">
+              <Database className="w-4 h-4 text-slate-500" />
+              <span className="text-xs text-slate-600">
+                {persistenceType === 'opfs' ? 'Using Origin Private File System for storage' : 
+                 persistenceType === 'indexeddb' ? 'Using IndexedDB for storage' : 
+                 'Using in-memory storage (data will be lost when page is closed)'}
+              </span>
+            </div>
+          )}
 
           {/* Task Schedule Overlay */}
           {showTaskOptions && (
@@ -1063,6 +1163,8 @@ export default function DodoListApp() {
 
                 {/* List Options Menu */}
                 <div className="ml-auto flex items-center gap-1">
+                  
+
                   {/* Clone List Button */}
                   <Button
                       variant="ghost"
@@ -1233,12 +1335,32 @@ export default function DodoListApp() {
             <div className="max-w-2xl mx-auto">
               <Card className={`p-4 ${activeColor.light} ${activeColor.border} border backdrop-blur-sm`}>
                 <div className="flex gap-3">
-                  
-                  <Input value={inputValue} onChange={(e) => setInputValue(e.target.value)} onKeyPress={handleKeyPress} placeholder={`Add a task to ${activeList?.name}...`} className="border-slate-200 focus:border-slate-300 focus:ring-slate-200 bg-white/80" disabled={activeList?.archived || loading} />
-                  <Button onClick={handleAddTodo} disabled={!inputValue.trim() || activeList?.archived || isAddingTodo} className={`${activeList?.color} hover:opacity-90 text-white px-4`} loading={isAddingTodo} aria-label="Add task"><Send className="w-4 h-4" /></Button>
+                  <div className="flex-1">
+                    <Input
+                      value={inputValue}
+                      onChange={(e) => setInputValue(e.target.value)}
+                      onKeyPress={handleKeyPress}
+                      placeholder={`Add a task to ${activeList?.name}...`}
+                      className="border-slate-200 focus:border-slate-300 focus:ring-slate-200 bg-white/80"
+                      disabled={activeList?.archived || loading}
+                    />
+                  </div>
+                  <Button
+                    onClick={handleAddTodo}
+                    disabled={!inputValue.trim() || activeList?.archived || isAddingTodo}
+                    className={`${activeList?.color} hover:opacity-90 text-white px-4`}
+                    loading={isAddingTodo}
+                  >
+                    <Send className="w-4 h-4" />
+                  </Button>
                 </div>
-                {inputValue.trim() && !activeList?.archived && <div className="mt-2 text-xs text-slate-500">Press Enter or click send to add this task</div>}
-                {activeList?.archived && <div className="mt-2 text-xs text-amber-600">Cannot add tasks to archived lists</div>}
+
+                {inputValue.trim() && !activeList?.archived && (
+                  <div className="mt-2 text-xs text-slate-500">Press Enter or click send to add this task</div>
+                )}
+                {activeList?.archived && (
+                  <div className="mt-2 text-xs text-amber-600">Cannot add tasks to archived lists</div>
+                )}
               </Card>
             </div>
           </div>

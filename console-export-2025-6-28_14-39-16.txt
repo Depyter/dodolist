@@ -1,565 +1,1021 @@
-GET
-http://localhost:3000/list
-[HTTP/1.1 304 Not Modified 8ms]
-
-GET
-http://localhost:3000/@vite/client
-[HTTP/1.1 304 Not Modified 2ms]
-
-GET
-http://localhost:3000/src/main.tsx?t=1751092693811
-[HTTP/1.1 304 Not Modified 2ms]
-
-GET
-http://localhost:3000/@react-refresh
-[HTTP/1.1 304 Not Modified 1ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=33d65415
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/react.js?v=33d65415
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=7ef43f31
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/src/index.css?t=1751092693811
-[HTTP/1.1 304 Not Modified 2ms]
-
-GET
-http://localhost:3000/src/App.tsx?t=1751092693811
-[HTTP/1.1 304 Not Modified 2ms]
-
-GET
-http://localhost:3000/node_modules/vite/dist/client/env.mjs
-[HTTP/1.1 304 Not Modified 1ms]
-
-[vite] connecting... client:789:9
-GET
-http://localhost:3000/node_modules/.vite/deps/chunk-UGC3UZ7L.js?v=ba46d394
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/chunk-G3PMV62Z.js?v=ba46d394
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/react-router-dom.js?v=d46c65b3
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/src/pages/TodoListPage.tsx?t=1751092693811
-[HTTP/1.1 304 Not Modified 2ms]
-
-GET
-http://localhost:3000/src/pages/LoginPage.tsx
-[HTTP/1.1 304 Not Modified 1ms]
-
-GET
-http://localhost:3000/src/pages/RegisterPage.tsx
-[HTTP/1.1 304 Not Modified 1ms]
-
-GET
-http://localhost:3000/src/components/ProtectedRoute.tsx
-[HTTP/1.1 304 Not Modified 1ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/chunk-HE4GKDYE.js?v=ba46d394
-[HTTP/1.1 200 OK 0ms]
-
-GET
-ws://localhost:3000/?token=ktrfjAPtFIVY
-[HTTP/1.1 101 Switching Protocols 2ms]
-
-GET
-http://localhost:3000/src/components/ui/card.tsx
-[HTTP/1.1 304 Not Modified 1ms]
-
-GET
-http://localhost:3000/src/components/LoginForm.tsx
-[HTTP/1.1 304 Not Modified 1ms]
-
-GET
-http://localhost:3000/src/components/TexturedBackground.tsx
-[HTTP/1.1 304 Not Modified 1ms]
-
-GET
-http://localhost:3000/src/services/authService.ts
-[HTTP/1.1 304 Not Modified 1ms]
-
-GET
-http://localhost:3000/src/services/todoService.ts?t=1751092693811
-[HTTP/1.1 304 Not Modified 1ms]
-
-GET
-http://localhost:3000/src/hooks/use-mobile.ts
-[HTTP/1.1 304 Not Modified 1ms]
-
-GET
-http://localhost:3000/src/components/ui/button.tsx
-[HTTP/1.1 304 Not Modified 1ms]
-
-GET
-http://localhost:3000/src/components/ui/input.tsx
-[HTTP/1.1 304 Not Modified 1ms]
-
-GET
-http://localhost:3000/src/components/ui/dropdown-menu.tsx
-[HTTP/1.1 304 Not Modified 1ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/lucide-react.js?v=9a91e7c1
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/src/components/AppSidebar.tsx
-[HTTP/1.1 304 Not Modified 1ms]
-
-GET
-http://localhost:3000/src/components/ui/sidebar.tsx
-[HTTP/1.1 304 Not Modified 1ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/sonner.js?v=e9c41c37
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/src/components/ui/sonner.tsx
-[HTTP/1.1 304 Not Modified 1ms]
-
-GET
-http://localhost:3000/src/components/ui/label.tsx
-[HTTP/1.1 304 Not Modified 1ms]
-
-[vite] connected. client:912:15
-GET
-http://localhost:3000/src/lib/utils.ts
-[HTTP/1.1 304 Not Modified 2ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/pocketbase.js?v=eecf78f1
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/src/config.ts
-[HTTP/1.1 304 Not Modified 1ms]
-
-GET
-http://localhost:3000/src/hooks/use-media-query.tsx
-[HTTP/1.1 304 Not Modified 1ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/yjs.js?v=54b042fb
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/src/services/YjsPocketbaseProvider.ts?t=1751090195611
-[HTTP/1.1 304 Not Modified 2ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/@radix-ui_react-slot.js?v=d9afd721
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/class-variance-authority.js?v=d543e623
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/src/components/ui/loader.tsx
-[HTTP/1.1 304 Not Modified 1ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/@radix-ui_react-dropdown-menu.js?v=3d254d61
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/src/components/ui/dialog.tsx
-[HTTP/1.1 304 Not Modified 1ms]
-
-GET
-http://localhost:3000/src/components/ui/separator.tsx
-[HTTP/1.1 304 Not Modified 1ms]
-
-GET
-http://localhost:3000/src/components/ui/sheet.tsx
-[HTTP/1.1 304 Not Modified 1ms]
-
-GET
-http://localhost:3000/src/components/ui/skeleton.tsx
-[HTTP/1.1 304 Not Modified 1ms]
-
-GET
-http://localhost:3000/src/components/ui/tooltip.tsx
-[HTTP/1.1 304 Not Modified 1ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/@radix-ui_react-label.js?v=8f569c39
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/next-themes.js?v=6982c613
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/chunk-NIR4DFCD.js?v=ba46d394
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/chunk-MJNCUEZK.js?v=ba46d394
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/chunk-ITJMDIN4.js?v=ba46d394
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/chunk-U7P2NEEE.js?v=ba46d394
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/chunk-USP4MWKJ.js?v=ba46d394
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/chunk-YZYEZFNH.js?v=ba46d394
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/chunk-M2LNQOGT.js?v=ba46d394
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/chunk-FV6F57PV.js?v=ba46d394
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/clsx.js?v=325c94c8
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/uuid.js?v=aabea08e
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/tailwind-merge.js?v=309bd94a
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/y-indexeddb.js?v=33d65415
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/@radix-ui_react-dialog.js?v=ec104971
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=9d7e24db
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/@radix-ui_react-separator.js?v=74b70532
-[HTTP/1.1 200 OK 0ms]
-
-Download the React DevTools for a better development experience: https://react.dev/link/react-devtools react-dom_client.js:17987:54
-[todoService] connectAndSynchronize called. todoService.ts:164:15
-[todoService] Current state: isOnline=true, isAuthenticated=true todoService.ts:165:15
-[todoService] Conditions met: Attempting to synchronize with PocketBase. todoService.ts:167:17
-[todoService] synchronizeWithPocketBase called. todoService.ts:35:13
-[todoService] handleSyncAndSubscribe called. todoService.ts:352:15
-[todoService] Current state: isOnline=true, isAuthenticated=true todoService.ts:353:15
-[todoService] Conditions met: Attempting to synchronize with PocketBase. todoService.ts:355:17
-[todoService] synchronizeWithPocketBase called. todoService.ts:35:13
-Active List ID: <empty string> TodoListPage.tsx:202:13
-Active List Todos: undefined TodoListPage.tsx:203:13
-[todoService] Cleanup: Clearing periodic reconnection interval. todoService.ts:264:17
-[todoService] Cleanup: Destroying all Yjs providers and docs. todoService.ts:268:15
-[todoService] Cleanup: Destroying all Yjs providers and docs. todoService.ts:456:15
-[todoService] connectAndSynchronize called. todoService.ts:164:15
-[todoService] Current state: isOnline=true, isAuthenticated=true todoService.ts:165:15
-[todoService] Conditions met: Attempting to synchronize with PocketBase. todoService.ts:167:17
-[todoService] synchronizeWithPocketBase called. todoService.ts:35:13
-[todoService] handleSyncAndSubscribe called. todoService.ts:352:15
-[todoService] Current state: isOnline=true, isAuthenticated=true todoService.ts:353:15
-[todoService] Conditions met: Attempting to synchronize with PocketBase. todoService.ts:355:17
-[todoService] synchronizeWithPocketBase called. todoService.ts:35:13
-Active List ID: <empty string> TodoListPage.tsx:202:13
-Active List Todos: undefined TodoListPage.tsx:203:13
-[todoService] Failed to fetch lists from PocketBase during synchronization. Skipping further sync. ClientResponseError 0: The request was autocancelled. You can find more info in https://github.com/pocketbase/js-sdk#auto-cancellation.
-    _ClientResponseError ClientResponseError.ts:13
-    send Client.ts:376
-    promise callback*send Client.ts:374
-    getList CrudService.ts:80
-    getList RecordService.ts:196
-    request CrudService.ts:254
-    _getFullList CrudService.ts:268
-    getFullList CrudService.ts:50
-    getFullList RecordService.ts:185
-    synchronizeWithPocketBase todoService.ts:84
-    connectAndSynchronize todoService.ts:234
-    usePersistentTodoLists todoService.ts:331
-    React 34
-    performWorkUntilDeadline scheduler.development.js:45
-    js scheduler.development.js:223
-    js scheduler.development.js:364
-    __require chunk-G3PMV62Z.js:8
-    js index.js:6
-    __require chunk-G3PMV62Z.js:8
-    React 2
-    __require chunk-G3PMV62Z.js:8
-    js React
-    __require chunk-G3PMV62Z.js:8
-    <anonymous> react-dom_client.js:18075
-todoService.ts:50:17
-[todoService] Failed to fetch lists from PocketBase during synchronization. Skipping further sync. ClientResponseError 0: The request was autocancelled. You can find more info in https://github.com/pocketbase/js-sdk#auto-cancellation.
-    _ClientResponseError ClientResponseError.ts:13
-    send Client.ts:376
-    promise callback*send Client.ts:374
-    getList CrudService.ts:80
-    getList RecordService.ts:196
-    request CrudService.ts:254
-    _getFullList CrudService.ts:268
-    getFullList CrudService.ts:50
-    getFullList RecordService.ts:185
-    synchronizeWithPocketBase todoService.ts:84
-    handleSyncAndSubscribe todoService.ts:465
-    usePersistentTodoLists todoService.ts:561
-    React 34
-    performWorkUntilDeadline scheduler.development.js:45
-    js scheduler.development.js:223
-    js scheduler.development.js:364
-    __require chunk-G3PMV62Z.js:8
-    js index.js:6
-    __require chunk-G3PMV62Z.js:8
-    React 2
-    __require chunk-G3PMV62Z.js:8
-    js React
-    __require chunk-G3PMV62Z.js:8
-    <anonymous> react-dom_client.js:18075
-todoService.ts:50:17
-[todoService] Failed to fetch lists from PocketBase during synchronization. Skipping further sync. ClientResponseError 0: The request was autocancelled. You can find more info in https://github.com/pocketbase/js-sdk#auto-cancellation.
-    _ClientResponseError ClientResponseError.ts:13
-    send Client.ts:376
-    promise callback*send Client.ts:374
-    getList CrudService.ts:80
-    getList RecordService.ts:196
-    request CrudService.ts:254
-    _getFullList CrudService.ts:268
-    getFullList CrudService.ts:50
-    getFullList RecordService.ts:185
-    synchronizeWithPocketBase todoService.ts:84
-    connectAndSynchronize todoService.ts:234
-    usePersistentTodoLists todoService.ts:331
-    React 36
-    performWorkUntilDeadline scheduler.development.js:45
-    js scheduler.development.js:223
-    js scheduler.development.js:364
-    __require chunk-G3PMV62Z.js:8
-    js index.js:6
-    __require chunk-G3PMV62Z.js:8
-    React 2
-    __require chunk-G3PMV62Z.js:8
-    js React
-    __require chunk-G3PMV62Z.js:8
-    <anonymous> react-dom_client.js:18075
-todoService.ts:50:17
-[todoService] Attempting to subscribe to PocketBase real-time updates. todoService.ts:170:19
-[todoService] Attempting to subscribe to PocketBase real-time updates. todoService.ts:358:19
-[todoService] Attempting to subscribe to PocketBase real-time updates. todoService.ts:170:19
-Cross-Origin Request Blocked: The Same Origin Policy disallows reading the remote resource at http://127.0.0.1:8080/api/realtime. (Reason: CORS request did not succeed). Status code: (null).
-Firefox can’t establish a connection to the server at http://127.0.0.1:8080/api/realtime. pocketbase.js:487:52
-Uncaught (in promise) ClientResponseError 0: Something went wrong while processing your request.
-    _ClientResponseError ClientResponseError.ts:13
-    connectErrorHandler RealtimeService.ts:447
-    onerror RealtimeService.ts:373
-    initConnect RealtimeService.ts:372
-    connect RealtimeService.ts:357
-    connect RealtimeService.ts:349
-    subscribe RealtimeService.ts:87
-    subscribe RecordService.ts:130
-    connectAndSynchronize todoService.ts:239
-    usePersistentTodoLists todoService.ts:331
-    React 34
-    performWorkUntilDeadline scheduler.development.js:45
-    js scheduler.development.js:223
-    js scheduler.development.js:364
-    __require chunk-G3PMV62Z.js:8
-    js index.js:6
-    __require chunk-G3PMV62Z.js:8
-    React 2
-    __require chunk-G3PMV62Z.js:8
-    js React
-    __require chunk-G3PMV62Z.js:8
-    <anonymous> react-dom_client.js:18075
-pocketbase.js:7:5
-Uncaught (in promise) ClientResponseError 0: Something went wrong while processing your request.
-    _ClientResponseError ClientResponseError.ts:13
-    connectErrorHandler RealtimeService.ts:447
-    onerror RealtimeService.ts:373
-    initConnect RealtimeService.ts:372
-    connect RealtimeService.ts:357
-    connect RealtimeService.ts:349
-    subscribe RealtimeService.ts:87
-    subscribe RecordService.ts:130
-    connectAndSynchronize todoService.ts:239
-    usePersistentTodoLists todoService.ts:331
-    React 34
-    performWorkUntilDeadline scheduler.development.js:45
-    js scheduler.development.js:223
-    js scheduler.development.js:364
-    __require chunk-G3PMV62Z.js:8
-    js index.js:6
-    __require chunk-G3PMV62Z.js:8
-    React 2
-    __require chunk-G3PMV62Z.js:8
-    js React
-    __require chunk-G3PMV62Z.js:8
-    <anonymous> react-dom_client.js:18075
-pocketbase.js:7:5
-Uncaught (in promise) ClientResponseError 0: Something went wrong while processing your request.
-    _ClientResponseError ClientResponseError.ts:13
-    connectErrorHandler RealtimeService.ts:447
-    onerror RealtimeService.ts:373
-    initConnect RealtimeService.ts:372
-    connect RealtimeService.ts:357
-    connect RealtimeService.ts:349
-    subscribe RealtimeService.ts:87
-    subscribe RecordService.ts:130
-    connectAndSynchronize todoService.ts:239
-    usePersistentTodoLists todoService.ts:331
-    React 34
-    performWorkUntilDeadline scheduler.development.js:45
-    js scheduler.development.js:223
-    js scheduler.development.js:364
-    __require chunk-G3PMV62Z.js:8
-    js index.js:6
-    __require chunk-G3PMV62Z.js:8
-    React 2
-    __require chunk-G3PMV62Z.js:8
-    js React
-    __require chunk-G3PMV62Z.js:8
-    <anonymous> react-dom_client.js:18075
-pocketbase.js:7:5
-Cross-Origin Request Blocked: The Same Origin Policy disallows reading the remote resource at http://127.0.0.1:8080/api/collections/task_lists/records?page=1&perPage=500&skipTotal=1&filter=user_id%20%3D%20%2251612qsjktu0i93%22&sort=-createdAt. (Reason: CORS request did not succeed). Status code: (null). 2
-[todoService] Failed to fetch lists from PocketBase during synchronization. Skipping further sync. ClientResponseError 0: Something went wrong while processing your request.
-    _ClientResponseError ClientResponseError.ts:13
-    send Client.ts:376
-    promise callback*send Client.ts:374
-    getList CrudService.ts:80
-    getList RecordService.ts:196
-    request CrudService.ts:254
-    _getFullList CrudService.ts:268
-    getFullList CrudService.ts:50
-    getFullList RecordService.ts:185
-    synchronizeWithPocketBase todoService.ts:84
-    handleSyncAndSubscribe todoService.ts:465
-    usePersistentTodoLists todoService.ts:561
-    React 36
-    performWorkUntilDeadline scheduler.development.js:45
-    js scheduler.development.js:223
-    js scheduler.development.js:364
-    __require chunk-G3PMV62Z.js:8
-    js index.js:6
-    __require chunk-G3PMV62Z.js:8
-    React 2
-    __require chunk-G3PMV62Z.js:8
-    js React
-    __require chunk-G3PMV62Z.js:8
-    <anonymous> react-dom_client.js:18075
-todoService.ts:50:17
-[todoService] Attempting to subscribe to PocketBase real-time updates. todoService.ts:358:19
-GET
-http://localhost:3000/vite.svg
-[HTTP/1.1 200 OK 0ms]
-
-Cross-Origin Request Blocked: The Same Origin Policy disallows reading the remote resource at http://127.0.0.1:8080/api/realtime. (Reason: CORS request did not succeed). Status code: (null).
-Firefox can’t establish a connection to the server at http://127.0.0.1:8080/api/realtime. pocketbase.js:487:52
-Uncaught (in promise) ClientResponseError 0: Something went wrong while processing your request.
-    _ClientResponseError ClientResponseError.ts:13
-    connectErrorHandler RealtimeService.ts:447
-    onerror RealtimeService.ts:373
-    initConnect RealtimeService.ts:372
-    connect RealtimeService.ts:357
-    connect RealtimeService.ts:349
-    subscribe RealtimeService.ts:87
-    subscribe RecordService.ts:130
-    handleSyncAndSubscribe todoService.ts:470
-    usePersistentTodoLists todoService.ts:561
-    React 36
-    performWorkUntilDeadline scheduler.development.js:45
-    js scheduler.development.js:223
-    js scheduler.development.js:364
-    __require chunk-G3PMV62Z.js:8
-    js index.js:6
-    __require chunk-G3PMV62Z.js:8
-    React 2
-    __require chunk-G3PMV62Z.js:8
-    js React
-    __require chunk-G3PMV62Z.js:8
-    <anonymous> react-dom_client.js:18075
-pocketbase.js:7:5
-[todoService] Periodic reconnection attempt... todoService.ts:442:17
-[todoService] handleSyncAndSubscribe called. todoService.ts:352:15
-[todoService] Current state: isOnline=true, isAuthenticated=true todoService.ts:353:15
-[todoService] Conditions met: Attempting to synchronize with PocketBase. todoService.ts:355:17
-[todoService] synchronizeWithPocketBase called. todoService.ts:35:13
-Cross-Origin Request Blocked: The Same Origin Policy disallows reading the remote resource at http://127.0.0.1:8080/api/collections/task_lists/records?page=1&perPage=500&skipTotal=1&filter=user_id%20%3D%20%2251612qsjktu0i93%22&sort=-createdAt. (Reason: CORS request did not succeed). Status code: (null).
-Cross-Origin Request Blocked: The Same Origin Policy disallows reading the remote resource at http://127.0.0.1:8080/api/collections/task_lists/records?page=1&perPage=500&skipTotal=1&filter=user_id%20%3D%20%2251612qsjktu0i93%22&sort=-createdAt. (Reason: CORS request did not succeed). Status code: (null).
-[todoService] Failed to fetch lists from PocketBase during synchronization. Skipping further sync. ClientResponseError 0: Something went wrong while processing your request.
-    _ClientResponseError ClientResponseError.ts:13
-    send Client.ts:376
-    promise callback*send Client.ts:374
-    getList CrudService.ts:80
-    getList RecordService.ts:196
-    request CrudService.ts:254
-    _getFullList CrudService.ts:268
-    getFullList CrudService.ts:50
-    getFullList RecordService.ts:185
-    synchronizeWithPocketBase todoService.ts:84
-    handleSyncAndSubscribe todoService.ts:465
-    current todoService.ts:570
-    setInterval handler*usePersistentTodoLists/< todoService.ts:568
-    React 36
-    performWorkUntilDeadline scheduler.development.js:45
-    js scheduler.development.js:223
-    js scheduler.development.js:364
-    __require chunk-G3PMV62Z.js:8
-    js index.js:6
-    __require chunk-G3PMV62Z.js:8
-    React 2
-    __require chunk-G3PMV62Z.js:8
-    js React
-    __require chunk-G3PMV62Z.js:8
-    <anonymous> react-dom_client.js:18075
-todoService.ts:50:17
-[todoService] Attempting to subscribe to PocketBase real-time updates. todoService.ts:358:19
-Cross-Origin Request Blocked: The Same Origin Policy disallows reading the remote resource at http://127.0.0.1:8080/api/realtime. (Reason: CORS request did not succeed). Status code: (null).
-Firefox can’t establish a connection to the server at http://127.0.0.1:8080/api/realtime. pocketbase.js:487:52
-Uncaught (in promise) ClientResponseError 0: Something went wrong while processing your request.
-    _ClientResponseError ClientResponseError.ts:13
-    connectErrorHandler RealtimeService.ts:447
-    onerror RealtimeService.ts:373
-    initConnect RealtimeService.ts:372
-    connect RealtimeService.ts:357
-    connect RealtimeService.ts:349
-    subscribe RealtimeService.ts:87
-    subscribe RecordService.ts:130
-    handleSyncAndSubscribe todoService.ts:470
-    current todoService.ts:570
-    setInterval handler*usePersistentTodoLists/< todoService.ts:568
-    React 36
-    performWorkUntilDeadline scheduler.development.js:45
-    js scheduler.development.js:223
-    js scheduler.development.js:364
-    __require chunk-G3PMV62Z.js:8
-    js index.js:6
-    __require chunk-G3PMV62Z.js:8
-    React 2
-    __require chunk-G3PMV62Z.js:8
-    js React
-    __require chunk-G3PMV62Z.js:8
-    <anonymous> react-dom_client.js:18075
-pocketbase.js:7:5
+[todoService] Pushed changes for list 531c5316-a643-48d0-b8fd-9cf554121d47 todoService.ts:229:21
+[todoService] Connecting providers and pulling remote changes... todoService.ts:235:15
+[todoService] Applied remote update for list b199633d-3f31-4fa0-b0e2-d5d8e0dcaddb todoService.ts:253:19
+[todoService] Real-time update received from PocketBase (native): 
+Object { record: {…}, action: "update" }
+todoService.ts:461:15
+[todoService] performSync called by: realtime_update todoService.ts:130:13
+[todoService] Current state: connected=true, syncing=true todoService.ts:131:13
+[todoService] Already syncing, skipping todoService.ts:133:15
+[YjsPocketbaseProvider] Realtime update received for list 531c5316-a643-48d0-b8fd-9cf554121d47: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 531c5316-a643-48d0-b8fd-9cf554121d47: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 531c5316-a643-48d0-b8fd-9cf554121d47: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 531c5316-a643-48d0-b8fd-9cf554121d47: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 531c5316-a643-48d0-b8fd-9cf554121d47: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 531c5316-a643-48d0-b8fd-9cf554121d47: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 531c5316-a643-48d0-b8fd-9cf554121d47: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 531c5316-a643-48d0-b8fd-9cf554121d47: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 531c5316-a643-48d0-b8fd-9cf554121d47: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 531c5316-a643-48d0-b8fd-9cf554121d47: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 531c5316-a643-48d0-b8fd-9cf554121d47: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 531c5316-a643-48d0-b8fd-9cf554121d47: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 531c5316-a643-48d0-b8fd-9cf554121d47: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 531c5316-a643-48d0-b8fd-9cf554121d47: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 531c5316-a643-48d0-b8fd-9cf554121d47: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 531c5316-a643-48d0-b8fd-9cf554121d47: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 531c5316-a643-48d0-b8fd-9cf554121d47: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 531c5316-a643-48d0-b8fd-9cf554121d47: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 531c5316-a643-48d0-b8fd-9cf554121d47: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 531c5316-a643-48d0-b8fd-9cf554121d47: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 531c5316-a643-48d0-b8fd-9cf554121d47: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Retrieved latest state from server for list: b199633d-3f31-4fa0-b0e2-d5d8e0dcaddb YjsPocketbaseProvider.ts:80:19
+[YjsPocketbaseProvider] Local Yjs update detected for list: b199633d-3f31-4fa0-b0e2-d5d8e0dcaddb. Origin: reconnect-sync YjsPocketbaseProvider.ts:30:13
+[YjsPocketbaseProvider] Attempting to send update to PocketBase for list: b199633d-3f31-4fa0-b0e2-d5d8e0dcaddb. YjsPocketbaseProvider.ts:32:15
+[YjsPocketbaseProvider] Successfully subscribed for list: b199633d-3f31-4fa0-b0e2-d5d8e0dcaddb. YjsPocketbaseProvider.ts:96:17
+[todoService] Connected provider for list b199633d-3f31-4fa0-b0e2-d5d8e0dcaddb todoService.ts:257:19
+[todoService] Applied remote update for list 6399d431-66af-485a-8998-fe81043444ca todoService.ts:253:19
+[YjsPocketbaseProvider] Retrieved latest state from server for list: 6399d431-66af-485a-8998-fe81043444ca YjsPocketbaseProvider.ts:80:19
+[YjsPocketbaseProvider] Local Yjs update detected for list: 6399d431-66af-485a-8998-fe81043444ca. Origin: reconnect-sync YjsPocketbaseProvider.ts:30:13
+[YjsPocketbaseProvider] Attempting to send update to PocketBase for list: 6399d431-66af-485a-8998-fe81043444ca. YjsPocketbaseProvider.ts:32:15
+[YjsPocketbaseProvider] Successfully subscribed for list: 6399d431-66af-485a-8998-fe81043444ca. YjsPocketbaseProvider.ts:96:17
+[todoService] Connected provider for list 6399d431-66af-485a-8998-fe81043444ca todoService.ts:257:19
+[todoService] Applied remote update for list 9eb3a017-d253-4824-ac0a-03fe22f4bb97 todoService.ts:253:19
+[YjsPocketbaseProvider] Successfully sent full state and metadata update to PocketBase for list: b199633d-3f31-4fa0-b0e2-d5d8e0dcaddb YjsPocketbaseProvider.ts:44:17
+[todoService] Real-time update received from PocketBase (native): 
+Object { record: {…}, action: "update" }
+todoService.ts:461:15
+[todoService] performSync called by: realtime_update todoService.ts:130:13
+[todoService] Current state: connected=true, syncing=true todoService.ts:131:13
+[todoService] Already syncing, skipping todoService.ts:133:15
+[YjsPocketbaseProvider] Realtime update received for list b199633d-3f31-4fa0-b0e2-d5d8e0dcaddb: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b199633d-3f31-4fa0-b0e2-d5d8e0dcaddb: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b199633d-3f31-4fa0-b0e2-d5d8e0dcaddb: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b199633d-3f31-4fa0-b0e2-d5d8e0dcaddb: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b199633d-3f31-4fa0-b0e2-d5d8e0dcaddb: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b199633d-3f31-4fa0-b0e2-d5d8e0dcaddb: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b199633d-3f31-4fa0-b0e2-d5d8e0dcaddb: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b199633d-3f31-4fa0-b0e2-d5d8e0dcaddb: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b199633d-3f31-4fa0-b0e2-d5d8e0dcaddb: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b199633d-3f31-4fa0-b0e2-d5d8e0dcaddb: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b199633d-3f31-4fa0-b0e2-d5d8e0dcaddb: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b199633d-3f31-4fa0-b0e2-d5d8e0dcaddb: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b199633d-3f31-4fa0-b0e2-d5d8e0dcaddb: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b199633d-3f31-4fa0-b0e2-d5d8e0dcaddb: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b199633d-3f31-4fa0-b0e2-d5d8e0dcaddb: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b199633d-3f31-4fa0-b0e2-d5d8e0dcaddb: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b199633d-3f31-4fa0-b0e2-d5d8e0dcaddb: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b199633d-3f31-4fa0-b0e2-d5d8e0dcaddb: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b199633d-3f31-4fa0-b0e2-d5d8e0dcaddb: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b199633d-3f31-4fa0-b0e2-d5d8e0dcaddb: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b199633d-3f31-4fa0-b0e2-d5d8e0dcaddb: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b199633d-3f31-4fa0-b0e2-d5d8e0dcaddb: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Retrieved latest state from server for list: 9eb3a017-d253-4824-ac0a-03fe22f4bb97 YjsPocketbaseProvider.ts:80:19
+[YjsPocketbaseProvider] Local Yjs update detected for list: 9eb3a017-d253-4824-ac0a-03fe22f4bb97. Origin: reconnect-sync YjsPocketbaseProvider.ts:30:13
+[YjsPocketbaseProvider] Attempting to send update to PocketBase for list: 9eb3a017-d253-4824-ac0a-03fe22f4bb97. YjsPocketbaseProvider.ts:32:15
+[YjsPocketbaseProvider] Successfully subscribed for list: 9eb3a017-d253-4824-ac0a-03fe22f4bb97. YjsPocketbaseProvider.ts:96:17
+[todoService] Connected provider for list 9eb3a017-d253-4824-ac0a-03fe22f4bb97 todoService.ts:257:19
+[todoService] Applied remote update for list 24ed711a-d4ea-4c97-9b4b-0eb21a01fa83 todoService.ts:253:19
+[todoService] Real-time update received from PocketBase (native): 
+Object { record: {…}, action: "update" }
+todoService.ts:461:15
+[todoService] performSync called by: realtime_update todoService.ts:130:13
+[todoService] Current state: connected=true, syncing=true todoService.ts:131:13
+[todoService] Already syncing, skipping todoService.ts:133:15
+[YjsPocketbaseProvider] Realtime update received for list 6399d431-66af-485a-8998-fe81043444ca: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 6399d431-66af-485a-8998-fe81043444ca: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 6399d431-66af-485a-8998-fe81043444ca: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 6399d431-66af-485a-8998-fe81043444ca: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 6399d431-66af-485a-8998-fe81043444ca: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 6399d431-66af-485a-8998-fe81043444ca: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 6399d431-66af-485a-8998-fe81043444ca: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 6399d431-66af-485a-8998-fe81043444ca: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 6399d431-66af-485a-8998-fe81043444ca: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 6399d431-66af-485a-8998-fe81043444ca: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 6399d431-66af-485a-8998-fe81043444ca: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 6399d431-66af-485a-8998-fe81043444ca: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 6399d431-66af-485a-8998-fe81043444ca: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 6399d431-66af-485a-8998-fe81043444ca: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 6399d431-66af-485a-8998-fe81043444ca: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 6399d431-66af-485a-8998-fe81043444ca: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 6399d431-66af-485a-8998-fe81043444ca: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 6399d431-66af-485a-8998-fe81043444ca: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 6399d431-66af-485a-8998-fe81043444ca: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 6399d431-66af-485a-8998-fe81043444ca: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 6399d431-66af-485a-8998-fe81043444ca: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 6399d431-66af-485a-8998-fe81043444ca: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Successfully sent full state and metadata update to PocketBase for list: 6399d431-66af-485a-8998-fe81043444ca YjsPocketbaseProvider.ts:44:17
+[todoService] Real-time update received from PocketBase (native): 
+Object { record: {…}, action: "update" }
+todoService.ts:461:15
+[todoService] performSync called by: realtime_update todoService.ts:130:13
+[todoService] Current state: connected=true, syncing=true todoService.ts:131:13
+[todoService] Already syncing, skipping todoService.ts:133:15
+[YjsPocketbaseProvider] Realtime update received for list 9eb3a017-d253-4824-ac0a-03fe22f4bb97: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 9eb3a017-d253-4824-ac0a-03fe22f4bb97: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 9eb3a017-d253-4824-ac0a-03fe22f4bb97: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 9eb3a017-d253-4824-ac0a-03fe22f4bb97: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 9eb3a017-d253-4824-ac0a-03fe22f4bb97: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 9eb3a017-d253-4824-ac0a-03fe22f4bb97: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 9eb3a017-d253-4824-ac0a-03fe22f4bb97: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 9eb3a017-d253-4824-ac0a-03fe22f4bb97: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 9eb3a017-d253-4824-ac0a-03fe22f4bb97: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 9eb3a017-d253-4824-ac0a-03fe22f4bb97: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 9eb3a017-d253-4824-ac0a-03fe22f4bb97: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 9eb3a017-d253-4824-ac0a-03fe22f4bb97: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 9eb3a017-d253-4824-ac0a-03fe22f4bb97: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 9eb3a017-d253-4824-ac0a-03fe22f4bb97: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 9eb3a017-d253-4824-ac0a-03fe22f4bb97: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 9eb3a017-d253-4824-ac0a-03fe22f4bb97: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 9eb3a017-d253-4824-ac0a-03fe22f4bb97: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 9eb3a017-d253-4824-ac0a-03fe22f4bb97: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 9eb3a017-d253-4824-ac0a-03fe22f4bb97: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 9eb3a017-d253-4824-ac0a-03fe22f4bb97: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 9eb3a017-d253-4824-ac0a-03fe22f4bb97: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 9eb3a017-d253-4824-ac0a-03fe22f4bb97: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Successfully sent full state and metadata update to PocketBase for list: 9eb3a017-d253-4824-ac0a-03fe22f4bb97 YjsPocketbaseProvider.ts:44:17
+[YjsPocketbaseProvider] Retrieved latest state from server for list: 24ed711a-d4ea-4c97-9b4b-0eb21a01fa83 YjsPocketbaseProvider.ts:80:19
+[YjsPocketbaseProvider] Local Yjs update detected for list: 24ed711a-d4ea-4c97-9b4b-0eb21a01fa83. Origin: reconnect-sync YjsPocketbaseProvider.ts:30:13
+[YjsPocketbaseProvider] Attempting to send update to PocketBase for list: 24ed711a-d4ea-4c97-9b4b-0eb21a01fa83. YjsPocketbaseProvider.ts:32:15
+[YjsPocketbaseProvider] Successfully subscribed for list: 24ed711a-d4ea-4c97-9b4b-0eb21a01fa83. YjsPocketbaseProvider.ts:96:17
+[todoService] Connected provider for list 24ed711a-d4ea-4c97-9b4b-0eb21a01fa83 todoService.ts:257:19
+[todoService] Applied remote update for list 9a240040-d3d6-4223-8997-51bcf3ee4856 todoService.ts:253:19
+[YjsPocketbaseProvider] Retrieved latest state from server for list: 9a240040-d3d6-4223-8997-51bcf3ee4856 YjsPocketbaseProvider.ts:80:19
+[YjsPocketbaseProvider] Local Yjs update detected for list: 9a240040-d3d6-4223-8997-51bcf3ee4856. Origin: reconnect-sync YjsPocketbaseProvider.ts:30:13
+[YjsPocketbaseProvider] Attempting to send update to PocketBase for list: 9a240040-d3d6-4223-8997-51bcf3ee4856. YjsPocketbaseProvider.ts:32:15
+[YjsPocketbaseProvider] Successfully subscribed for list: 9a240040-d3d6-4223-8997-51bcf3ee4856. YjsPocketbaseProvider.ts:96:17
+[todoService] Connected provider for list 9a240040-d3d6-4223-8997-51bcf3ee4856 todoService.ts:257:19
+[todoService] Applied remote update for list 74ec9c15-2f75-457a-9511-8e86f332b946 todoService.ts:253:19
+[todoService] Real-time update received from PocketBase (native): 
+Object { record: {…}, action: "update" }
+todoService.ts:461:15
+[todoService] performSync called by: realtime_update todoService.ts:130:13
+[todoService] Current state: connected=true, syncing=true todoService.ts:131:13
+[todoService] Already syncing, skipping todoService.ts:133:15
+[YjsPocketbaseProvider] Realtime update received for list 24ed711a-d4ea-4c97-9b4b-0eb21a01fa83: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 24ed711a-d4ea-4c97-9b4b-0eb21a01fa83: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 24ed711a-d4ea-4c97-9b4b-0eb21a01fa83: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 24ed711a-d4ea-4c97-9b4b-0eb21a01fa83: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 24ed711a-d4ea-4c97-9b4b-0eb21a01fa83: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 24ed711a-d4ea-4c97-9b4b-0eb21a01fa83: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 24ed711a-d4ea-4c97-9b4b-0eb21a01fa83: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 24ed711a-d4ea-4c97-9b4b-0eb21a01fa83: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 24ed711a-d4ea-4c97-9b4b-0eb21a01fa83: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 24ed711a-d4ea-4c97-9b4b-0eb21a01fa83: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 24ed711a-d4ea-4c97-9b4b-0eb21a01fa83: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 24ed711a-d4ea-4c97-9b4b-0eb21a01fa83: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 24ed711a-d4ea-4c97-9b4b-0eb21a01fa83: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 24ed711a-d4ea-4c97-9b4b-0eb21a01fa83: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 24ed711a-d4ea-4c97-9b4b-0eb21a01fa83: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 24ed711a-d4ea-4c97-9b4b-0eb21a01fa83: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 24ed711a-d4ea-4c97-9b4b-0eb21a01fa83: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 24ed711a-d4ea-4c97-9b4b-0eb21a01fa83: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 24ed711a-d4ea-4c97-9b4b-0eb21a01fa83: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 24ed711a-d4ea-4c97-9b4b-0eb21a01fa83: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 24ed711a-d4ea-4c97-9b4b-0eb21a01fa83: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 24ed711a-d4ea-4c97-9b4b-0eb21a01fa83: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Successfully sent full state and metadata update to PocketBase for list: 24ed711a-d4ea-4c97-9b4b-0eb21a01fa83 YjsPocketbaseProvider.ts:44:17
+[YjsPocketbaseProvider] Successfully sent full state and metadata update to PocketBase for list: 9a240040-d3d6-4223-8997-51bcf3ee4856 YjsPocketbaseProvider.ts:44:17
+[YjsPocketbaseProvider] Realtime update received for list 9a240040-d3d6-4223-8997-51bcf3ee4856: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 9a240040-d3d6-4223-8997-51bcf3ee4856: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 9a240040-d3d6-4223-8997-51bcf3ee4856: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 9a240040-d3d6-4223-8997-51bcf3ee4856: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 9a240040-d3d6-4223-8997-51bcf3ee4856: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 9a240040-d3d6-4223-8997-51bcf3ee4856: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 9a240040-d3d6-4223-8997-51bcf3ee4856: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 9a240040-d3d6-4223-8997-51bcf3ee4856: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 9a240040-d3d6-4223-8997-51bcf3ee4856: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 9a240040-d3d6-4223-8997-51bcf3ee4856: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 9a240040-d3d6-4223-8997-51bcf3ee4856: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 9a240040-d3d6-4223-8997-51bcf3ee4856: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 9a240040-d3d6-4223-8997-51bcf3ee4856: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 9a240040-d3d6-4223-8997-51bcf3ee4856: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 9a240040-d3d6-4223-8997-51bcf3ee4856: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 9a240040-d3d6-4223-8997-51bcf3ee4856: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 9a240040-d3d6-4223-8997-51bcf3ee4856: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 9a240040-d3d6-4223-8997-51bcf3ee4856: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 9a240040-d3d6-4223-8997-51bcf3ee4856: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 9a240040-d3d6-4223-8997-51bcf3ee4856: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 9a240040-d3d6-4223-8997-51bcf3ee4856: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 9a240040-d3d6-4223-8997-51bcf3ee4856: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[todoService] Real-time update received from PocketBase (native): 
+Object { record: {…}, action: "update" }
+todoService.ts:461:15
+[todoService] performSync called by: realtime_update todoService.ts:130:13
+[todoService] Current state: connected=true, syncing=true todoService.ts:131:13
+[todoService] Already syncing, skipping todoService.ts:133:15
+[YjsPocketbaseProvider] Retrieved latest state from server for list: 74ec9c15-2f75-457a-9511-8e86f332b946 YjsPocketbaseProvider.ts:80:19
+[YjsPocketbaseProvider] Local Yjs update detected for list: 74ec9c15-2f75-457a-9511-8e86f332b946. Origin: reconnect-sync YjsPocketbaseProvider.ts:30:13
+[YjsPocketbaseProvider] Attempting to send update to PocketBase for list: 74ec9c15-2f75-457a-9511-8e86f332b946. YjsPocketbaseProvider.ts:32:15
+[YjsPocketbaseProvider] Successfully subscribed for list: 74ec9c15-2f75-457a-9511-8e86f332b946. YjsPocketbaseProvider.ts:96:17
+[todoService] Connected provider for list 74ec9c15-2f75-457a-9511-8e86f332b946 todoService.ts:257:19
+[todoService] Applied remote update for list e5814bb4-9aec-4379-a245-f2bdcaf0232b todoService.ts:253:19
+[YjsPocketbaseProvider] Successfully sent full state and metadata update to PocketBase for list: 74ec9c15-2f75-457a-9511-8e86f332b946 YjsPocketbaseProvider.ts:44:17
+[todoService] Real-time update received from PocketBase (native): 
+Object { record: {…}, action: "update" }
+todoService.ts:461:15
+[todoService] performSync called by: realtime_update todoService.ts:130:13
+[todoService] Current state: connected=true, syncing=true todoService.ts:131:13
+[todoService] Already syncing, skipping todoService.ts:133:15
+[YjsPocketbaseProvider] Realtime update received for list 74ec9c15-2f75-457a-9511-8e86f332b946: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 74ec9c15-2f75-457a-9511-8e86f332b946: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 74ec9c15-2f75-457a-9511-8e86f332b946: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 74ec9c15-2f75-457a-9511-8e86f332b946: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 74ec9c15-2f75-457a-9511-8e86f332b946: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 74ec9c15-2f75-457a-9511-8e86f332b946: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 74ec9c15-2f75-457a-9511-8e86f332b946: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 74ec9c15-2f75-457a-9511-8e86f332b946: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 74ec9c15-2f75-457a-9511-8e86f332b946: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 74ec9c15-2f75-457a-9511-8e86f332b946: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 74ec9c15-2f75-457a-9511-8e86f332b946: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 74ec9c15-2f75-457a-9511-8e86f332b946: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 74ec9c15-2f75-457a-9511-8e86f332b946: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 74ec9c15-2f75-457a-9511-8e86f332b946: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 74ec9c15-2f75-457a-9511-8e86f332b946: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 74ec9c15-2f75-457a-9511-8e86f332b946: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 74ec9c15-2f75-457a-9511-8e86f332b946: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 74ec9c15-2f75-457a-9511-8e86f332b946: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 74ec9c15-2f75-457a-9511-8e86f332b946: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 74ec9c15-2f75-457a-9511-8e86f332b946: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 74ec9c15-2f75-457a-9511-8e86f332b946: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 74ec9c15-2f75-457a-9511-8e86f332b946: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Retrieved latest state from server for list: e5814bb4-9aec-4379-a245-f2bdcaf0232b YjsPocketbaseProvider.ts:80:19
+[YjsPocketbaseProvider] Local Yjs update detected for list: e5814bb4-9aec-4379-a245-f2bdcaf0232b. Origin: reconnect-sync YjsPocketbaseProvider.ts:30:13
+[YjsPocketbaseProvider] Attempting to send update to PocketBase for list: e5814bb4-9aec-4379-a245-f2bdcaf0232b. YjsPocketbaseProvider.ts:32:15
+[YjsPocketbaseProvider] Successfully subscribed for list: e5814bb4-9aec-4379-a245-f2bdcaf0232b. YjsPocketbaseProvider.ts:96:17
+[todoService] Connected provider for list e5814bb4-9aec-4379-a245-f2bdcaf0232b todoService.ts:257:19
+[todoService] Applied remote update for list 3ef1e054-cbbe-4439-ab2f-7698b912aed4 todoService.ts:253:19
+[YjsPocketbaseProvider] Retrieved latest state from server for list: 3ef1e054-cbbe-4439-ab2f-7698b912aed4 YjsPocketbaseProvider.ts:80:19
+[YjsPocketbaseProvider] Local Yjs update detected for list: 3ef1e054-cbbe-4439-ab2f-7698b912aed4. Origin: reconnect-sync YjsPocketbaseProvider.ts:30:13
+[YjsPocketbaseProvider] Attempting to send update to PocketBase for list: 3ef1e054-cbbe-4439-ab2f-7698b912aed4. YjsPocketbaseProvider.ts:32:15
+[YjsPocketbaseProvider] Successfully subscribed for list: 3ef1e054-cbbe-4439-ab2f-7698b912aed4. YjsPocketbaseProvider.ts:96:17
+[todoService] Connected provider for list 3ef1e054-cbbe-4439-ab2f-7698b912aed4 todoService.ts:257:19
+[todoService] Applied remote update for list b4cf0a71-bf96-4bd4-a635-78b3db362cc4 todoService.ts:253:19
+[YjsPocketbaseProvider] Realtime update received for list e5814bb4-9aec-4379-a245-f2bdcaf0232b: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list e5814bb4-9aec-4379-a245-f2bdcaf0232b: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list e5814bb4-9aec-4379-a245-f2bdcaf0232b: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list e5814bb4-9aec-4379-a245-f2bdcaf0232b: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list e5814bb4-9aec-4379-a245-f2bdcaf0232b: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list e5814bb4-9aec-4379-a245-f2bdcaf0232b: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list e5814bb4-9aec-4379-a245-f2bdcaf0232b: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list e5814bb4-9aec-4379-a245-f2bdcaf0232b: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list e5814bb4-9aec-4379-a245-f2bdcaf0232b: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list e5814bb4-9aec-4379-a245-f2bdcaf0232b: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list e5814bb4-9aec-4379-a245-f2bdcaf0232b: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list e5814bb4-9aec-4379-a245-f2bdcaf0232b: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list e5814bb4-9aec-4379-a245-f2bdcaf0232b: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list e5814bb4-9aec-4379-a245-f2bdcaf0232b: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list e5814bb4-9aec-4379-a245-f2bdcaf0232b: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list e5814bb4-9aec-4379-a245-f2bdcaf0232b: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list e5814bb4-9aec-4379-a245-f2bdcaf0232b: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list e5814bb4-9aec-4379-a245-f2bdcaf0232b: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list e5814bb4-9aec-4379-a245-f2bdcaf0232b: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list e5814bb4-9aec-4379-a245-f2bdcaf0232b: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list e5814bb4-9aec-4379-a245-f2bdcaf0232b: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list e5814bb4-9aec-4379-a245-f2bdcaf0232b: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[todoService] Real-time update received from PocketBase (native): 
+Object { record: {…}, action: "update" }
+todoService.ts:461:15
+[todoService] performSync called by: realtime_update todoService.ts:130:13
+[todoService] Current state: connected=true, syncing=true todoService.ts:131:13
+[todoService] Already syncing, skipping todoService.ts:133:15
+[YjsPocketbaseProvider] Successfully sent full state and metadata update to PocketBase for list: e5814bb4-9aec-4379-a245-f2bdcaf0232b YjsPocketbaseProvider.ts:44:17
+[YjsPocketbaseProvider] Successfully sent full state and metadata update to PocketBase for list: 3ef1e054-cbbe-4439-ab2f-7698b912aed4 YjsPocketbaseProvider.ts:44:17
+[YjsPocketbaseProvider] Realtime update received for list 3ef1e054-cbbe-4439-ab2f-7698b912aed4: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 3ef1e054-cbbe-4439-ab2f-7698b912aed4: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 3ef1e054-cbbe-4439-ab2f-7698b912aed4: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 3ef1e054-cbbe-4439-ab2f-7698b912aed4: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 3ef1e054-cbbe-4439-ab2f-7698b912aed4: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 3ef1e054-cbbe-4439-ab2f-7698b912aed4: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 3ef1e054-cbbe-4439-ab2f-7698b912aed4: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 3ef1e054-cbbe-4439-ab2f-7698b912aed4: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 3ef1e054-cbbe-4439-ab2f-7698b912aed4: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 3ef1e054-cbbe-4439-ab2f-7698b912aed4: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 3ef1e054-cbbe-4439-ab2f-7698b912aed4: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 3ef1e054-cbbe-4439-ab2f-7698b912aed4: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 3ef1e054-cbbe-4439-ab2f-7698b912aed4: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 3ef1e054-cbbe-4439-ab2f-7698b912aed4: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 3ef1e054-cbbe-4439-ab2f-7698b912aed4: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 3ef1e054-cbbe-4439-ab2f-7698b912aed4: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 3ef1e054-cbbe-4439-ab2f-7698b912aed4: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 3ef1e054-cbbe-4439-ab2f-7698b912aed4: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 3ef1e054-cbbe-4439-ab2f-7698b912aed4: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 3ef1e054-cbbe-4439-ab2f-7698b912aed4: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 3ef1e054-cbbe-4439-ab2f-7698b912aed4: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 3ef1e054-cbbe-4439-ab2f-7698b912aed4: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[todoService] Real-time update received from PocketBase (native): 
+Object { record: {…}, action: "update" }
+todoService.ts:461:15
+[todoService] performSync called by: realtime_update todoService.ts:130:13
+[todoService] Current state: connected=true, syncing=true todoService.ts:131:13
+[todoService] Already syncing, skipping todoService.ts:133:15
+[YjsPocketbaseProvider] Retrieved latest state from server for list: b4cf0a71-bf96-4bd4-a635-78b3db362cc4 YjsPocketbaseProvider.ts:80:19
+[YjsPocketbaseProvider] Local Yjs update detected for list: b4cf0a71-bf96-4bd4-a635-78b3db362cc4. Origin: reconnect-sync YjsPocketbaseProvider.ts:30:13
+[YjsPocketbaseProvider] Attempting to send update to PocketBase for list: b4cf0a71-bf96-4bd4-a635-78b3db362cc4. YjsPocketbaseProvider.ts:32:15
+[YjsPocketbaseProvider] Successfully subscribed for list: b4cf0a71-bf96-4bd4-a635-78b3db362cc4. YjsPocketbaseProvider.ts:96:17
+[todoService] Connected provider for list b4cf0a71-bf96-4bd4-a635-78b3db362cc4 todoService.ts:257:19
+[todoService] Applied remote update for list 03a65ad8-8130-4d00-a00e-489c8ebb193a todoService.ts:253:19
+[YjsPocketbaseProvider] Successfully sent full state and metadata update to PocketBase for list: b4cf0a71-bf96-4bd4-a635-78b3db362cc4 YjsPocketbaseProvider.ts:44:17
+[YjsPocketbaseProvider] Retrieved latest state from server for list: 03a65ad8-8130-4d00-a00e-489c8ebb193a YjsPocketbaseProvider.ts:80:19
+[YjsPocketbaseProvider] Local Yjs update detected for list: 03a65ad8-8130-4d00-a00e-489c8ebb193a. Origin: reconnect-sync YjsPocketbaseProvider.ts:30:13
+[YjsPocketbaseProvider] Attempting to send update to PocketBase for list: 03a65ad8-8130-4d00-a00e-489c8ebb193a. YjsPocketbaseProvider.ts:32:15
+[YjsPocketbaseProvider] Successfully subscribed for list: 03a65ad8-8130-4d00-a00e-489c8ebb193a. YjsPocketbaseProvider.ts:96:17
+[todoService] Connected provider for list 03a65ad8-8130-4d00-a00e-489c8ebb193a todoService.ts:257:19
+[todoService] Applied remote update for list 531c5316-a643-48d0-b8fd-9cf554121d47 todoService.ts:253:19
+[YjsPocketbaseProvider] Realtime update received for list b4cf0a71-bf96-4bd4-a635-78b3db362cc4: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b4cf0a71-bf96-4bd4-a635-78b3db362cc4: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b4cf0a71-bf96-4bd4-a635-78b3db362cc4: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b4cf0a71-bf96-4bd4-a635-78b3db362cc4: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b4cf0a71-bf96-4bd4-a635-78b3db362cc4: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b4cf0a71-bf96-4bd4-a635-78b3db362cc4: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b4cf0a71-bf96-4bd4-a635-78b3db362cc4: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b4cf0a71-bf96-4bd4-a635-78b3db362cc4: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b4cf0a71-bf96-4bd4-a635-78b3db362cc4: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b4cf0a71-bf96-4bd4-a635-78b3db362cc4: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b4cf0a71-bf96-4bd4-a635-78b3db362cc4: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b4cf0a71-bf96-4bd4-a635-78b3db362cc4: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b4cf0a71-bf96-4bd4-a635-78b3db362cc4: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b4cf0a71-bf96-4bd4-a635-78b3db362cc4: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b4cf0a71-bf96-4bd4-a635-78b3db362cc4: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b4cf0a71-bf96-4bd4-a635-78b3db362cc4: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b4cf0a71-bf96-4bd4-a635-78b3db362cc4: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b4cf0a71-bf96-4bd4-a635-78b3db362cc4: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b4cf0a71-bf96-4bd4-a635-78b3db362cc4: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b4cf0a71-bf96-4bd4-a635-78b3db362cc4: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b4cf0a71-bf96-4bd4-a635-78b3db362cc4: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b4cf0a71-bf96-4bd4-a635-78b3db362cc4: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[todoService] Real-time update received from PocketBase (native): 
+Object { record: {…}, action: "update" }
+todoService.ts:461:15
+[todoService] performSync called by: realtime_update todoService.ts:130:13
+[todoService] Current state: connected=true, syncing=true todoService.ts:131:13
+[todoService] Already syncing, skipping todoService.ts:133:15
+[YjsPocketbaseProvider] Retrieved latest state from server for list: 531c5316-a643-48d0-b8fd-9cf554121d47 YjsPocketbaseProvider.ts:80:19
+[YjsPocketbaseProvider] Local Yjs update detected for list: 531c5316-a643-48d0-b8fd-9cf554121d47. Origin: reconnect-sync YjsPocketbaseProvider.ts:30:13
+[YjsPocketbaseProvider] Attempting to send update to PocketBase for list: 531c5316-a643-48d0-b8fd-9cf554121d47. YjsPocketbaseProvider.ts:32:15
+[YjsPocketbaseProvider] Successfully subscribed for list: 531c5316-a643-48d0-b8fd-9cf554121d47. YjsPocketbaseProvider.ts:96:17
+[todoService] Connected provider for list 531c5316-a643-48d0-b8fd-9cf554121d47 todoService.ts:257:19
+[todoService] Sync completed successfully todoService.ts:260:15
+[todoService] Sync process finished todoService.ts:266:15
+[todoService] Real-time update received from PocketBase (native): 
+Object { record: {…}, action: "update" }
+todoService.ts:461:15
+[todoService] performSync called by: realtime_update todoService.ts:130:13
+[todoService] Current state: connected=true, syncing=false todoService.ts:131:13
+[todoService] Starting sync process... todoService.ts:141:13
+[todoService] User found, proceeding with sync todoService.ts:148:15
+[todoService] Fetching lists from server... todoService.ts:172:15
+[YjsPocketbaseProvider] Realtime update received for list 03a65ad8-8130-4d00-a00e-489c8ebb193a: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 03a65ad8-8130-4d00-a00e-489c8ebb193a: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 03a65ad8-8130-4d00-a00e-489c8ebb193a: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 03a65ad8-8130-4d00-a00e-489c8ebb193a: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 03a65ad8-8130-4d00-a00e-489c8ebb193a: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 03a65ad8-8130-4d00-a00e-489c8ebb193a: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 03a65ad8-8130-4d00-a00e-489c8ebb193a: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 03a65ad8-8130-4d00-a00e-489c8ebb193a: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 03a65ad8-8130-4d00-a00e-489c8ebb193a: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 03a65ad8-8130-4d00-a00e-489c8ebb193a: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 03a65ad8-8130-4d00-a00e-489c8ebb193a: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 03a65ad8-8130-4d00-a00e-489c8ebb193a: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 03a65ad8-8130-4d00-a00e-489c8ebb193a: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 03a65ad8-8130-4d00-a00e-489c8ebb193a: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 03a65ad8-8130-4d00-a00e-489c8ebb193a: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 03a65ad8-8130-4d00-a00e-489c8ebb193a: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 03a65ad8-8130-4d00-a00e-489c8ebb193a: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 03a65ad8-8130-4d00-a00e-489c8ebb193a: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 03a65ad8-8130-4d00-a00e-489c8ebb193a: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 03a65ad8-8130-4d00-a00e-489c8ebb193a: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 03a65ad8-8130-4d00-a00e-489c8ebb193a: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 03a65ad8-8130-4d00-a00e-489c8ebb193a: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Successfully sent full state and metadata update to PocketBase for list: 03a65ad8-8130-4d00-a00e-489c8ebb193a YjsPocketbaseProvider.ts:44:17
+[YjsPocketbaseProvider] Successfully sent full state and metadata update to PocketBase for list: 531c5316-a643-48d0-b8fd-9cf554121d47 YjsPocketbaseProvider.ts:44:17
+[YjsPocketbaseProvider] Realtime update received for list 531c5316-a643-48d0-b8fd-9cf554121d47: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 531c5316-a643-48d0-b8fd-9cf554121d47: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 531c5316-a643-48d0-b8fd-9cf554121d47: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 531c5316-a643-48d0-b8fd-9cf554121d47: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 531c5316-a643-48d0-b8fd-9cf554121d47: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 531c5316-a643-48d0-b8fd-9cf554121d47: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 531c5316-a643-48d0-b8fd-9cf554121d47: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 531c5316-a643-48d0-b8fd-9cf554121d47: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 531c5316-a643-48d0-b8fd-9cf554121d47: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 531c5316-a643-48d0-b8fd-9cf554121d47: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 531c5316-a643-48d0-b8fd-9cf554121d47: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 531c5316-a643-48d0-b8fd-9cf554121d47: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 531c5316-a643-48d0-b8fd-9cf554121d47: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 531c5316-a643-48d0-b8fd-9cf554121d47: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 531c5316-a643-48d0-b8fd-9cf554121d47: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 531c5316-a643-48d0-b8fd-9cf554121d47: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 531c5316-a643-48d0-b8fd-9cf554121d47: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 531c5316-a643-48d0-b8fd-9cf554121d47: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 531c5316-a643-48d0-b8fd-9cf554121d47: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 531c5316-a643-48d0-b8fd-9cf554121d47: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 531c5316-a643-48d0-b8fd-9cf554121d47: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list 531c5316-a643-48d0-b8fd-9cf554121d47: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[todoService] Real-time update received from PocketBase (native): 
+Object { record: {…}, action: "update" }
+todoService.ts:461:15
+[todoService] performSync called by: realtime_update todoService.ts:130:13
+[todoService] Current state: connected=true, syncing=true todoService.ts:131:13
+[todoService] Already syncing, skipping todoService.ts:133:15
+[todoService] Fetched 11 lists from server todoService.ts:177:15
+[todoService] Local IDs: 11, Server IDs: 11 todoService.ts:180:15
+[todoService] Updated stored IDs to 11 total todoService.ts:213:15
+[todoService] Pushing local changes to server... todoService.ts:214:15
+[YjsPocketbaseProvider] Realtime update received for list b199633d-3f31-4fa0-b0e2-d5d8e0dcaddb: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b199633d-3f31-4fa0-b0e2-d5d8e0dcaddb: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b199633d-3f31-4fa0-b0e2-d5d8e0dcaddb: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b199633d-3f31-4fa0-b0e2-d5d8e0dcaddb: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b199633d-3f31-4fa0-b0e2-d5d8e0dcaddb: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b199633d-3f31-4fa0-b0e2-d5d8e0dcaddb: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b199633d-3f31-4fa0-b0e2-d5d8e0dcaddb: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b199633d-3f31-4fa0-b0e2-d5d8e0dcaddb: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b199633d-3f31-4fa0-b0e2-d5d8e0dcaddb: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b199633d-3f31-4fa0-b0e2-d5d8e0dcaddb: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b199633d-3f31-4fa0-b0e2-d5d8e0dcaddb: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b199633d-3f31-4fa0-b0e2-d5d8e0dcaddb: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b199633d-3f31-4fa0-b0e2-d5d8e0dcaddb: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b199633d-3f31-4fa0-b0e2-d5d8e0dcaddb: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b199633d-3f31-4fa0-b0e2-d5d8e0dcaddb: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b199633d-3f31-4fa0-b0e2-d5d8e0dcaddb: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b199633d-3f31-4fa0-b0e2-d5d8e0dcaddb: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b199633d-3f31-4fa0-b0e2-d5d8e0dcaddb: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b199633d-3f31-4fa0-b0e2-d5d8e0dcaddb: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b199633d-3f31-4fa0-b0e2-d5d8e0dcaddb: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b199633d-3f31-4fa0-b0e2-d5d8e0dcaddb: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[YjsPocketbaseProvider] Realtime update received for list b199633d-3f31-4fa0-b0e2-d5d8e0dcaddb: 
+Object { record: {…}, action: "update" }
+YjsPocketbaseProvider.ts:87:17
+[todoService] Real-time update received from PocketBase (native): 
+Object { record: {…}, action: "update" }
+todoService.ts:461:15
+[todoService] performSync called by: realtime_update todoService.ts:130:13
+[todoService] Current state: connected=true, syncing=true todoService.ts:131:13
+[todoService] Already syncing, skipping todoService.ts:133:15
+[todoService] Pushed changes for list b199633d-3f31-4fa0-b0e2-d5d8e0dcaddb todoService.ts:229:21
