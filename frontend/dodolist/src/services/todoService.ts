@@ -126,9 +126,35 @@ export const usePersistentTodoLists = () => {
     }
   }, []);
 
+  const attachDocUpdateListener = (doc: Y.Doc, listId: string) => {
+    const updateHandler = (yjsUpdate: Uint8Array, origin: any) => {
+        console.log(`[todoService] Y.Doc update detected for list ${listId}. Origin: ${origin}`);
+        const yTodos = doc.getArray<any>('todos').toJSON();
+        const todos = yTodos.map(yjsToTodo);
+        const metadata = doc.getMap('metadata').toJSON();
+        setTodoLists(currentLists =>
+            currentLists.map(l => (
+                l.id === listId ? {
+                    ...l, todos,
+                    name: metadata.name || l.name,
+                    color: metadata.color || l.color,
+                    pinned: typeof metadata.pinned === 'boolean' ? metadata.pinned : l.pinned,
+                    archived: typeof metadata.archived === 'boolean' ? metadata.archived : l.archived,
+                } : l
+            ))
+        );
+    };
+
+    doc.on('update', updateHandler);
+  };
+
   const synchronizeWithPocketBase = useCallback(async () => {
-    if (isSyncing.current || !isPocketBaseConnected) {
-        console.log("[todoService] Sync check: Already syncing or offline, skipping.");
+    if (isSyncing.current) {
+        console.log("[todoService] Sync check: Another sync is already in progress, skipping.");
+        return;
+    }
+    if (!isPocketBaseConnected) {
+        console.log("[todoService] Sync check: PocketBase is not connected, skipping server sync.");
         return;
     }
     isSyncing.current = true;
@@ -229,7 +255,7 @@ export const usePersistentTodoLists = () => {
         console.log("[todoService] Synchronization with PocketBase completed.");
     } catch (err) {
         console.error('[todoService] Failed to synchronize with PocketBase:', err);
-        setError(err instanceof Error ? err : new Error('Failed to synchronize data'));
+        
     } finally {
         isSyncing.current = false;
     }
@@ -257,6 +283,8 @@ export const usePersistentTodoLists = () => {
                 provider = new YjsPocketbaseProvider(listId, doc, pb);
                 providers.current.set(listId, provider);
             }
+
+            attachDocUpdateListener(doc, listId); // Attach listener here
 
             await provider.persistence.whenSynced;
 
@@ -368,31 +396,7 @@ export const usePersistentTodoLists = () => {
     }]);
     setActiveListId(newId);
 
-    doc.transact(() => {
-        const metadataMap = doc.getMap('metadata');
-        metadataMap.set('name', trimmedName);
-        metadataMap.set('color', color);
-        metadataMap.set('pinned', false);
-        metadataMap.set('archived', false);
-        metadataMap.set('createdAt', creationDate);
-    });
-
-    doc.on('update', () => {
-        const yTodos = doc.getArray<any>('todos').toJSON();
-        const todos = yTodos.map(yjsToTodo);
-        const metadata = doc.getMap('metadata').toJSON();
-        setTodoLists(currentLists =>
-            currentLists.map(l => (
-                l.id === newId ? {
-                    ...l, todos,
-                    name: metadata.name || l.name,
-                    color: metadata.color || l.color,
-                    pinned: typeof metadata.pinned === 'boolean' ? metadata.pinned : l.pinned,
-                    archived: typeof metadata.archived === 'boolean' ? metadata.archived : l.archived,
-                } : l
-            ))
-        );
-    });
+    attachDocUpdateListener(doc, newId);
 
     console.log(`[todoService] List ${newId} created locally. Global sync will handle server update.`);
 

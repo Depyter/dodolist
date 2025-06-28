@@ -39,33 +39,35 @@ export class YjsPocketbaseProvider {
     private _onLocalUpdate = (update: Uint8Array, origin: any) => {
         // Prevent re-broadcasting updates that originated from PocketBase or from this provider
         if (origin === this.pb || origin === 'pocketbase') {
+            console.log(`[YjsPocketbaseProvider] Skipping update due to origin: ${origin}`);
             return;
         }
 
+        console.log(`[YjsPocketbaseProvider] Local Yjs update detected for list: ${this.listId}. Current provider sync status: ${this.isSynced ? 'CONNECTED' : 'DISCONNECTED'}.`);
+
         // If not connected to PocketBase, the update is still persisted locally by IndexedDB.
-        // It will be synced when the connection is re-established.
+        // It will be synced when the connection is re-established by the global sync mechanism.
         if (!this.isSynced) {
-            console.log(`[YjsPocketbaseProvider] Offline. Update for list ${this.listId} persisted locally.`);
+            console.log(`[YjsPocketbaseProvider] Provider for list ${this.listId} is DISCONNECTED. Update persisted locally. Skipping server sync attempt.`);
             return;
         }
 
         if (this.updateTimeout) {
             clearTimeout(this.updateTimeout);
+            console.log(`[YjsPocketbaseProvider] Debounce cleared for list: ${this.listId}.`);
         }
 
         this.updateTimeout = setTimeout(async () => {
+            console.log(`[YjsPocketbaseProvider] Debounced update triggered for list: ${this.listId}. Attempting to send to PocketBase.`);
             try {
                 const base64Update = uint8ArrayToBase64(Y.encodeStateAsUpdate(this.doc));
-                console.log(`[YjsPocketbaseProvider] Sending debounced Yjs update to PocketBase for list ${this.listId}.`);
-
                 await this.pb.collection('task_lists').update(this.listId, {
                     yjsUpdate: base64Update,
                 });
-                console.log(`[YjsPocketbaseProvider] Sent update to PocketBase for list: ${this.listId}`);
+                console.log(`[YjsPocketbaseProvider] Successfully sent update to PocketBase for list: ${this.listId}`);
             } catch (error) {
-                console.error(`[YjsPocketbaseProvider] Failed to send update to PocketBase for list ${this.listId}:`, error);
-                // If the update fails, we assume disconnection. The global connectivity check will handle reconnection.
-                this.disconnect();
+                console.error(`[YjsPocketbaseProvider] Failed to send update to PocketBase for list ${this.listId}. Setting isSynced to false.`, error);
+                this.disconnect(); // This sets isSynced to false.
             } finally {
                 this.updateTimeout = null;
             }
@@ -82,23 +84,22 @@ export class YjsPocketbaseProvider {
             const record = await this.pb.collection('task_lists').getOne(this.listId);
             if (record.yjsUpdate) {
                 const remoteUpdate = base64ToUint8Array(record.yjsUpdate);
-                // Use a unique origin to mark this as a remote update
+                console.log(`[YjsPocketbaseProvider] Applying initial state from PocketBase for list: ${this.listId}.`);
                 Y.applyUpdate(this.doc, remoteUpdate, 'pocketbase');
-                console.log(`[YjsPocketbaseProvider] Applied initial state from PocketBase for list: ${this.listId}. Yjs update size: ${remoteUpdate.length} bytes.`);
             }
             // Metadata is now solely managed within the Yjs doc, no direct application from PB record here.
             // The Y.applyUpdate above will handle the full Yjs doc state, including metadata map.
             console.log(`[YjsPocketbaseProvider] Initial state (including metadata) applied from PocketBase for list: ${this.listId}.`);
 
             // 2. Subscribe to real-time updates from PocketBase for this specific list record
+            console.log(`[YjsPocketbaseProvider] Subscribing to real-time updates for list: ${this.listId}.`);
             this.unsubscribe = await this.pb.collection('task_lists').subscribe(this.listId, (e) => {
                 if (e.action === 'update') {
                     console.log(`[YjsPocketbaseProvider] Received real-time update for list: ${this.listId}. Action: ${e.action}`);
                     if (e.record.yjsUpdate) {
                         const remoteUpdate = base64ToUint8Array(e.record.yjsUpdate);
-                        // Use a unique origin to mark this as a remote update
+                        console.log(`[YjsPocketbaseProvider] Applying real-time Yjs update for list: ${this.listId}.`);
                         Y.applyUpdate(this.doc, remoteUpdate, 'pocketbase');
-                        console.log(`[YjsPocketbaseProvider] Applied real-time Yjs update for list: ${this.listId}. Yjs update size: ${remoteUpdate.length} bytes.`);
                     }
 
                     // Apply metadata from PocketBase record to Yjs doc if available
