@@ -19,7 +19,7 @@ class DbService {
 
   private async initDb(): Promise<void> {
     try {
-      console.log('Loading and initializing SQLite3 module...');
+      // console.log('Loading and initializing SQLite3 module...');
       
       // Initialize the SQLite WASM worker with promiser pattern
       this.promiser = await new Promise((resolve) => {
@@ -28,11 +28,11 @@ class DbService {
         });
       });
       
-      console.log('Done initializing. Running demo...');
+      // console.log('Done initializing. Running demo...');
       
       // Get SQLite version info
       const configResponse = await this.promiser('config-get', {});
-      console.log('Running SQLite3 version', configResponse.result.version.libVersion);
+      // console.log('Running SQLite3 version', configResponse.result.version.libVersion);
       
       // Try to open database with OPFS persistence first
       await this.initializeDatabase();
@@ -40,7 +40,7 @@ class DbService {
       // Emit storage info
       this.emitStorageInfo();
       
-      console.log('Database initialization complete');
+      // console.log('Database initialization complete');
       
     } catch (error: any) {
       console.error('Failed to initialize SQLite WASM:', error);
@@ -70,8 +70,8 @@ class DbService {
         });
         this.dbId = openResponse.dbId;
         storageType = 'opfs';
-        console.log('Using OPFS storage for persistence');
-        console.log('OPFS database created at:', openResponse.result.filename.replace(/^file:(.*?)\?vfs=opfs$/, '$1'));
+        // console.log('Using OPFS storage for persistence');
+        // console.log('OPFS database created at:', openResponse.result.filename.replace(/^file:(.*?)\?vfs=opfs$/, '$1'));
         dbCreated = true;
       } catch (opfsError) {
         console.warn('OPFS database creation failed:', opfsError);
@@ -86,7 +86,7 @@ class DbService {
         });
         this.dbId = openResponse.dbId;
         storageType = 'indexeddb';
-        console.log('Using IndexedDB storage for persistence');
+        // console.log('Using IndexedDB storage for persistence');
         dbCreated = true;
       } catch (kvvfsError) {
         console.warn('IndexedDB VFS creation failed:', kvvfsError);
@@ -101,7 +101,7 @@ class DbService {
         });
         this.dbId = openResponse.dbId;
         storageType = 'memory';
-        console.log('Using in-memory storage (data will not persist)');
+        // console.log('Using in-memory storage (data will not persist)');
         console.warn('⚠️ WARNING: Data will be lost when page is refreshed!');
         dbCreated = true;
       } catch (memoryError) {
@@ -121,11 +121,11 @@ class DbService {
     
     const persistent = this.storageType !== 'memory';
     
-    console.log('Storage persistence info:', {
-      storageType: this.storageType,
-      persistent,
-      dbType: 'worker-based'
-    });
+    // console.log('Storage persistence info:', {
+    //   storageType: this.storageType,
+    //   persistent,
+    //   dbType: 'worker-based'
+    // });
     
     window.dispatchEvent(new CustomEvent('dodolist-storage-info', {
       detail: {
@@ -225,7 +225,7 @@ class DbService {
         return false;
       }
       await root.removeEntry(dbName);
-      console.log(`OPFS database file '${dbName}' deleted.`);
+      // console.log(`OPFS database file '${dbName}' deleted.`);
       return true;
     } catch (err) {
       console.error('Failed to delete OPFS database:', err);
