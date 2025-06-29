@@ -140,4 +140,8 @@ export class YjsPocketbaseProvider {
         // Do not disconnect PocketBase realtime here, as it's a global connection.
         console.log(`[YjsPocketbaseProvider] Destroyed for list: ${this.listId}`);
     };
+
+    public isConnected(): boolean {
+        return typeof this.unsubscribe === 'function';
+    }
 }

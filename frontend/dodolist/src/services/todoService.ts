@@ -156,10 +156,71 @@ export const usePersistentTodoLists = () => {
 
   // --- Add: Effect to subscribe to PocketBase realtime events and trigger sync ---
   useEffect(() => {
+    // Helper: check if event is newer than local
+    function isEventNewerThanLocal(record: any): boolean {
+      const doc = ydocs.current.get(record.id);
+      if (!doc) return true;
+      const metadata = doc.getMap('metadata').toJSON();
+      // Prefer updatedAt, fallback to createdAt
+      return !metadata.updatedAt || new Date(record.updatedAt) > new Date(metadata.updatedAt || metadata.createdAt || 0);
+    }
+
+    // Helper: sync a single list from PocketBase
+    async function syncSingleList(listId: string) {
+      try {
+        const pbList = await pb.collection('task_lists').getOne(listId);
+        let doc = ydocs.current.get(listId);
+        let provider = providers.current.get(listId);
+
+        if (!doc) {
+          doc = new Y.Doc();
+          ydocs.current.set(listId, doc);
+        }
+        if (!provider) {
+          provider = new YjsPocketbaseProvider(listId, doc, pb);
+          providers.current.set(listId, provider);
+          attachDocUpdateListener(doc, listId);
+        }
+
+        if (pbList.yjsUpdate) {
+          const remoteUpdate = base64ToUint8Array(pbList.yjsUpdate);
+          Y.applyUpdate(doc, remoteUpdate, 'pocketbase');
+        }
+        if (isPocketBaseConnectedRef.current && !provider.isConnected()) {
+          await provider.connect();
+        }
+      } catch (err) {
+        console.error(`[todoService] Failed to sync list ${listId}:`, err);
+      }
+    }
+
     const handleRealtimeEvent = (e: any) => {
-      // Always sync on any event (create, update, delete)
-      performSync('realtime_event');
+      const { action, record } = e;
+      if (!record || !record.id) return;
+
+      const localIds = getAllYjsDocKeys();
+      const isLocal = localIds.includes(record.id);
+
+      if (action === 'delete') {
+        if (isLocal) {
+          setTodoLists(lists => lists.filter(l => l.id !== record.id));
+          providers.current.get(record.id)?.destroy();
+          providers.current.delete(record.id);
+          ydocs.current.delete(record.id);
+          removeYjsDocKey(record.id);
+          removePendingDeletions([record.id]);
+        }
+        return;
+      }
+
+      if (action === 'create' || action === 'update') {
+        // Only sync if the event is newer than local
+        if (!isLocal || isEventNewerThanLocal(record)) {
+          syncSingleList(record.id);
+        }
+      }
     };
+
     pbRealtimeManager.subscribe('task_lists', handleRealtimeEvent);
     return () => {
       pbRealtimeManager.unsubscribe('task_lists');
