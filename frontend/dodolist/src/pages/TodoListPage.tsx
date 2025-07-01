@@ -40,7 +40,6 @@ import {
   Copy, // Import Copy icon
   Palette, // Import Palette icon
   Edit3, // Import Edit3 icon for Rename
-  // MoreHorizontal, // Removed as it's not used
   Users,
   UserX
 } from "lucide-react"
@@ -48,8 +47,10 @@ import {
 import AppSidebar from "@/components/AppSidebar"
 import TexturedBackground from "@/components/TexturedBackground"
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
-import { toast } from "sonner"
-import { Toaster } from "@/components/ui/sonner";
+import { Notification } from "@/components/ui/Notification";
+import SyncStatusIndicator from "@/components/SyncStatusIndicator";
+import PocketBaseRealtimeManager, { ConnectionStatus } from "@/services/PocketBaseRealtimeManager";
+import PocketBase from "pocketbase";
 
 // We're using the Todo and TodoList interfaces from todoService.ts,
 // but we'll still define them here to maintain type safety without refactoring the whole file
@@ -74,84 +75,84 @@ interface UserProfile {
 
 const colors = [
   {
-    name: "Ocean",
-    value: "bg-blue-500",
-    light: "bg-blue-50",
-    border: "border-blue-200",
-    text: "text-blue-700",
-    dark: "bg-gradient-to-br from-blue-600 to-blue-800",
-    darkText: "text-blue-50",
-    texture: "bg-blue-500/10",
+    name: "Taupe",
+    value: "bg-stone-400",
+    light: "bg-stone-50",
+    border: "border-stone-200",
+    text: "text-stone-700",
+    dark: "bg-gradient-to-br from-stone-500 to-stone-700",
+    darkText: "text-stone-50",
+    texture: "bg-stone-400/10",
   },
   {
-    name: "Forest",
-    value: "bg-emerald-500",
+    name: "Olive",
+    value: "bg-emerald-600",
     light: "bg-emerald-50",
-    border: "border-emerald-200",
-    text: "text-emerald-700",
-    dark: "bg-gradient-to-br from-emerald-600 to-emerald-800",
+    border: "border-emerald-300",
+    text: "text-emerald-800",
+    dark: "bg-gradient-to-br from-emerald-700 to-emerald-900",
     darkText: "text-emerald-50",
-    texture: "bg-emerald-500/10",
+    texture: "bg-emerald-600/10",
   },
   {
-    name: "Sunset",
-    value: "bg-orange-500",
-    light: "bg-orange-50",
-    border: "border-orange-200",
-    text: "text-orange-700",
-    dark: "bg-gradient-to-br from-orange-600 to-orange-800",
-    darkText: "text-orange-50",
-    texture: "bg-orange-500/10",
-  },
-  {
-    name: "Lavender",
-    value: "bg-purple-500",
-    light: "bg-purple-50",
-    border: "border-purple-200",
-    text: "text-purple-700",
-    dark: "bg-gradient-to-br from-purple-600 to-purple-800",
-    darkText: "text-purple-50",
-    texture: "bg-purple-500/10",
-  },
-  {
-    name: "Rose",
-    value: "bg-rose-500",
-    light: "bg-rose-50",
-    border: "border-rose-200",
-    text: "text-rose-700",
-    dark: "bg-gradient-to-br from-rose-600 to-rose-800",
-    darkText: "text-rose-50",
-    texture: "bg-rose-500/10",
-  },
-  {
-    name: "Sky",
-    value: "bg-cyan-500",
-    light: "bg-cyan-50",
-    border: "border-cyan-200",
-    text: "text-cyan-700",
-    dark: "bg-gradient-to-br from-cyan-600 to-cyan-800",
-    darkText: "text-cyan-50",
-    texture: "bg-cyan-500/10",
-  },
-  {
-    name: "Amber",
-    value: "bg-amber-500",
+    name: "Sand",
+    value: "bg-amber-300",
     light: "bg-amber-50",
     border: "border-amber-200",
     text: "text-amber-700",
-    dark: "bg-gradient-to-br from-amber-600 to-amber-800",
+    dark: "bg-gradient-to-br from-amber-400 to-amber-600",
     darkText: "text-amber-50",
-    texture: "bg-amber-500/10",
+    texture: "bg-amber-300/10",
   },
   {
-    name: "Indigo",
-    value: "bg-indigo-500",
-    light: "bg-indigo-50",
-    border: "border-indigo-200",
-    text: "text-indigo-700",
-    dark: "bg-gradient-to-br from-indigo-600 to-indigo-800",
-    darkText: "text-indigo-50",
-    texture: "bg-indigo-500/10",
+    name: "Clay",
+    value: "bg-orange-300",
+    light: "bg-orange-50",
+    border: "border-orange-200",
+    text: "text-orange-700",
+    dark: "bg-gradient-to-br from-orange-400 to-orange-600",
+    darkText: "text-orange-50",
+    texture: "bg-orange-300/10",
+  },
+  {
+    name: "Stone",
+    value: "bg-blue-400",
+    light: "bg-blue-50",
+    border: "border-blue-200",
+    text: "text-blue-800",
+    dark: "bg-gradient-to-br from-blue-500 to-blue-700",
+    darkText: "text-blue-50",
+    texture: "bg-blue-400/10",
+  },
+  {
+    name: "Moss",
+    value: "bg-lime-400",
+    light: "bg-lime-50",
+    border: "border-lime-200",
+    text: "text-lime-700",
+    dark: "bg-gradient-to-br from-lime-500 to-lime-700",
+    darkText: "text-lime-50",
+    texture: "bg-lime-400/10",
+  },
+  {
+    name: "Slate",
+    value: "bg-slate-500",
+    light: "bg-slate-50",
+    border: "border-slate-200",
+    text: "text-slate-700",
+    dark: "bg-gradient-to-br from-slate-600 to-slate-800",
+    darkText: "text-slate-50",
+    texture: "bg-slate-500/10",
+  },
+  {
+    name: "Terracotta",
+    value: "bg-rose-400",
+    light: "bg-rose-50",
+    border: "border-rose-200",
+    text: "text-rose-700",
+    dark: "bg-gradient-to-br from-rose-500 to-rose-700",
+    darkText: "text-rose-50",
+    texture: "bg-rose-400/10",
   },
 ]
 
@@ -215,7 +216,11 @@ export default function DodoListApp() {
     updateTodo: updateTodoItem,
     toggleTodo,
     deleteTodo,
-    batchAddTodos
+    batchAddTodos,
+    isPocketBaseConnected, // <-- add this
+    connectionDebug, // <-- add this
+    triggerManualSync, // (optional, for manual sync)
+    currentConnectionStatus, // (optional, for debug)
   } = usePersistentTodoLists();
   
   const [inputValue, setInputValue] = useState("")
@@ -257,13 +262,13 @@ export default function DodoListApp() {
   // --- Yjs integration --- (Removed as handled in the hook)
   // useEffect(() => { ... }, [activeListId])
 
-  const todosToUse = activeList?.todos || []; // Use todos directly from the hook's state
+  const todosToUse = activeList?.todos || [];
   const activeTodos = todosToUse.filter((todo) => !todo.completed)
   const completedTodos = todosToUse.filter((todo) => todo.completed)
   const sortedActiveTodos = [...activeTodos].sort((a, b) => {
-    if (!a.deadline && !b.deadline) return 0
-    if (!a.deadline) return 1
-    if (!b.deadline) return -1
+    if (!isValidDate(a.deadline) && !isValidDate(b.deadline)) return 0
+    if (!isValidDate(a.deadline)) return 1
+    if (!isValidDate(b.deadline)) return -1
     return a.deadline.getTime() - b.deadline.getTime()
   })
 
@@ -324,11 +329,19 @@ export default function DodoListApp() {
     }
   }
 
-  // Handle task update (updated to directly use the hook's function)
+  // In handleUpdateTodo, ensure we pass the correct date values to the service
   const handleUpdateTodo = async (todoId: string, updates: Partial<Todo>) => {
     if (activeListId) {
+      // Convert deadline/reminder to ISO string if present and valid
+      const updatesToSend: Partial<Todo> = { ...updates };
+      if ('deadline' in updates && updates.deadline instanceof Date && !isNaN(updates.deadline.getTime())) {
+        updatesToSend.deadline = new Date(updates.deadline); // keep as Date, todoService handles conversion
+      }
+      if ('reminder' in updates && updates.reminder instanceof Date && !isNaN(updates.reminder.getTime())) {
+        updatesToSend.reminder = new Date(updates.reminder); // keep as Date, todoService handles conversion
+      }
       try {
-        await updateTodoItem(todoId, activeListId, updates) // Directly call the hook's function
+        await updateTodoItem(todoId, activeListId, updatesToSend)
       } catch (err) {
         console.error("Error updating todo:", err)
       }
@@ -394,8 +407,10 @@ export default function DodoListApp() {
   const handleUpdateListName = useCallback(async (listId: string, newName: string | null) => {
     const trimmedName = newName?.trim();
     if (!trimmedName) {
-      toast.error("List name cannot be empty.", {
+      addNotification({
+        message: "List name cannot be empty.",
         description: "Please enter a valid name for your list.",
+        type: "error",
       });
       return;
     }
@@ -406,8 +421,10 @@ export default function DodoListApp() {
       (document.activeElement as HTMLElement)?.blur();
     } catch (err) {
       console.error("Error updating list name:", err);
-      toast.error("Failed to update list name.", {
+      addNotification({
+        message: "Failed to update list name.",
         description: "Please try again.",
+        type: "error",
       });
     }
   }, [updateList]);
@@ -468,6 +485,7 @@ export default function DodoListApp() {
   }
 
   const formatDateTime = (date: Date, includeTime = true) => {
+    if (!isValidDate(date)) return "";
     if (includeTime) {
       const options: Intl.DateTimeFormatOptions = {
         weekday: "short",
@@ -489,6 +507,7 @@ export default function DodoListApp() {
   }
 
   const isOverdue = (deadline: Date) => {
+    if (!isValidDate(deadline)) return false;
     const now = new Date()
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
     const deadlineDate = new Date(deadline.getFullYear(), deadline.getMonth(), deadline.getDate())
@@ -496,6 +515,7 @@ export default function DodoListApp() {
   }
 
   const isDueToday = (deadline: Date) => {
+    if (!isValidDate(deadline)) return false;
     const now = new Date()
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
     const deadlineDate = new Date(deadline.getFullYear(), deadline.getMonth(), deadline.getDate())
@@ -503,12 +523,14 @@ export default function DodoListApp() {
   }
 
   const isDueSoon = (deadline: Date) => {
+    if (!isValidDate(deadline)) return false;
     const now = new Date()
     const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000)
     return deadline > now && deadline <= tomorrow
   }
 
   const getDeadlineColor = (deadline: Date) => {
+    if (!isValidDate(deadline)) return "text-slate-600"
     if (isOverdue(deadline)) return "text-red-600"
     if (isDueToday(deadline)) return "text-red-600"
     if (isDueSoon(deadline)) return "text-orange-600"
@@ -577,11 +599,11 @@ export default function DodoListApp() {
                 <div className="space-y-3">
                   <Input
                     type="date"
-                    value={todo.deadline ? todo.deadline.toISOString().split("T")[0] : ""}
+                    value={isValidDate(todo.deadline) && todo.deadline.toISOString() !== 'Invalid Date' ? todo.deadline.toISOString().split("T")[0] : ""}
                     onChange={(e) => {
                       if (e.target.value) {
                         const newDate = new Date(e.target.value)
-                        if (deadlineHasTime && todo.deadline) {
+                        if (deadlineHasTime && isValidDate(todo.deadline)) {
                           newDate.setHours(todo.deadline.getHours(), todo.deadline.getMinutes())
                         } else {
                           newDate.setHours(9, 0) // Default to 9 AM if time is enabled
@@ -691,11 +713,11 @@ export default function DodoListApp() {
                 <div className="space-y-3">
                   <Input
                     type="date"
-                    value={todo.reminder ? todo.reminder.toISOString().split("T")[0] : ""}
+                    value={isValidDate(todo.reminder) && todo.reminder.toISOString() !== 'Invalid Date' ? todo.reminder.toISOString().split("T")[0] : ""}
                     onChange={(e) => {
                       if (e.target.value) {
                         const newDate = new Date(e.target.value)
-                        if (reminderHasTime && todo.reminder) {
+                        if (reminderHasTime && isValidDate(todo.reminder)) {
                           newDate.setHours(todo.reminder.getHours(), todo.reminder.getMinutes())
                         } else {
                           newDate.setHours(8, 0) // Default to 8 AM if time is enabled
@@ -922,7 +944,6 @@ export default function DodoListApp() {
                     {isDueToday(todo.deadline) && " (Today)"}
                   </span>
                 )}
-
                 {todo.reminder && !todo.completed && (
                   <span className="text-slate-500">
                     Remind{" "}
@@ -982,8 +1003,65 @@ export default function DodoListApp() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [listId, todoLists.length, navigate]);
 
+  // --- Notification System ---
+  type NotificationType = "success" | "error" | "info" | "warning";
+  interface NotificationState {
+    id: number;
+    message: string;
+    description?: string;
+    type?: NotificationType;
+  }
+
+  function useNotification() {
+    const [notifications, setNotifications] = useState<NotificationState[]>([]);
+    const addNotification = (n: Omit<NotificationState, "id">) => {
+      setNotifications((prev) => [
+        ...prev,
+        { ...n, id: Date.now() + Math.random() },
+      ]);
+    };
+    const removeNotification = (id: number) => {
+      setNotifications((prev) => prev.filter((n) => n.id !== id));
+    };
+    return { notifications, addNotification, removeNotification };
+  }
+
+  const NotificationPortal: React.FC<{
+    notifications: NotificationState[];
+    removeNotification: (id: number) => void;
+  }> = ({ notifications, removeNotification }) => (
+    <div
+      className="fixed top-6 right-6 z-[9999] flex flex-col items-end gap-2"
+      style={{ pointerEvents: "none" }}
+    >
+      {notifications.map((n) => (
+        <div key={n.id} style={{ pointerEvents: "auto" }}>
+          <Notification
+            message={n.message}
+            description={n.description}
+            type={n.type}
+            onClose={() => removeNotification(n.id)}
+          />
+        </div>
+      ))}
+    </div>
+  );
+
+  const notificationApi = useNotification();
+  const { notifications, addNotification, removeNotification } = notificationApi;
+
+  // --- Sync Indicator State ---
+  // Derive sync status from isPocketBaseConnected and connectionDebug
+  const getSyncStatus = () => {
+    if (!isPocketBaseConnected) return 'offline';
+    if (connectionDebug.toLowerCase().includes('syncing')) return 'syncing';
+    return 'synced';
+  };
+  const syncStatus = getSyncStatus();
+
   return (
     <div className={`min-h-screen relative overflow-hidden ${activeColor.light}`}>
+      <NotificationPortal notifications={notifications} removeNotification={removeNotification} />
       <TexturedBackground className="absolute inset-0" intensity="normal" />
       <SidebarProvider>
         <AppSidebar
@@ -1101,8 +1179,8 @@ export default function DodoListApp() {
           )}
 
           {/* Header */}
-          <header className="flex h-14 shrink-0 items-center gap-2 border-b border-blue-200 px-4 relative z-10 bg-white/60 backdrop-blur-sm">
-            <SidebarTrigger className="-ml-1" />
+          <header className="z-10 relative flex items-center gap-2 px-4 py-3 border-b border-slate-100 bg-white/80 backdrop-blur-md">
+          <SidebarTrigger className="-ml-1" />
             {activeList && (
               <>
                 {/* List Icon/Color */}
@@ -1177,6 +1255,8 @@ export default function DodoListApp() {
                       <Copy className="w-4 h-4" />
                   </Button>
 
+                  <SyncStatusIndicator status={syncStatus} activeColor={activeColor} />
+
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button
@@ -1229,7 +1309,6 @@ export default function DodoListApp() {
                 </div>
               </>
             )}
-            <Toaster activeColor={activeColor} />
           </header>
 
           {/* Main Content */}
@@ -1325,47 +1404,51 @@ export default function DodoListApp() {
                     )}
                   </div>
                 )}
+
+                {/* Input Section - Always at the bottom, above all main content */}
+                <div className="w-full max-w-2xl mx-auto z-20 sticky bottom-0 left-0 right-0 bg-transparent pointer-events-none">
+                  <Card className="border-0 shadow-none bg-transparent pointer-events-auto">
+                    <div className="flex gap-0 items-center rounded-2xl overflow-hidden bg-white/90 border border-slate-200 shadow-sm">
+                      <input
+                        value={inputValue}
+                        onChange={(e) => setInputValue(e.target.value)}
+                        onKeyPress={handleKeyPress}
+                        placeholder={`Add a task to ${activeList?.name}...`}
+                        disabled={activeList?.archived || loading}
+                        className="w-full h-12 pl-4 pr-14 text-base bg-transparent border-0 focus:ring-2 focus:ring-blue-100 outline-none transition-all duration-200 placeholder-slate-400"
+                        style={{ boxShadow: 'none' }}
+                      />
+                      <Button
+                        onClick={handleAddTodo}
+                        disabled={!inputValue.trim() || activeList?.archived || isAddingTodo}
+                        className={`h-12 min-w-[48px] rounded-none rounded-r-2xl ${activeList?.color} hover:opacity-90 text-white flex items-center justify-center shadow-none border-0`}
+                        loading={isAddingTodo}
+                        tabIndex={-1}
+                        type="button"
+                        style={{ boxShadow: 'none' }}
+                      >
+                        <Send className="w-5 h-5" />
+                      </Button>
+                    </div>
+                    {activeList?.archived && (
+                      <div className="mt-2 text-xs text-amber-600">Cannot add tasks to archived lists</div>
+                    )}
+                  </Card>
+                </div>
               </>
             )}
             </div>
           </div>
 
-          {/* Input Section - Limited width on desktop */}
-          <div className="p-6 pt-0">
-            <div className="max-w-2xl mx-auto">
-              <Card className={`p-4 ${activeColor.light} ${activeColor.border} border backdrop-blur-sm`}>
-                <div className="flex gap-3">
-                  <div className="flex-1">
-                    <Input
-                      value={inputValue}
-                      onChange={(e) => setInputValue(e.target.value)}
-                      onKeyPress={handleKeyPress}
-                      placeholder={`Add a task to ${activeList?.name}...`}
-                      className="border-slate-200 focus:border-slate-300 focus:ring-slate-200 bg-white/80"
-                      disabled={activeList?.archived || loading}
-                    />
-                  </div>
-                  <Button
-                    onClick={handleAddTodo}
-                    disabled={!inputValue.trim() || activeList?.archived || isAddingTodo}
-                    className={`${activeList?.color} hover:opacity-90 text-white px-4`}
-                    loading={isAddingTodo}
-                  >
-                    <Send className="w-4 h-4" />
-                  </Button>
-                </div>
-
-                {inputValue.trim() && !activeList?.archived && (
-                  <div className="mt-2 text-xs text-slate-500">Press Enter or click send to add this task</div>
-                )}
-                {activeList?.archived && (
-                  <div className="mt-2 text-xs text-amber-600">Cannot add tasks to archived lists</div>
-                )}
-              </Card>
-            </div>
-          </div>
+          {/* Floating Input Section */}
+          
         </SidebarInset>
       </SidebarProvider>
     </div>
   )
+}
+
+// Utility function to check for valid Date
+function isValidDate(date: any): date is Date {
+  return date instanceof Date && !isNaN(date.getTime());
 }

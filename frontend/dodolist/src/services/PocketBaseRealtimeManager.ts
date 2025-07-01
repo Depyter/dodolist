@@ -33,11 +33,17 @@ class PocketBaseRealtimeManager {
     // Listen for browser online/offline events
     window.addEventListener('online', () => {
       this.logWithTimestamp('Browser online event detected, checking health...');
-      this.forceConnectionCheck();
+      this.forceConnectionCheck(); // Already present, triggers health check
     });
     window.addEventListener('offline', () => {
       this.logWithTimestamp('Browser offline event detected, marking as disconnected.');
       this.connectionStatusSubject.next(ConnectionStatus.Disconnected);
+      // Trigger a health check to confirm status (optional, but ensures state is up to date)
+      this.checkHealth().then(isHealthy => {
+        if (!isHealthy) {
+          this.logWithTimestamp('Confirmed: PocketBase is not reachable after offline event.');
+        }
+      });
     });
   }
 
@@ -68,46 +74,6 @@ class PocketBaseRealtimeManager {
 
   private setupRealtimeListeners() {
     this.logWithTimestamp('Setting up realtime listeners...');
-    
-    // IMPORTANT: PocketBase uses different event names than you might expect
-    // Let's try multiple possible event names and see which ones fire
-    
-    // Standard PocketBase events
-    this.pb.realtime.subscribe('PB_CONNECT', (e) => {
-      this.logWithTimestamp('PB_CONNECT event received:', e);
-      this.connectionStatusSubject.next(ConnectionStatus.Connected);
-      this.reconnectAttempts = 0;
-    });
-
-    this.pb.realtime.subscribe('PB_DISCONNECT', (e) => {
-      this.logWithTimestamp('PB_DISCONNECT event received:', e);
-      this.connectionStatusSubject.next(ConnectionStatus.Disconnected);
-      if (navigator.onLine) {
-        this.scheduleReconnect();
-      }
-    });
-
-    // Alternative event names to try (PocketBase versions may vary)
-    this.pb.realtime.subscribe('connect', (e) => {
-      this.logWithTimestamp('connect event received:', e);
-      this.connectionStatusSubject.next(ConnectionStatus.Connected);
-      this.reconnectAttempts = 0;
-    });
-
-    this.pb.realtime.subscribe('disconnect', (e) => {
-      this.logWithTimestamp('disconnect event received:', e);
-      this.connectionStatusSubject.next(ConnectionStatus.Disconnected);
-      if (navigator.onLine) {
-        this.scheduleReconnect();
-      }
-    });
-
-    // Error handling
-    this.pb.realtime.subscribe('error', (e) => {
-      this.logWithTimestamp('Error event received:', e);
-      this.connectionStatusSubject.next(ConnectionStatus.Error);
-    });
-
     this.logWithTimestamp('Realtime listeners setup complete');
   }
 
@@ -231,43 +197,3 @@ class PocketBaseRealtimeManager {
 }
 
 export default PocketBaseRealtimeManager;
-
-// DEBUGGING VERSION - Use this temporarily to see what events are actually firing
-class DebugPocketBaseRealtimeManager extends PocketBaseRealtimeManager {
-  constructor(pb: PocketBase) {
-    super(pb);
-    this.setupDebugListeners(pb);
-  }
-
-  private setupDebugListeners(pb: PocketBase) {
-    this.logWithTimestamp('Setting up debug listeners for ALL possible events...');
-    
-    // Try to listen to any possible event names
-    const possibleEvents = [
-      'PB_CONNECT', 'PB_DISCONNECT', 'connect', 'disconnect', 
-      'open', 'close', 'error', 'message', 'reconnect',
-      'connection', 'disconnection', 'online', 'offline'
-    ];
-    
-    possibleEvents.forEach(eventName => {
-      try {
-        pb.realtime.subscribe(eventName, (data) => {
-          this.logWithTimestamp(`Event '${eventName}' fired with data:`, data);
-        });
-      } catch (error) {
-        if (error instanceof Error) {
-          this.logWithTimestamp(`Could not subscribe to event '${eventName}':`, error.message);
-        } else {
-          this.logWithTimestamp(`Could not subscribe to event '${eventName}':`, error);
-        }
-      }
-    });
-
-    // Also monitor the realtime object itself
-    this.logWithTimestamp('PocketBase realtime object:', pb.realtime);
-    this.logWithTimestamp('Available methods:', Object.getOwnPropertyNames(pb.realtime));
-  }
-}
-
-// Export the debug version for testing
-export { DebugPocketBaseRealtimeManager };

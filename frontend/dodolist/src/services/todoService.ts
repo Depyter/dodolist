@@ -8,7 +8,7 @@ import { ClientResponseError } from 'pocketbase';
 import PocketBase from 'pocketbase';
 
 // Initialize PocketBase and AuthService
-const pb = new PocketBase('http://127.0.0.1:8080');
+const pb = new PocketBase(import.meta.env.VITE_API_URL || '');
 const pbRealtimeManager = new PocketBaseRealtimeManager(pb);
 const authService = new AuthService();
 
@@ -82,27 +82,47 @@ export interface TodoList {
   name: string;
   color: string;
   todos: Todo[];
-  createdAt: string;
+  createdAt: Date;
   pinned: boolean;
   archived: boolean;
 }
 
 // --- Helper Functions ---
-const yjsToTodo = (yjsTodo: any): Todo => ({
-  ...yjsTodo,
-  createdAt: new Date(yjsTodo.createdAt),
-  completedAt: yjsTodo.completedAt ? new Date(yjsTodo.completedAt) : undefined,
-  deadline: yjsTodo.deadline ? new Date(yjsTodo.deadline) : undefined,
-  reminder: yjsTodo.reminder ? new Date(yjsTodo.reminder) : undefined,
-});
+const yjsToTodo = (yjsTodo: any): Todo => {
+  const parseValidDate = (val: any): Date | undefined => {
+    if (!val || val === 'null' || val === '') return undefined;
+    const d = new Date(val);
+    return isNaN(d.getTime()) ? undefined : d;
+  };
+  return {
+    ...yjsTodo,
+    createdAt: parseValidDate(yjsTodo.createdAt)!,
+    completedAt: parseValidDate(yjsTodo.completedAt),
+    deadline: parseValidDate(yjsTodo.deadline),
+    reminder: parseValidDate(yjsTodo.reminder),
+  };
+};
 
-const todoToYjsFormat = (todo: Todo) => ({
-  ...todo,
-  createdAt: todo.createdAt.toISOString(),
-  completedAt: todo.completedAt?.toISOString() || null,
-  deadline: todo.deadline?.toISOString() || null,
-  reminder: todo.reminder?.toISOString() || null,
-});
+const todoToYjsFormat = (todo: Todo) => {
+  // Helper to ensure we always store a valid ISO string or null
+  const toISOStringOrNull = (val: any) => {
+    if (!val || val === 'null' || val === '') return null;
+    if (val instanceof Date && !isNaN(val.getTime())) return val.toISOString();
+    if (typeof val === 'string') {
+      // Check if it's a valid ISO string
+      const d = new Date(val);
+      return isNaN(d.getTime()) ? null : d.toISOString();
+    }
+    return null;
+  };
+  return {
+    ...todo,
+    createdAt: todo.createdAt instanceof Date && !isNaN(todo.createdAt.getTime()) ? todo.createdAt.toISOString() : (typeof todo.createdAt === 'string' ? todo.createdAt : new Date().toISOString()),
+    completedAt: toISOStringOrNull(todo.completedAt),
+    deadline: toISOStringOrNull(todo.deadline),
+    reminder: toISOStringOrNull(todo.reminder),
+  };
+};
 
 // --- Main Hook ---
 export const usePersistentTodoLists = () => {
@@ -514,7 +534,7 @@ export const usePersistentTodoLists = () => {
 
     setTodoLists(current => [...current, {
         id: newId, name: trimmedName, color, todos: [],
-        createdAt: creationDate, pinned: false, archived: false,
+        createdAt: new Date(creationDate), pinned: false, archived: false,
     }]);
     setActiveListId(newId);
 
@@ -570,8 +590,11 @@ export const usePersistentTodoLists = () => {
       id: generateId(),
     };
 
+    // Convert the Todo to the right format with proper date handling
+    const formattedTodo = todoToYjsFormat(newTodo);
+
     doc.transact(() => {
-      doc.getArray('todos').push([todoToYjsFormat(newTodo)]);
+      doc.getArray('todos').push([formattedTodo]);
     });
   };
 
@@ -585,9 +608,12 @@ export const usePersistentTodoLists = () => {
       const index = arr.findIndex((t: any) => t.id === todoId);
       if (index > -1) {
         const oldTodo = arr[index];
-        const updatedTodo = { ...oldTodo, ...updates };
+        // Create a complete Todo object with the updates
+        const completeTodo = { ...oldTodo, ...updates } as Todo;
+        // Use todoToYjsFormat to ensure dates are properly converted to strings
+        const formattedTodo = todoToYjsFormat(completeTodo);
         yTodos.delete(index, 1);
-        yTodos.insert(index, [updatedTodo]);
+        yTodos.insert(index, [formattedTodo]);
       }
     });
   };
@@ -603,13 +629,19 @@ export const usePersistentTodoLists = () => {
       if (index > -1) {
         const oldTodo = arr[index];
         const newCompleted = !oldTodo.completed;
-        const updatedTodo = { 
-            ...oldTodo, 
-            completed: newCompleted,
-            completedAt: newCompleted ? new Date().toISOString() : null
-        };
+        
+        // Create complete Todo object with updated values
+        const updatedTodoObject: Todo = {
+          ...oldTodo,
+          completed: newCompleted,
+          completedAt: newCompleted ? new Date() : undefined
+        } as Todo;
+        
+        // Format with proper date handling
+        const formattedTodo = todoToYjsFormat(updatedTodoObject);
+        
         yTodos.delete(index, 1);
-        yTodos.insert(index, [updatedTodo]);
+        yTodos.insert(index, [formattedTodo]);
       }
     });
   };
@@ -633,14 +665,18 @@ export const usePersistentTodoLists = () => {
     const doc = ydocs.current.get(todosData[0].listId);
     if (!doc) return;
 
-    const newTodos = todosData.map(data => todoToYjsFormat({
+    const newTodos = todosData.map(data => {
+      const todo: Todo = {
         completed: false,
         createdAt: new Date(),
         recurring: 'none',
         ...data,
         text: data.text.trim(),
         id: generateId(),
-    }));
+      };
+      // Properly format each todo to ensure dates are stored correctly
+      return todoToYjsFormat(todo);
+    });
 
     doc.transact(() => {
         doc.getArray('todos').push(newTodos);

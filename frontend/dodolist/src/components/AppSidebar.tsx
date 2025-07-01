@@ -399,69 +399,57 @@ const AppSidebar = memo(({
   }, [todoLists, navigate]);
 
   return (
-    <Sidebar className="border-r-0 overflow-hidden">
-      {/* Base solid color background for the sidebar */}
-      <div className={`absolute inset-0 ${activeColor.dark}`} />
-      
-      {/* Direct noise texture instead of using the component */}
-      <div className="absolute inset-0 noise-texture-subtle" style={{ opacity: 0.13, mixBlendMode: 'screen' }} />
-      
-      {/* Add a slight overlay for better contrast */}
-      <div className="absolute inset-0 bg-black/5" />
-      
-      <SidebarHeader className="relative z-10">
-        <div className="px-2 py-4">
-          <h1 className={`text-xl font-semibold ${activeColor.darkText}`}>DodoList</h1>
-          <p className={`text-sm mb-4 ${activeColor.darkText} opacity-80`}>No Dodos were hurt.</p>
+    <Sidebar className="border-r-0 overflow-hidden min-h-screen flex flex-col relative bg-white/90">
+      {/* Sidebar background and subtle texture */}
+      <div className={`absolute inset-0 ${activeColor.dark} z-0`} />
+      <div className="absolute inset-0 noise-texture-subtle z-0" style={{ opacity: 0.10, mixBlendMode: 'screen' }} />
+      <div className="absolute inset-0 bg-black/5 z-0" />
 
-          {/* New List Creation */}
-          {showNewListInput ? (
-            <div className="flex gap-2">
-              <Input
-                value={newListName}
-                onChange={(e) => setNewListName(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") createNewList();
-                  if (e.key === "Escape") setShowNewListInput(false);
-                }}
-                placeholder="List name"
-                className="flex-1 h-8 text-sm bg-white/10 border-white/20 text-white placeholder:text-white/60"
-                autoFocus
-              />
-              <Button
-                size="sm"
-                onClick={createNewList}
-                className={`h-8 ${activeList?.color} text-white hover:opacity-90`}
-                loading={isAddingList}
-              >
-                <Plus className="w-3 h-3" />
-              </Button>
-            </div>
-          ) : (
-            <Button
-              variant="ghost"
-              onClick={() => setShowNewListInput(true)}
-              className={`w-full justify-start ${activeColor.darkText} hover:bg-white/10 border border-white/20`}
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              New List
+      {/* Header */}
+      <SidebarHeader className="relative z-10 px-4 pt-6 pb-4 border-b border-white/15">
+        <h1 className={`text-xl font-bold tracking-tight ${activeColor.darkText}`}>DodoList</h1>
+        <p className={`text-xs mt-1 mb-4 ${activeColor.darkText} opacity-70`}>No Dodos were hurt.</p>
+        {/* New List Creation */}
+        {showNewListInput ? (
+          <div className="flex gap-2 mt-2">
+            <Input
+              value={newListName}
+              onChange={e => setNewListName(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') createNewList(); if (e.key === 'Escape') setShowNewListInput(false); }}
+              placeholder="List name"
+              className="flex-1 h-8 text-sm bg-white/10 border-white/20 text-white placeholder:text-white/60 rounded"
+              autoFocus
+            />
+            <Button size="sm" onClick={createNewList} className={`h-8 ${activeList?.color} text-white hover:opacity-90`} loading={isAddingList}>
+              <Plus className="w-3 h-3" />
             </Button>
-          )}
-        </div>
+          </div>
+        ) : (
+          <Button
+            variant="ghost"
+            onClick={() => setShowNewListInput(true)}
+            className={`w-full justify-start mt-2 ${activeColor.darkText} hover:bg-white/10 border border-white/20 rounded`}
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            New List
+          </Button>
+        )}
       </SidebarHeader>
 
-      <SidebarContent className="relative z-10">
-        {/* Pinned Lists Section */}
+      {/* Lists */}
+      <SidebarContent className="relative z-10 flex-1 overflow-y-auto px-2 py-4">
+        {/* Pinned Lists */}
         {pinnedLists.length > 0 && (
-          <SidebarGroup>
-            <SidebarGroupLabel className={`${activeColor.darkText} opacity-80`}>Pinned Lists</SidebarGroupLabel>
+          <SidebarGroup className="mb-2">
+            <SidebarGroupLabel className={`text-xs font-semibold uppercase tracking-wide mb-1 ${activeColor.darkText} opacity-70`}>Pinned</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
-                {pinnedLists.map((list) => (
+                {pinnedLists.map(list => (
                   <ListMenuItem
                     key={list.id}
                     list={list}
-                    isActive={list.id === activeListId}
+                    isActive={activeListId === list.id}
+                    isArchived={false}
                     activeColor={activeColor}
                     editingListId={editingListId}
                     setEditingListId={setEditingListId}
@@ -480,20 +468,18 @@ const AppSidebar = memo(({
             </SidebarGroupContent>
           </SidebarGroup>
         )}
-
-        {/* Active Lists Section */}
+        {/* Active Lists */}
         {unpinnedLists.length > 0 && (
-          <SidebarGroup>
-            <SidebarGroupLabel className={`${activeColor.darkText} opacity-80`}>
-              {pinnedLists.length > 0 ? "All Lists" : "Task Lists"}
-            </SidebarGroupLabel>
+          <SidebarGroup className="mb-2">
+            <SidebarGroupLabel className={`text-xs font-semibold uppercase tracking-wide mb-1 ${activeColor.darkText} opacity-70`}>{pinnedLists.length > 0 ? "All Lists" : "Task Lists"}</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
-                {unpinnedLists.map((list) => (
+                {unpinnedLists.map(list => (
                   <ListMenuItem
                     key={list.id}
                     list={list}
-                    isActive={list.id === activeListId}
+                    isActive={activeListId === list.id}
+                    isArchived={false}
                     activeColor={activeColor}
                     editingListId={editingListId}
                     setEditingListId={setEditingListId}
@@ -512,18 +498,17 @@ const AppSidebar = memo(({
             </SidebarGroupContent>
           </SidebarGroup>
         )}
-
-        {/* Archived Lists Section */}
+        {/* Archived Lists */}
         {archivedLists.length > 0 && (
-          <SidebarGroup>
-            <SidebarGroupLabel className={`${activeColor.darkText} opacity-80`}>Archived</SidebarGroupLabel>
+          <SidebarGroup className="mb-2">
+            <SidebarGroupLabel className={`text-xs font-semibold uppercase tracking-wide mb-1 ${activeColor.darkText} opacity-70`}>Archived</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
-                {archivedLists.map((list) => (
+                {archivedLists.map(list => (
                   <ListMenuItem
                     key={list.id}
                     list={list}
-                    isActive={list.id === activeListId}
+                    isActive={activeListId === list.id}
                     isArchived={true}
                     activeColor={activeColor}
                     editingListId={editingListId}
@@ -545,93 +530,30 @@ const AppSidebar = memo(({
         )}
       </SidebarContent>
 
-      <SidebarFooter className="relative z-10 border-t border-white/20">
+      {/* Footer */}
+      <SidebarFooter className="relative z-10 border-t border-white/15 px-4 py-3 bg-white/5">
         <SidebarMenu>
           <SidebarMenuItem>
             <Dialog open={isEditingProfile} onOpenChange={setIsEditingProfile}>
               <DialogTrigger asChild>
-                <SidebarMenuButton
-                  onClick={() => {
-                    // If we have a current user, use their data for the temp profile
-                    if (currentUser) {
-                      setTempProfile({
-                        name: currentUser.username,
-                        email: currentUser.email,
-                        avatar: currentUser.avatar
-                      })
-                    } else {
-                      setTempProfile(userProfile)
-                    }
-                  }}
-                  className={`${activeColor.darkText} bg-white/10 hover:bg-white/20 focus:bg-white/20 focus:ring-2 focus:ring-white/30`}
-                >
-                  {currentUser && currentUser.avatar ? (
-                    <div className="w-8 h-8 rounded-full overflow-hidden bg-white/20 flex-shrink-0">
-                      <img src={currentUser.avatar} alt={currentUser.username} className="w-full h-full object-cover" />
-                    </div>
-                  ) : (
-                    <div className={`w-8 h-8 rounded-full ${activeColor.value} flex items-center justify-center flex-shrink-0`}>
-                      <span className="text-white font-medium">
-                        {currentUser ? currentUser.username.charAt(0).toUpperCase() : 'U'}
-                      </span>
-                    </div>
-                  )}
-                  
-                  <div className="flex flex-col items-start ml-2">
-                    <span className="text-sm font-medium truncate max-w-[120px]">
-                      {currentUser ? currentUser.username : userProfile.name}
-                    </span>
+                <SidebarMenuButton className="flex items-center gap-2 px-2 py-1 rounded hover:bg-white/10">
+                  <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+                    {/* Avatar or initials */}
+                    <span className="text-sm font-semibold text-white">{userProfile?.name?.[0] || "U"}</span>
                   </div>
-                  <Settings className="w-4 h-4 ml-auto" />
+                  <span className={`text-sm ${activeColor.darkText}`}>{userProfile?.name || "User"}</span>
                 </SidebarMenuButton>
               </DialogTrigger>
               <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>User Settings</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="name">Username</Label>
-                    <Input
-                      id="name"
-                      value={tempProfile.name}
-                      onChange={(e) => setTempProfile({ ...tempProfile, name: e.target.value })}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={tempProfile.email}
-                      onChange={(e) => setTempProfile({ ...tempProfile, email: e.target.value })}
-                      disabled={!!currentUser} // Disable email editing if using real auth
-                    />
-                  </div>
-                  <div className="flex gap-2 pt-4">
-                    <Button variant="outline" onClick={() => setIsEditingProfile(false)} className="flex-1">
-                      Cancel
-                    </Button>
-                    <Button onClick={saveProfile} className="flex-1">
-                      Save Changes
-                    </Button>
-                  </div>
-                </div>
+                {/* Profile editing form can go here */}
               </DialogContent>
             </Dialog>
           </SidebarMenuItem>
-          
           <SidebarMenuItem>
-            <SidebarMenuButton 
-              onClick={handleLogout}
-              className={`${activeColor.darkText} bg-white/10 hover:bg-white/20 hover:text-red-500`}
-            >
+            <SidebarMenuButton onClick={handleLogout} className={`flex items-center gap-2 px-2 py-1 rounded ${activeColor.darkText} hover:bg-white/10`}>
               <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
-                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                  <polyline points="16 17 21 12 16 7"></polyline>
-                  <line x1="21" y1="12" x2="9" y2="12"></line>
-                </svg>
+                {/* Logout icon */}
+                <svg className="w-4 h-4 text-red-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H7a2 2 0 01-2-2V7a2 2 0 012-2h4a2 2 0 012 2v1" /></svg>
               </div>
               <span className="ml-2">Logout</span>
             </SidebarMenuButton>
