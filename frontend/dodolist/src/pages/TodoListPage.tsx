@@ -218,8 +218,6 @@ export default function DodoListApp() {
     deleteTodo,
     batchAddTodos,
     isPocketBaseConnected, // <-- add this
-    connectionDebug, // <-- add this
-    triggerManualSync, // (optional, for manual sync)
     currentConnectionStatus, // (optional, for debug)
   } = usePersistentTodoLists();
   
@@ -1054,7 +1052,6 @@ export default function DodoListApp() {
   // Derive sync status from isPocketBaseConnected and connectionDebug
   const getSyncStatus = () => {
     if (!isPocketBaseConnected) return 'offline';
-    if (connectionDebug.toLowerCase().includes('syncing')) return 'syncing';
     return 'synced';
   };
   const syncStatus = getSyncStatus();

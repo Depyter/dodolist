@@ -34,7 +34,7 @@ export default defineConfig({
     },
     proxy: {
       '/api': {
-        target: process.env.VITE_API_URL || 'http://localhost:8080',
+        target: process.env.VITE_PROXY_TARGET || 'http://localhost:8080',
         changeOrigin: true,
         ws: true, // Enable WebSocket proxying
         configure: (proxy) => {
@@ -44,7 +44,7 @@ export default defineConfig({
         },
       },
       '/_/': {
-        target: process.env.VITE_API_URL || 'http://localhost:8080',
+        target: process.env.VITE_PROXY_TARGET || 'http://localhost:8080',
         changeOrigin: true,
         ws: true, // Enable WebSocket proxying for admin dashboard
         configure: (proxy) => {

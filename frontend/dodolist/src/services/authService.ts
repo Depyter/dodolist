@@ -1,5 +1,5 @@
 import PocketBase from 'pocketbase'
-import { PB_URL } from '../config'
+import { PB_URL } from '@/config'
 
 export interface User {
   id: string

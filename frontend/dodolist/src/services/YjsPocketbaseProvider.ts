@@ -12,6 +12,8 @@ export class YjsPocketbaseProvider {
     private unsubscribe: (() => void) | null = null;
     private updateTimeout: ReturnType<typeof setTimeout> | null = null;
     private debounceDelay = 500; // milliseconds
+    private connected: boolean = false;
+    private syncInProgress: boolean = false;
     
 
     constructor(listId: string, doc: Y.Doc, pbInstance: PocketBase) {
@@ -22,8 +24,8 @@ export class YjsPocketbaseProvider {
 
         // 1. Setup IndexedDB persistence for offline support and initial load
         this.persistence = new IndexeddbPersistence(listId, doc);
-        this.persistence.on('update', (yjsUpdate: Uint8Array, origin: any) => {
-            console.log(`[YjsPocketbaseProvider] IndexedDB update for list: ${listId}. Update size: ${yjsUpdate.byteLength} bytes. Origin:`, origin);
+        this.persistence.on('synced', () => {
+            console.log(`[YjsPocketbaseProvider] IndexedDB synced for list: ${listId}`);
         });
 
         // 2. Listen for local Yjs changes and push them to PocketBase
@@ -31,117 +33,225 @@ export class YjsPocketbaseProvider {
         this.doc.on('update', this._onLocalUpdate);
     }
 
-    
-
     private _onLocalUpdate = (update: Uint8Array, origin: any) => {
-        // Prevent re-broadcasting updates that originated from PocketBase or from this provider
+        // Prevent re-broadcasting updates that originated from PocketBase or this provider
         if (origin === this.pb || origin === 'pocketbase') {
-            console.log(`[YjsPocketbaseProvider] Skipping update due to origin: ${origin}`);
             return;
         }
 
-        console.log(`[YjsPocketbaseProvider] Local Yjs update detected for list: ${this.listId}. Origin:`, origin);
+        // Debounce the update to bundle rapid changes (e.g., typing)
+        if (this.updateTimeout) {
+            clearTimeout(this.updateTimeout);
+        }
 
-        (async () => {
-            console.log(`[YjsPocketbaseProvider] Attempting to send update to PocketBase for list: ${this.listId}.`);
-            try {
-                const base64Update = uint8ArrayToBase64(Y.encodeStateAsUpdate(this.doc));
-                const metadata = this.doc.getMap('metadata').toJSON();
-                const currentUser = this.pb.authStore.model;
+        // Only attempt to sync if connected - local changes are always persisted via IndexedDB
+        if (!this.connected) {
+            console.log(`[YjsPocketbaseProvider] Local update received while offline for list: ${this.listId}. Changes saved locally.`);
+            return;
+        }
 
-                await this.pb.collection('task_lists').update(this.listId, {
-                    yjsUpdate: base64Update,
-                    name: metadata.name,
-                    color: metadata.color,
-                    pinned: metadata.pinned,
-                    archived: metadata.archived,
-                });
-                console.log(`[YjsPocketbaseProvider] Successfully sent full state and metadata update to PocketBase for list: ${this.listId}`);
-            } catch (error) {
-                if (error instanceof ClientResponseError && error.status === 404) {
-                    console.log(`[YjsPocketbaseProvider] List ${this.listId} not found in PocketBase, attempting to create.`);
-                    try {
-                        const metadata = this.doc.getMap('metadata').toJSON();
-                        const yjsUpdate = Y.encodeStateAsUpdate(this.doc);
-                        const base64Update = uint8ArrayToBase64(yjsUpdate);
-                        const currentUser = this.pb.authStore.model;
-
-                        await this.pb.collection('task_lists').create({
-                            id: this.listId,
-                            user_id: currentUser?.id,
-                            createdAt: metadata.createdAt || new Date().toISOString(),
-                            name: metadata.name || 'Unnamed List',
-                            color: metadata.color || '#000000',
-                            pinned: metadata.pinned || false,
-                            archived: metadata.archived || false,
-                            yjsUpdate: base64Update,
-                        });
-                        console.log(`[YjsPocketbaseProvider] Successfully created new list ${this.listId} in PocketBase.`);
-                    } catch (createError) {
-                        console.error(`[YjsPocketbaseProvider] Failed to create new list ${this.listId} in PocketBase:`, createError);
-                    }
-                } else {
-                    console.error(`[YjsPocketbaseProvider] Failed to send update to PocketBase for list ${this.listId}:`, error);
-                }
-            }
-        })();
+        this.updateTimeout = setTimeout(() => {
+            this._pushUpdatesToServer(update);
+        }, this.debounceDelay);
     };
 
-    public async connect() {
+    private async _pushUpdatesToServer(update: Uint8Array) {
+        if (!this.connected) return;
+        
+        console.log(`[YjsPocketbaseProvider] Pushing updates to server for list: ${this.listId}`);
         try {
-            // Fetch the latest state from PocketBase before subscribing
-            try {
-                const record = await this.pb.collection('task_lists').getOne(this.listId);
-                if (record && record.yjsUpdate) {
-                    const remoteUpdate = base64ToUint8Array(record.yjsUpdate);
-                    Y.applyUpdate(this.doc, remoteUpdate, 'pocketbase');
-                    console.log(`[YjsPocketbaseProvider] Retrieved latest state from server for list: ${this.listId}`);
-                }
-            } catch (fetchError) {
-                console.error(`[YjsPocketbaseProvider] Failed to fetch initial state for list ${this.listId}:`, fetchError);
+            const base64Update = uint8ArrayToBase64(update);
+            const metadata = this.doc.getMap('metadata').toJSON();
+            
+            // If it doesn't exist on server, _createListOnServer will handle the deleted check
+            await this.pb.collection('task_lists').update(this.listId, {
+                yjsUpdate: base64Update,
+                name: metadata.name,
+                color: metadata.color,
+                pinned: metadata.pinned,
+                archived: metadata.archived,
+                deleted: metadata.deleted || false,
+            });
+            console.log(`[YjsPocketbaseProvider] Successfully pushed update to server for list: ${this.listId}`);
+        } catch (error) {
+            if (error instanceof ClientResponseError && error.status === 404) {
+                console.log(`[YjsPocketbaseProvider] List ${this.listId} not found in PocketBase, attempting to create.`);
+                this._createListOnServer().catch(err => {
+                    console.error(`[YjsPocketbaseProvider] Failed to create list on server, but local changes are preserved.`, err);
+                });
+            } else {
+                console.error(`[YjsPocketbaseProvider] Network error while pushing updates. Local changes are preserved:`, error);
+                // We don't rethrow - local changes are preserved via IndexedDB regardless
+            }
+        }
+    }
+
+    private async _createListOnServer() {
+        try {
+            const metadata = this.doc.getMap('metadata').toJSON();
+            // When creating, we send the full state
+            const fullStateUpdate = Y.encodeStateAsUpdate(this.doc);
+            const base64Update = uint8ArrayToBase64(fullStateUpdate);
+            const currentUser = this.pb.authStore.model;
+
+            if (!currentUser) {
+                console.warn(`[YjsPocketbaseProvider] No authenticated user, cannot create list on server`);
+                return;
             }
 
-            // After applying remote state, the local doc has the merged state.
-            // We broadcast this back to ensure all clients converge to the same state.
-            this._onLocalUpdate(Y.encodeStateAsUpdate(this.doc), 'reconnect-sync');
+            // Check if the list is marked as deleted locally
+            const isDeleted = metadata.deleted === true;
+            
+            // If list is deleted, don't create it on the server
+            if (isDeleted) {
+                console.log(`[YjsPocketbaseProvider] List ${this.listId} is marked as deleted locally, skipping server creation`);
+                return;
+            }
 
+            await this.pb.collection('task_lists').create({
+                id: this.listId,
+                user_id: currentUser.id,
+                createdAt: metadata.createdAt || new Date().toISOString(),
+                name: metadata.name || 'Unnamed List',
+                color: metadata.color || '#000000',
+                pinned: metadata.pinned || false,
+                archived: metadata.archived || false,
+                deleted: metadata.deleted || false,
+                yjsUpdate: base64Update,
+            });
+            console.log(`[YjsPocketbaseProvider] Successfully created new list ${this.listId} in PocketBase.`);
+        } catch (error) {
+            console.error(`[YjsPocketbaseProvider] Failed to create list ${this.listId} on server, but local changes are preserved:`, error);
+            // We don't rethrow - local functionality continues
+        }
+    }
+
+    public async connect() {
+        if (this.connected || this.syncInProgress) return;
+        
+        this.syncInProgress = true;
+        console.log(`[YjsPocketbaseProvider] Connecting list: ${this.listId}`);
+        
+        try {
+            // Pull from server first to get latest state
+            await this._pullFromServer();
+            
+            // Set up subscription for real-time updates
+            this._setupSubscription().catch(err => {
+                console.warn(`[YjsPocketbaseProvider] Subscription setup failed, but local functionality continues:`, err);
+            });
+            
+            this.connected = true;
+        } catch (error) {
+            console.error(`[YjsPocketbaseProvider] Connection failed for list ${this.listId}, but local functionality continues:`, error);
+            // We don't rethrow - local functionality continues
+        } finally {
+            this.syncInProgress = false;
+        }
+    }
+
+    private async _pullFromServer() {
+        try {
+            const record = await this.pb.collection('task_lists').getOne(this.listId);
+            if (record && record.yjsUpdate) {
+                const remoteUpdate = base64ToUint8Array(record.yjsUpdate);
+                // Apply the update with 'pocketbase' origin to prevent echo
+                Y.applyUpdate(this.doc, remoteUpdate, 'pocketbase');
+                console.log(`[YjsPocketbaseProvider] Retrieved and applied latest state from server for list: ${this.listId}`);
+            }
+        } catch (error) {
+            if (error instanceof ClientResponseError && error.status === 404) {
+                console.log(`[YjsPocketbaseProvider] List ${this.listId} not found on server. Will create on next update.`);
+            } else {
+                console.warn(`[YjsPocketbaseProvider] Failed to fetch state from server for list ${this.listId}, continuing with local state:`, error);
+            }
+            // Don't rethrow - we continue with local state
+        }
+    }
+
+    private async _setupSubscription() {
+        try {
             this.unsubscribe = await this.pb.collection('task_lists').subscribe(this.listId, (e) => {
-                console.log(`[YjsPocketbaseProvider] Realtime update received for list ${this.listId}:`, e);
-                if (e.action === 'update') {
-                    if (e.record.yjsUpdate) {
+                if (e.action === 'update' && e.record.yjsUpdate) {
+                    try {
                         const remoteUpdate = base64ToUint8Array(e.record.yjsUpdate);
+                        // Apply the update with 'pocketbase' origin to prevent echo
                         Y.applyUpdate(this.doc, remoteUpdate, 'pocketbase');
+                    } catch (err) {
+                        console.error(`[YjsPocketbaseProvider] Error applying remote update:`, err);
+                        // Don't throw - we continue with local state
                     }
                 }
             });
+            
             if (typeof this.unsubscribe === 'function') {
-                console.log(`[YjsPocketbaseProvider] Successfully subscribed for list: ${this.listId}.`);
+                console.log(`[YjsPocketbaseProvider] Successfully subscribed to realtime updates for list: ${this.listId}`);
             } else {
                 console.warn(`[YjsPocketbaseProvider] Subscription failed for list: ${this.listId}. No unsubscribe function received.`);
             }
         } catch (error) {
-            console.error(`[YjsPocketbaseProvider] Failed to subscribe or fetch initial state for list ${this.listId}:`, error);
+            console.warn(`[YjsPocketbaseProvider] Failed to subscribe to list ${this.listId}, but local functionality continues:`, error);
+            // Don't rethrow - we continue with local state
         }
     }
 
     public disconnect() {
+        if (!this.connected) return;
+        
         if (this.unsubscribe !== null) {
             this.unsubscribe();
             this.unsubscribe = null;
-            console.log(`[YjsPocketbaseProvider] Unsubscribed for list: ${this.listId}`);
         }
+        
+        this.connected = false;
         console.log(`[YjsPocketbaseProvider] Disconnected from PocketBase for list: ${this.listId}`);
-    };
+    }
 
     public destroy() {
         this.disconnect();
-        this.doc.off('update', this._onLocalUpdate); // Remove event listener
-        this.persistence?.destroy(); // Clean up IndexedDB persistence
-        // Do not disconnect PocketBase realtime here, as it's a global connection.
+        this.doc.off('update', this._onLocalUpdate);
+        if (this.updateTimeout) {
+            clearTimeout(this.updateTimeout);
+        }
+        this.persistence?.destroy();
         console.log(`[YjsPocketbaseProvider] Destroyed for list: ${this.listId}`);
-    };
+    }
 
     public isConnected(): boolean {
-        return typeof this.unsubscribe === 'function';
+        return this.connected;
+    }
+
+    // Force a full sync by sending the complete document state to the server
+    public async forceSyncToServer() {
+        if (!this.connected) {
+            console.log(`[YjsPocketbaseProvider] Cannot force sync while disconnected for list: ${this.listId}`);
+            return;
+        }
+        
+        console.log(`[YjsPocketbaseProvider] Forcing full sync to server for list: ${this.listId}`);
+        try {
+            const fullState = Y.encodeStateAsUpdate(this.doc);
+            const base64Update = uint8ArrayToBase64(fullState);
+            const metadata = this.doc.getMap('metadata').toJSON();
+            
+            // Check if list is marked as deleted
+            const isDeleted = metadata.deleted === true;
+            if (isDeleted) {
+                console.log(`[YjsPocketbaseProvider] List ${this.listId} is marked as deleted, updating server with deleted status`);
+            }
+            
+            await this.pb.collection('task_lists').update(this.listId, {
+                yjsUpdate: base64Update,
+                name: metadata.name,
+                color: metadata.color,
+                pinned: metadata.pinned,
+                archived: metadata.archived,
+                deleted: metadata.deleted || false,
+            });
+            console.log(`[YjsPocketbaseProvider] Successfully pushed full state to server for list: ${this.listId}`);
+        } catch (error) {
+            console.error(`[YjsPocketbaseProvider] Failed to force sync list ${this.listId}, but local functionality continues:`, error);
+            // Don't rethrow - local functionality continues
+        }
     }
 }

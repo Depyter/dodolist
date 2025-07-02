@@ -1,11 +1,6 @@
 // @ts-ignore
 import { sqlite3Worker1Promiser } from '@sqlite.org/sqlite-wasm';
 
-
-
-// Custom ID generation function to meet PocketBase requirements
-
-
 class DbService {
   private promiser: any = null;
   private dbId: string | null = null;
@@ -114,18 +109,10 @@ class DbService {
     this.storageType = storageType;
   }
 
-  
-
   private emitStorageInfo(): void {
     if (typeof window === 'undefined') return;
     
     const persistent = this.storageType !== 'memory';
-    
-    // console.log('Storage persistence info:', {
-    //   storageType: this.storageType,
-    //   persistent,
-    //   dbType: 'worker-based'
-    // });
     
     window.dispatchEvent(new CustomEvent('dodolist-storage-info', {
       detail: {
@@ -173,43 +160,6 @@ class DbService {
   hasPendingOperations(): boolean {
     return this.pendingOperations.length > 0;
   }
-
-  // Todo Lists Methods
-  
-
-  
-
-  
-
-  
-  
-  
-
-  
-
-  
-
-  // Todo Items Methods
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  // Initialize with default data if needed
-  
-
-  
-
-  
 
   // Utility: Delete the OPFS SQLite database file (if using OPFS in browser)
   async deleteOpfsDatabase(dbName: string = 'dodolist.sqlite3'): Promise<boolean> {
