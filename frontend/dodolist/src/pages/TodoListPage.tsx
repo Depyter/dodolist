@@ -4,7 +4,7 @@ import type React from "react"
 import { useState, useEffect, useCallback } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import AuthService from "@/services/authService"
-import { usePersistentTodoLists } from "@/services/todoService"
+import { useTodoLists } from "@/hooks/useTodoLists"
 
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -207,9 +207,8 @@ export default function DodoListApp() {
     updateTodo: updateTodoItem,
     toggleTodo,
     deleteTodo,
-    batchAddTodos,
     isPocketBaseConnected, // <-- add this
-  } = usePersistentTodoLists();
+  } = useTodoLists();
   
   const [inputValue, setInputValue] = useState("")
   const [newListName, setNewListName] = useState("")
@@ -230,26 +229,15 @@ export default function DodoListApp() {
   const [editingListId, setEditingListId] = useState<string | null>(null)
   const [isEditingHeader, setIsEditingHeader] = useState(false);
 
+  // When the activeListId from the URL changes, update the hook's state
+  useEffect(() => {
+    if (listId && listId !== activeListId) {
+      setActiveListId(listId);
+    }
+  }, [listId, activeListId, setActiveListId]);
+
   const activeList = todoLists.find((list) => list.id === activeListId)
   const activeColor = colors.find((color) => color.value === activeList?.color) || colors[0]
-
-  // --- COLLABORATIVE TODO STATE --- (Removed as Yjs is handled in the hook)
-  // const [collabTodos, setCollabTodos] = useState<Todo[]>([])
-  // const [yTodos, setYTodos] = useState<Y.Array<any> | null>(null)
-  // const [provider, setProvider] = useState<YjsTodoListProvider | null>(null)
-  // const [yDoc, setYDoc] = useState<Y.Doc | null>(null)
-
-  
-
-  // --- Collaborative todo handlers --- (Removed as handled in the hook)
-  // const handleAddTodoCollab = (text: string) => { ... }
-  // const handleToggleTodoCollab = (todoId: string) => { ... }
-  // const handleDeleteTodoCollab = (todoId: string) => { ... }
-  // const handleUpdateTodoCollab = (todoId: string, updates: Partial<Todo>) => { ... }
-
-  // --- Yjs integration --- (Removed as handled in the hook)
-  // useEffect(() => { ... }, [activeListId])
-
   const todosToUse = activeList?.todos || [];
   const activeTodos = todosToUse.filter((todo) => !todo.completed)
   const completedTodos = todosToUse.filter((todo) => todo.completed)
@@ -263,8 +251,12 @@ export default function DodoListApp() {
   // --- Debugging ---
   useEffect(() => {
     console.log("Active List ID:", activeListId)
+    console.log("Active List:", activeList)
     console.log("Active List Todos:", activeList?.todos)
-  }, [activeListId, activeList?.todos]) // Use isCollaborativeMode dependency
+    console.log("Todos to use:", todosToUse)
+    console.log("Active todos:", activeTodos)
+    console.log("Sorted active todos:", sortedActiveTodos)
+  }, [activeListId, activeList, todosToUse, activeTodos, sortedActiveTodos]) // Use isCollaborativeMode dependency
 
   const totalCount = activeList?.todos.length || 0
   const activeCount = activeTodos.length
@@ -282,7 +274,7 @@ export default function DodoListApp() {
     if (inputValue.trim() && activeListId) {
       setIsAddingTodo(true);
       try {
-        await addTodo({ text: inputValue.trim(), listId: activeListId });
+        await addTodo(inputValue.trim());
         setInputValue("")
       } catch (err) {
         console.error("Error adding todo:", err)
@@ -299,7 +291,7 @@ export default function DodoListApp() {
   const handleToggleTodo = async (todoId: string) => {
     if (activeListId) {
       try {
-        await toggleTodo(todoId, activeListId) // Directly call the hook's function
+        await toggleTodo(todoId) // Directly call the hook's function
       } catch (err) {
         console.error("Error toggling todo:", err)
       }
@@ -310,7 +302,7 @@ export default function DodoListApp() {
   const handleDeleteTodo = async (todoId: string) => {
     if (activeListId) {
       try {
-        await deleteTodo(todoId, activeListId) // Directly call the hook's function
+        await deleteTodo(todoId) // Directly call the hook's function
       } catch (err) {
         console.error("Error deleting todo:", err)
       }
@@ -329,7 +321,7 @@ export default function DodoListApp() {
         updatesToSend.reminder = new Date(updates.reminder); // keep as Date, todoService handles conversion
       }
       try {
-        await updateTodoItem(todoId, activeListId, updatesToSend)
+        await updateTodoItem(todoId, updatesToSend)
       } catch (err) {
         console.error("Error updating todo:", err)
       }
@@ -365,17 +357,13 @@ export default function DodoListApp() {
       // If the new list was created, clone the todos
       if (newListId) {
         const todosToClone = listToClone.todos.map(todo => ({
-          listId: newListId,
           text: todo.text,
-          description: todo.description,
-          completed: false, // Cloned tasks are active by default
-          createdAt: new Date(),
-          deadline: todo.deadline,
-          reminder: todo.reminder,
-          recurring: todo.recurring,
         }));
-        await batchAddTodos(todosToClone);
         
+        // Since batchAddTodos is removed, we add them one by one
+        for (const todo of todosToClone) {
+          await addTodo(todo.text);
+        }
       }
     } catch (err) {
       console.error("Error cloning list:", err);

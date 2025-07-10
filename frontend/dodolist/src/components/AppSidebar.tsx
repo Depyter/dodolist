@@ -29,7 +29,6 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { useNavigate } from 'react-router-dom'
 import AuthService from '@/services/authService'
-import { usePersistentTodoLists } from '@/services/todoService';
 
 interface Color {
   name: string;
@@ -47,7 +46,7 @@ interface TodoList {
   name: string;
   color: string;
   todos: any[];
-  createdAt: Date;
+  createdAt: string; // Changed to string to match the hook
   pinned?: boolean;
   archived?: boolean;
 }
@@ -273,8 +272,8 @@ ListMenuItem.displayName = "ListMenuItem";
 
 interface AppSidebarProps {
   todoLists: TodoList[];
-  activeListId: string;
-  setActiveListId: (id: string) => void;
+  activeListId: string | null;
+  setActiveListId: (id: string | null) => void;
   newListName: string;
   setNewListName: (name: string) => void;
   showNewListInput: boolean;
@@ -325,7 +324,6 @@ const AppSidebar = memo(({
 }: AppSidebarProps) => {
   const navigate = useNavigate()
   const [authService] = useState(() => new AuthService())
-  const { clearAllLocalData } = usePersistentTodoLists();
 
   const handleLogout = () => {
     if (onLogout) {
@@ -518,17 +516,6 @@ const AppSidebar = memo(({
       <SidebarFooter className="relative z-10 border-t border-white/15 px-4 py-3 bg-white/5">
         {/* Debug: Clear Local Data Button */}
         <div className="mb-2 flex justify-center">
-          <button
-            onClick={() => {
-              if (window.confirm('Are you sure you want to clear all local data? This cannot be undone.')) {
-                clearAllLocalData();
-              }
-            }}
-            style={{ color: 'red', fontWeight: 600, border: '1px solid #f87171', borderRadius: 6, padding: '4px 12px', background: 'rgba(255,255,255,0.7)' }}
-            title="Debug: Remove all local data"
-          >
-            Clear All Local Data
-          </button>
         </div>
         <SidebarMenu>
           <SidebarMenuItem>
