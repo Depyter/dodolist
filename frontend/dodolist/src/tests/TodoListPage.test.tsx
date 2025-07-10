@@ -260,7 +260,6 @@ describe('TodoListPage', () => {
     const moreOptionsButton = within(header).getByRole('button', { name: /more list options/i });
     fireEvent.click(moreOptionsButton);
 
-    const menu = await screen.findByRole('menu'); // Wait for the dropdown menu to appear
     const pinMenuItem = await screen.findByRole('menuitem', { name: /pin list/i });
     fireEvent.click(pinMenuItem);
 

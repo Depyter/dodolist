@@ -1,6 +1,7 @@
 import * as Y from 'yjs';
 import PocketBase, { ClientResponseError } from 'pocketbase';
 import { IndexeddbPersistence } from 'y-indexeddb';
+import { networkStatusService } from './NetworkStatusService';
 
 import { uint8ArrayToBase64, base64ToUint8Array } from '@/lib/utils';
 
@@ -25,12 +26,21 @@ export class YjsPocketbaseProvider {
         // 1. Setup IndexedDB persistence for offline support and initial load
         this.persistence = new IndexeddbPersistence(listId, doc);
         this.persistence.on('synced', () => {
-            console.log(`[YjsPocketbaseProvider] IndexedDB synced for list: ${listId}`);
+            console.log(`[YjsPocketbaseProvider] IndexedDB synced for list: ${this.listId}`);
         });
 
         // 2. Listen for local Yjs changes and push them to PocketBase
         // The 'update' event fires when the Y.Doc changes (locally or remotely applied)
         this.doc.on('update', this._onLocalUpdate);
+
+        // 3. Listen to network status changes
+        networkStatusService.status$.subscribe(status => {
+            if (status === 'online') {
+                this.connect();
+            } else {
+                this.disconnect();
+            }
+        });
     }
 
     private _onLocalUpdate = (update: Uint8Array, origin: any) => {
@@ -126,8 +136,12 @@ export class YjsPocketbaseProvider {
         }
     }
 
+    public isConnected(): boolean {
+        return this.pb.realtime.isConnected;
+    }
+
     public async connect() {
-        if (this.connected || this.syncInProgress) return;
+        if (this.syncInProgress || this.connected) return;
         
         this.syncInProgress = true;
         console.log(`[YjsPocketbaseProvider] Connecting list: ${this.listId}`);
@@ -136,15 +150,15 @@ export class YjsPocketbaseProvider {
             // Pull from server first to get latest state
             await this._pullFromServer();
             
-            // Set up subscription for real-time updates
-            this._setupSubscription().catch(err => {
-                console.warn(`[YjsPocketbaseProvider] Subscription setup failed, but local functionality continues:`, err);
-            });
-            
-            this.connected = true;
+            // After pulling, set up the realtime subscription for ongoing updates
+            await this._setupSubscription();
+
+            // The subscription is the primary indicator of a successful "connection" for this provider.
+            if (typeof this.unsubscribe === 'function') {
+                this.connected = true;
+            }
         } catch (error) {
             console.error(`[YjsPocketbaseProvider] Connection failed for list ${this.listId}, but local functionality continues:`, error);
-            // We don't rethrow - local functionality continues
         } finally {
             this.syncInProgress = false;
         }
@@ -165,7 +179,6 @@ export class YjsPocketbaseProvider {
             } else {
                 console.warn(`[YjsPocketbaseProvider] Failed to fetch state from server for list ${this.listId}, continuing with local state:`, error);
             }
-            // Don't rethrow - we continue with local state
         }
     }
 
@@ -217,8 +230,12 @@ export class YjsPocketbaseProvider {
         console.log(`[YjsPocketbaseProvider] Destroyed for list: ${this.listId}`);
     }
 
-    public isConnected(): boolean {
-        return this.connected;
+    public async reconnect() {
+        console.log(`[YjsPocketbaseProvider] Forcing reconnect for list: ${this.listId}`);
+        this.disconnect();
+        // Add a small delay to ensure the disconnection completes
+        await new Promise(resolve => setTimeout(resolve, 100));
+        this.connect();
     }
 
     // Force a full sync by sending the complete document state to the server

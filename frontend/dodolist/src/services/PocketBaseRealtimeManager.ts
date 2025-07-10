@@ -1,6 +1,7 @@
+import { App } from '@capacitor/app';
 import PocketBase from 'pocketbase';
-import { BehaviorSubject, Observable, timer } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { networkStatusService } from './NetworkStatusService';
 
 export type ConnectionStatus = 'connected' | 'disconnected' | 'error';
 
@@ -14,37 +15,41 @@ class PocketBaseRealtimeManager {
   private pb: PocketBase;
   private connectionStatusSubject: BehaviorSubject<ConnectionStatus>;
   public connectionStatus$: Observable<ConnectionStatus>;
-  private reconnectAttempts = 0;
-  private maxReconnectAttempts = 10;
-  private initialReconnectInterval = 1000;
-  private isInitialized = false;
-  private healthCheckIntervalId: any = null;
-  private healthCheckIntervalMs = 30000; // 30 secs
-
+  
   constructor(pb: PocketBase) {
     this.pb = pb;
-    this.connectionStatusSubject = new BehaviorSubject<ConnectionStatus>(ConnectionStatus.Disconnected);
+    this.connectionStatusSubject = new BehaviorSubject<ConnectionStatus>(
+      this.pb.realtime.isConnected ? ConnectionStatus.Connected : ConnectionStatus.Disconnected
+    );
     this.connectionStatus$ = this.connectionStatusSubject.asObservable();
     
-    // Don't setup listeners immediately - wait for initialization
-    this.initializeConnection();
-    this.startPeriodicHealthCheck();
+    // Setup connection listeners using PocketBase native events
+    this.setupRealtimeListeners();
+    
+    // Listen for network status changes
+    networkStatusService.status$.subscribe(status => {
+      if (status === 'online' && !this.pb.realtime.isConnected) {
+        this.logWithTimestamp('Network online, reconnecting...');
+        this.reconnectRealtime();
+      }
+    });
 
-    // Listen for browser online/offline events
-    window.addEventListener('online', () => {
-      this.logWithTimestamp('Browser online event detected, checking health...');
-      this.forceConnectionCheck(); // Already present, triggers health check
+    // Listen for app state changes (background/foreground)
+    App.addListener('appStateChange', ({ isActive }) => {
+      if (isActive && !this.pb.realtime.isConnected) {
+        this.logWithTimestamp('App is active, reconnecting...');
+        this.reconnectRealtime();
+      }
     });
-    window.addEventListener('offline', () => {
-      this.logWithTimestamp('Browser offline event detected, marking as disconnected.');
-      this.connectionStatusSubject.next(ConnectionStatus.Disconnected);
-      // Trigger a health check to confirm status (optional, but ensures state is up to date)
-      this.checkHealth().then(isHealthy => {
-        if (!isHealthy) {
-          this.logWithTimestamp('Confirmed: PocketBase is not reachable after offline event.');
-        }
-      });
-    });
+  }
+
+  public reconnectRealtime(): void {
+    this.logWithTimestamp('Reconnecting realtime...');
+    // PocketBase handles reconnection internally, but we can force a disconnect/reconnect
+    this.pb.realtime.unsubscribe();
+    
+    // PocketBase will auto-reconnect on the next subscription
+    this.updateConnectionStatus();
   }
 
   protected logWithTimestamp(message: string, ...args: any[]) {
@@ -52,134 +57,60 @@ class PocketBaseRealtimeManager {
     console.log(`[${now}] [PocketBaseRealtimeManager] ${message}`, ...args);
   }
 
-  private async initializeConnection() {
-    this.logWithTimestamp('Initializing connection...');
-    
-    // Check initial connection state
-    const isHealthy = await this.checkHealth();
-    if (isHealthy) {
-      this.logWithTimestamp('Initial health check passed');
-      this.connectionStatusSubject.next(ConnectionStatus.Connected);
-    } else {
-      this.logWithTimestamp('Initial health check failed');
-      this.connectionStatusSubject.next(ConnectionStatus.Disconnected);
-    }
-    
-    // Now setup the realtime listeners
-    this.setupRealtimeListeners();
-    this.isInitialized = true;
-    
-    this.logWithTimestamp(`Initialized with status: ${this.connectionStatusSubject.value}`);
-  }
-
   private setupRealtimeListeners() {
     this.logWithTimestamp('Setting up realtime listeners...');
+    
+    // Listen for PocketBase realtime connection changes
+    this.pb.realtime.subscribe('*', () => {
+      this.updateConnectionStatus();
+    });
+    
+    // Handle disconnect events
+    this.updateConnectionStatus();
+    
     this.logWithTimestamp('Realtime listeners setup complete');
   }
-
-  private scheduleReconnect() {
-    if (this.reconnectAttempts >= this.maxReconnectAttempts) {
-      this.logWithTimestamp('Max reconnect attempts reached. Giving up.');
-      this.connectionStatusSubject.next(ConnectionStatus.Error);
-      return;
-    }
-
-    const delay = this.initialReconnectInterval * Math.pow(2, this.reconnectAttempts);
-    this.logWithTimestamp(`Scheduling reconnect in ${delay / 1000}s (attempt ${this.reconnectAttempts + 1})`);
+  
+  private updateConnectionStatus() {
+    const isConnected = this.pb.realtime.isConnected;
+    const currentStatus = isConnected ? ConnectionStatus.Connected : ConnectionStatus.Disconnected;
     
-    timer(delay)
-      .pipe(
-        takeUntil(this.connectionStatus$.pipe(
-          // Only cancel if we successfully reconnect
-          takeUntil(timer(delay + 5000)) // Or timeout after delay + 5s
-        ))
-      )
-      .subscribe(async () => {
-        this.reconnectAttempts++;
-        this.logWithTimestamp(`Executing reconnect attempt ${this.reconnectAttempts}`);
-        
-        // Force a health check to trigger connection
-        const isHealthy = await this.checkHealth();
-        if (isHealthy) {
-          this.logWithTimestamp('Reconnect successful via health check');
-          this.connectionStatusSubject.next(ConnectionStatus.Connected);
-          this.reconnectAttempts = 0;
-        } else {
-          this.logWithTimestamp('Reconnect failed, will retry');
-          this.scheduleReconnect();
-        }
-      });
-  }
-
-  private startPeriodicHealthCheck() {
-    if (this.healthCheckIntervalId) return;
-    this.healthCheckIntervalId = setInterval(async () => {
-      if (this.connectionStatusSubject.value !== ConnectionStatus.Connected) {
-        this.logWithTimestamp('Periodic health check triggered...');
-        const isHealthy = await this.checkHealth();
-        if (isHealthy) {
-          this.logWithTimestamp('Periodic health check: reconnected!');
-          this.connectionStatusSubject.next(ConnectionStatus.Connected);
-          this.reconnectAttempts = 0;
-        }
-      }
-    }, this.healthCheckIntervalMs);
-  }
-
-  private stopPeriodicHealthCheck() {
-    if (this.healthCheckIntervalId) {
-      clearInterval(this.healthCheckIntervalId);
-      this.healthCheckIntervalId = null;
+    if (this.connectionStatusSubject.value !== currentStatus) {
+      this.logWithTimestamp(`Connection status changed to: ${currentStatus}`);
+      this.connectionStatusSubject.next(currentStatus);
     }
   }
 
-  public async checkHealth(): Promise<boolean> {
-    try {
-      this.logWithTimestamp('Performing health check...');
-      await this.pb.health.check();
-      this.logWithTimestamp('Health check successful');
-      return true;
-    } catch (error) {
-      this.logWithTimestamp('Health check failed:', error);
-      return false;
-    }
-  }
-
-  // Add method to manually trigger connection check
-  public async forceConnectionCheck(): Promise<void> {
-    this.logWithTimestamp('Manual connection check requested');
-    const isHealthy = await this.checkHealth();
-    const newStatus = isHealthy ? ConnectionStatus.Connected : ConnectionStatus.Disconnected;
-    
-    if (this.connectionStatusSubject.value !== newStatus) {
-      this.logWithTimestamp(`Status changed from ${this.connectionStatusSubject.value} to ${newStatus}`);
-      this.connectionStatusSubject.next(newStatus);
-    }
-  }
-
-  // Add method to get current status synchronously
+  // Get current status synchronously
   public getCurrentStatus(): ConnectionStatus {
-    return this.connectionStatusSubject.value;
+    return this.pb.realtime.isConnected ? ConnectionStatus.Connected : ConnectionStatus.Disconnected;
   }
 
-  public async subscribe(collectionName: string, callback: (e: any) => void, recordId?: string) {
+  // Subscribe to a collection with user-specific filter
+  public async subscribeToUserCollection(
+    collectionName: string, 
+    userId: string, 
+    callback: (e: any) => void
+  ) {
     try {
-      await this.pb.collection(collectionName).subscribe(recordId || '*', callback);
-      this.logWithTimestamp(`Subscribed to ${collectionName}${recordId ? `:${recordId}` : ''}`);
+      // Subscribe to all records in collection that belong to the current user
+      await this.pb.collection(collectionName).subscribe(`user_id="${userId}"`, callback);
+      this.logWithTimestamp(`Subscribed to ${collectionName} for user ${userId}`);
+      this.updateConnectionStatus();
     } catch (error) {
       this.logWithTimestamp(`Failed to subscribe to ${collectionName}:`, error);
       throw error;
     }
   }
 
-  public async unsubscribe(collectionName: string, recordId?: string) {
+  public async unsubscribe(collectionName: string, filter?: string) {
     try {
-      if (recordId) {
-        await this.pb.collection(collectionName).unsubscribe(recordId);
+      if (filter) {
+        await this.pb.collection(collectionName).unsubscribe(filter);
       } else {
         await this.pb.collection(collectionName).unsubscribe();
       }
-      this.logWithTimestamp(`Unsubscribed from ${collectionName}${recordId ? `:${recordId}` : ''}`);
+      this.logWithTimestamp(`Unsubscribed from ${collectionName}${filter ? ` with filter ${filter}` : ''}`);
     } catch (error) {
       this.logWithTimestamp(`Failed to unsubscribe from ${collectionName}:`, error);
       throw error;
@@ -189,10 +120,8 @@ class PocketBaseRealtimeManager {
   // Cleanup method
   public destroy() {
     this.logWithTimestamp('Destroying manager...');
-    // Unsubscribe from all realtime events
     this.pb.realtime.unsubscribe();
     this.connectionStatusSubject.complete();
-    this.stopPeriodicHealthCheck();
   }
 }
 

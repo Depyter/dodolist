@@ -136,17 +136,26 @@ export const usePersistentTodoLists = () => {
 
     // Initialize with provided data if any
     if (initialData) {
-      const metadata = doc.getMap('metadata');
-      Object.entries(initialData).forEach(([key, value]) => {
-        if (key !== 'todos' && value !== undefined) {
-          metadata.set(key, value instanceof Date ? value.toISOString() : value);
-        }
-      });
+	  doc.transact(() => {
+		const metadata = doc.getMap('metadata');
+		Object.entries(initialData).forEach(([key, value]) => {
+			if (key !== 'todos' && value !== undefined) {
+			metadata.set(key, value instanceof Date ? value.toISOString() : value);
+			}
+		});
 
-      if (initialData.todos?.length) {
-        const todosArray = doc.getArray('todos');
-        todosArray.insert(0, initialData.todos.map(todoToYjsFormat));
-      }
+		if (initialData.todos?.length) {
+			const todosArray = doc.getArray('todos');
+			const yjsTodos = initialData.todos.map(todo => {
+			const yjsTodo = new Y.Map();
+			Object.entries(todoToYjsFormat(todo)).forEach(([key, value]) => {
+				yjsTodo.set(key, value);
+			});
+			return yjsTodo;
+			});
+			todosArray.insert(0, yjsTodos);
+		}
+	  });
     }
 
     // Create a provider to handle persistence and sync
@@ -175,23 +184,28 @@ export const usePersistentTodoLists = () => {
   const attachDocUpdateListener = (doc: Y.Doc, listId: string) => {
     // Always update UI state when Yjs doc changes (local or remote)
     const updateState = () => {
-      const metadata = doc.getMap('metadata').toJSON();
-      const todos = doc.getArray<any>('todos').toJSON().map(yjsToTodo);
-      
+      const metadata = doc.getMap('metadata');
+
+      // On initial setup for a new client, the doc is empty.
+      // We wait for the first sync before rendering the list to avoid a "blank slate" flash.
+      if (metadata.size === 0) {
+        return;
+      }
+
       const listData: TodoList = {
         id: listId,
-        name: metadata.name as string || 'Unnamed List',
-        color: metadata.color as string || '#000000',
-        pinned: metadata.pinned as boolean || false,
-        archived: metadata.archived as boolean || false,
-        deleted: metadata.deleted as boolean || false,
-        todos: todos,
-        createdAt: new Date(metadata.createdAt as string || new Date().toISOString()),
+        name: metadata.get('name') as string || 'Unnamed List',
+        color: metadata.get('color') as string || '#000000',
+        pinned: metadata.get('pinned') as boolean || false,
+        archived: metadata.get('archived') as boolean || false,
+        deleted: metadata.get('deleted') as boolean || false,
+        todos: doc.getArray<any>('todos').toJSON().map(yjsToTodo),
+        createdAt: new Date(metadata.get('createdAt') as string || new Date().toISOString()),
       };
 
       // Handle soft delete (deleted or archived flag)
-      if (metadata.deleted === true || listData.archived) {
-        console.log(`[todoService] List ${listId} was ${metadata.deleted ? 'deleted' : 'archived'}. Cleaning up.`);
+      if (listData.deleted === true || listData.archived) {
+        console.log(`[todoService] List ${listId} was ${listData.deleted ? 'deleted' : 'archived'}. Cleaning up.`);
         setTodoLists(prev => prev.filter(l => l.id !== listId));
         
         // Clean up resources
@@ -231,7 +245,7 @@ export const usePersistentTodoLists = () => {
     };
 
     doc.on('update', updateState);
-    // Run once to initialize
+    // Run once to initialize, but the guard clause will prevent rendering empty lists.
     updateState();
   };
 
@@ -247,7 +261,11 @@ export const usePersistentTodoLists = () => {
       
       setIsPocketBaseConnected(isNowConnected);
       isPocketBaseConnectedRef.current = isNowConnected;
-      setConnectionDebug(`${status} at ${new Date().toLocaleTimeString()}`);
+      
+      if (isNowConnected && !wasConnected) {
+        // We just reconnected - sync data
+        syncFromServer();
+      }
     });
 
     // Get initial status
@@ -260,17 +278,44 @@ export const usePersistentTodoLists = () => {
     };
   }, []);
 
+  // Subscription to task_lists - update to use the new method
+  useEffect(() => {
+    if (isPocketBaseConnected) {
+      const currentUser = authService.getCurrentUser();
+      if (!currentUser) return;
+      
+      // Subscribe to all task lists for this user
+      const setupRealtimeSubscription = async () => {
+        try {
+          await pbRealtimeManager.subscribeToUserCollection(
+            'task_lists',
+            currentUser.id,
+            handleRealtimeListEvent
+          );
+          console.log('[todoService] Subscribed to user task lists');
+        } catch (err) {
+          console.error('[todoService] Failed to subscribe to realtime events:', err);
+        }
+      };
+      
+      setupRealtimeSubscription();
+      
+      return () => {
+        pbRealtimeManager.unsubscribe('task_lists').catch(err => {
+          console.warn('[todoService] Error unsubscribing from task_lists:', err);
+        });
+      };
+    }
+  }, [isPocketBaseConnected]);
+
   // Effect to connect/disconnect providers based on connection status
   useEffect(() => {
     if (isPocketBaseConnected) {
-      console.log('[todoService] Connected to PocketBase, connecting providers and syncing lists');
+      console.log('[todoService] Connected to PocketBase, forcing reconnect for all providers.');
       
-      // Connect all providers to start syncing
-      for (const [id, provider] of providers.current.entries()) {
-        if (!provider.isConnected()) {
-          console.log(`[todoService] Connecting provider for list: ${id}`);
-          provider.connect();
-        }
+      // Force all existing providers to reconnect and sync
+      for (const provider of providers.current.values()) {
+        provider.reconnect();
       }
       
       // Discover new lists from server
@@ -279,8 +324,16 @@ export const usePersistentTodoLists = () => {
       // Subscribe to realtime events for task_lists
       const setupRealtimeSubscription = async () => {
         try {
-          await pbRealtimeManager.subscribe('task_lists', handleRealtimeListEvent);
-          console.log('[todoService] Subscribed to global list events');
+          // Use the correct subscription method for task_lists (adjust as needed for your implementation)
+          const currentUser = authService.getCurrentUser();
+          if (currentUser) {
+            await pbRealtimeManager.subscribeToUserCollection(
+              'task_lists',
+              currentUser.id,
+              handleRealtimeListEvent
+            );
+            console.log('[todoService] Subscribed to global list events');
+          }
         } catch (err) {
           console.error('[todoService] Failed to subscribe to realtime events:', err);
           // This is non-critical - local functionality continues
@@ -298,9 +351,8 @@ export const usePersistentTodoLists = () => {
       console.log('[todoService] Disconnected from PocketBase, disconnecting providers');
       
       // Disconnect all providers to prevent sync attempts while offline
-      for (const [id, provider] of providers.current.entries()) {
+      for (const provider of providers.current.values()) {
         if (provider.isConnected()) {
-          console.log(`[todoService] Disconnecting provider for list: ${id}`);
           provider.disconnect();
         }
       }
@@ -404,9 +456,11 @@ export const usePersistentTodoLists = () => {
       
       // Fetch all lists from server
       const remoteLists = await pb.collection('task_lists').getFullList({
-        filter: `user_id = "${currentUser.id}" && archived = false`,
-        sort: '-created',
+        filter: `user_id = "${currentUser.id}" && deleted = false`,
+        sort: 'createdAt',
       });
+      
+      console.log(`current guy ${currentUser.id}`)
       
       console.log(`[todoService] Found ${remoteLists.length} lists on server`);
       
@@ -455,10 +509,12 @@ export const usePersistentTodoLists = () => {
   const updateList = async (listId: string, updates: Partial<Omit<TodoList, 'id' | 'todos'>>) => {
     const doc = ydocs.current.get(listId);
     if (doc) {
-      const metadata = doc.getMap('metadata');
-      Object.entries(updates).forEach(([key, value]) => {
-        metadata.set(key, value instanceof Date ? value.toISOString() : value);
-      });
+	  doc.transact(() => {
+			const metadata = doc.getMap('metadata');
+			Object.entries(updates).forEach(([key, value]) => {
+				metadata.set(key, value instanceof Date ? value.toISOString() : value);
+			});
+	  });
     }
   };
 
@@ -466,8 +522,10 @@ export const usePersistentTodoLists = () => {
     console.log(`[todoService] Soft-deleting list: ${listId}`);
     const doc = ydocs.current.get(listId);
     if (doc) {
-      // Set deleted flag to true - the doc update listener will handle cleanup
-      doc.getMap('metadata').set('deleted', true);
+	  doc.transact(() => {
+			// Set deleted flag to true - the doc update listener will handle cleanup
+			doc.getMap('metadata').set('deleted', true);
+	  });
     }
   };
 
@@ -475,58 +533,119 @@ export const usePersistentTodoLists = () => {
     const { listId } = todoData;
     const doc = ydocs.current.get(listId);
     if (doc) {
-      const todosArray = doc.getArray<any>('todos');
-      const newTodo: Todo = {
-        id: generateId(),
-        completed: false,
-        recurring: 'none',
-        createdAt: new Date(),
-        ...todoData,
-      };
-      todosArray.insert(0, [todoToYjsFormat(newTodo)]);
+	  doc.transact(() => {
+			const todosArray = doc.getArray<any>('todos');
+			const newTodo: Todo = {
+				id: generateId(),
+				completed: false,
+				recurring: 'none',
+				createdAt: new Date(),
+				...todoData,
+			};
+			const yjsTodo = new Y.Map(Object.entries(todoToYjsFormat(newTodo)));
+			todosArray.insert(0, [yjsTodo]);
+	  });
     }
   };
 
   const updateTodo = (todoId: string, listId: string, updates: Partial<Todo>) => {
     const doc = ydocs.current.get(listId);
     if (doc) {
-      const todosArray = doc.getArray<any>('todos');
-      const todoIndex = todosArray.toArray().findIndex(t => t.get('id') === todoId);
-      if (todoIndex > -1) {
-        const todoMap = todosArray.get(todoIndex) as Y.Map<any>;
-        doc.transact(() => {
-          Object.entries(updates).forEach(([key, value]) => {
-            if (key === 'id' || key === 'listId') return;
-            const yjsValue = (value instanceof Date) ? value.toISOString() : value;
-            todoMap.set(key, yjsValue);
-          });
-        });
-      }
+      doc.transact(() => {
+        const todosArray = doc.getArray<any>('todos');
+        
+        // Find the todo by iterating through the array
+        for (let i = 0; i < todosArray.length; i++) {
+          const todoItem = todosArray.get(i);
+          
+          // Handle both Y.Map and plain object cases
+          let todoMap: Y.Map<any>;
+          if (todoItem instanceof Y.Map) {
+            todoMap = todoItem;
+          } else {
+            // If it's a plain object, convert it to Y.Map
+            todoMap = new Y.Map();
+            Object.entries(todoItem).forEach(([key, value]) => {
+              todoMap.set(key, value);
+            });
+            // Replace the plain object with the Y.Map
+            todosArray.delete(i, 1);
+            todosArray.insert(i, [todoMap]);
+          }
+          
+          // Check if this is the todo we're looking for
+          if (todoMap.get('id') === todoId) {
+            const currentTodo = yjsToTodo(todoMap.toJSON());
+            const updatedTodo = { ...currentTodo, ...updates };
+            const yjsFormattedTodo = todoToYjsFormat(updatedTodo);
+
+            Object.entries(yjsFormattedTodo).forEach(([key, value]) => {
+              if (key === 'id' || key === 'listId') return;
+              todoMap.set(key, value);
+            });
+            break;
+          }
+        }
+      });
     }
   };
 
   const toggleTodo = (todoId: string, listId: string) => {
     const doc = ydocs.current.get(listId);
     if (doc) {
-      const todosArray = doc.getArray<any>('todos');
-      const todoIndex = todosArray.toArray().findIndex(t => t.get('id') === todoId);
-      if (todoIndex > -1) {
-        const todoMap = todosArray.get(todoIndex) as Y.Map<any>;
-        const currentCompleted = todoMap.get('completed');
-        todoMap.set('completed', !currentCompleted);
-        todoMap.set('completedAt', !currentCompleted ? new Date().toISOString() : null);
-      }
+      doc.transact(() => {
+        const todosArray = doc.getArray<any>('todos');
+        
+        // Find the todo by iterating through the array
+        for (let i = 0; i < todosArray.length; i++) {
+          const todoItem = todosArray.get(i);
+          
+          // Handle both Y.Map and plain object cases
+          let todoMap: Y.Map<any>;
+          if (todoItem instanceof Y.Map) {
+            todoMap = todoItem;
+          } else {
+            // If it's a plain object, convert it to Y.Map
+            todoMap = new Y.Map();
+            Object.entries(todoItem).forEach(([key, value]) => {
+              todoMap.set(key, value);
+            });
+            // Replace the plain object with the Y.Map
+            todosArray.delete(i, 1);
+            todosArray.insert(i, [todoMap]);
+          }
+          
+          // Check if this is the todo we're looking for
+          if (todoMap.get('id') === todoId) {
+            const currentCompleted = todoMap.get('completed');
+            todoMap.set('completed', !currentCompleted);
+            todoMap.set('completedAt', !currentCompleted ? new Date().toISOString() : null);
+            break;
+          }
+        }
+      });
     }
   };
 
   const deleteTodo = (todoId: string, listId: string) => {
     const doc = ydocs.current.get(listId);
     if (doc) {
-      const todosArray = doc.getArray<any>('todos');
-      const todoIndex = todosArray.toArray().findIndex(t => t.get('id') === todoId);
-      if (todoIndex > -1) {
-        todosArray.delete(todoIndex, 1);
-      }
+      doc.transact(() => {
+        const todosArray = doc.getArray<any>('todos');
+        
+        // Find the todo by iterating through the array
+        for (let i = 0; i < todosArray.length; i++) {
+          const todoItem = todosArray.get(i);
+          
+          // Get the ID regardless of whether it's a Y.Map or plain object
+          const todoId_current = todoItem instanceof Y.Map ? todoItem.get('id') : todoItem.id;
+          
+          if (todoId_current === todoId) {
+            todosArray.delete(i, 1);
+            break;
+          }
+        }
+      });
     }
   };
 
@@ -544,15 +663,18 @@ export const usePersistentTodoLists = () => {
       if (doc) {
         doc.transact(() => {
           const todosArray = doc.getArray<any>('todos');
-          const newTodos = todos.map(todoData => ({
-            id: generateId(),
-            completed: false,
-            recurring: 'none' as const,
-            createdAt: new Date(),
-            ...todoData,
-          })).map(todo => todoToYjsFormat(todo as Todo));
-          
-          todosArray.insert(0, newTodos);
+          const newTodos = todos.map(todoData => {
+            const { listId, ...rest } = todoData;
+            const formattedTodo = todoToYjsFormat({
+              id: generateId(),
+              completed: false,
+              createdAt: new Date(),
+              recurring: "none" as const,
+              ...rest,
+            } as Todo);
+            return new Y.Map(Object.entries(formattedTodo));
+          });
+          todosArray.push(newTodos);
         });
       }
     });
@@ -572,18 +694,41 @@ export const usePersistentTodoLists = () => {
     }
   };
 
-  // Manual sync trigger for debugging/testing
   const triggerManualSync = () => {
     console.log('[todoService] Manual sync triggered');
     syncFromServer();
   };
 
+  // Function to clear all local data for all lists
+  const clearAllLocalData = () => {
+    // 1. Get all list IDs from localStorage
+    const storedListIds = getAllYjsDocKeys();
+    // 2. Destroy providers and clean up resources for each list
+    storedListIds.forEach(listId => {
+      const provider = providers.current.get(listId);
+      if (provider) {
+        provider.destroy();
+      }
+      providers.current.delete(listId);
+      ydocs.current.delete(listId);
+      undoManagers.current.delete(listId);
+    });
+    // 3. Clear list IDs from localStorage
+    setAllYjsDocKeys([]);
+    // 4. Clear React state
+    setTodoLists([]);
+    setActiveListId('');
+    console.log('[todoService] All local data cleared.');
+  };
+
   return {
-    todoLists: todoLists.filter(list => !list.archived && !(list as any).deleted),
+    todoLists,
     activeListId,
-    setActiveListId,
     loading,
     error,
+    isPocketBaseConnected,
+    connectionDebug,
+    setActiveListId,
     createNewList,
     updateList,
     deleteList,
@@ -592,11 +737,9 @@ export const usePersistentTodoLists = () => {
     toggleTodo,
     deleteTodo,
     batchAddTodos,
-    isPocketBaseConnected,
-    connectionDebug,
-    triggerManualSync,
     undo,
     redo,
-    currentConnectionStatus: () => pbRealtimeManager.getCurrentStatus(),
+    triggerManualSync,
+    clearAllLocalData,
   };
 };

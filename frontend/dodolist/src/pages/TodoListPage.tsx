@@ -5,7 +5,6 @@ import { useState, useEffect, useCallback } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import AuthService from "@/services/authService"
 import { usePersistentTodoLists } from "@/services/todoService"
-import { useIsMobile } from "@/hooks/use-mobile";
 
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -39,9 +38,6 @@ import {
   PinOff, // Import PinOff icon
   Copy, // Import Copy icon
   Palette, // Import Palette icon
-  Edit3, // Import Edit3 icon for Rename
-  Users,
-  UserX
 } from "lucide-react"
 
 import AppSidebar from "@/components/AppSidebar"
@@ -49,11 +45,7 @@ import TexturedBackground from "@/components/TexturedBackground"
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { Notification } from "@/components/ui/Notification";
 import SyncStatusIndicator from "@/components/SyncStatusIndicator";
-import PocketBaseRealtimeManager, { ConnectionStatus } from "@/services/PocketBaseRealtimeManager";
-import PocketBase from "pocketbase";
 
-// We're using the Todo and TodoList interfaces from todoService.ts,
-// but we'll still define them here to maintain type safety without refactoring the whole file
 interface Todo {
   id: string
   text: string
@@ -158,7 +150,6 @@ const colors = [
 
 export default function DodoListApp() {
   const { listId } = useParams();
-  const isMobile = useIsMobile();
   const navigate = useNavigate();
   const authService = new AuthService()
   
@@ -218,7 +209,6 @@ export default function DodoListApp() {
     deleteTodo,
     batchAddTodos,
     isPocketBaseConnected, // <-- add this
-    currentConnectionStatus, // (optional, for debug)
   } = usePersistentTodoLists();
   
   const [inputValue, setInputValue] = useState("")

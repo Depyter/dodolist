@@ -1,5 +1,6 @@
 import PocketBase from 'pocketbase'
 import { PB_URL } from '@/config'
+import { networkStatusService } from './NetworkStatusService'
 
 export interface User {
   id: string
@@ -35,6 +36,9 @@ class AuthService {
 
   // Register new user
   async register(data: RegisterData): Promise<User> {
+    if (networkStatusService.currentStatus === 'offline') {
+      throw new Error('No internet connection. Cannot register.')
+    }
     try {
       const record = await this.pb.collection('users').create(data)
       return {
@@ -52,6 +56,9 @@ class AuthService {
 
   // Login user
   async login(data: LoginData): Promise<AuthData> {
+    if (networkStatusService.currentStatus === 'offline') {
+      throw new Error('No internet connection. Cannot login.')
+    }
     try {
       const authData = await this.pb.collection('users').authWithPassword(
         data.identity,

@@ -15,7 +15,6 @@ import {
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Loader } from "@/components/ui/loader";
 import {
   MoreHorizontal,
   Plus,
@@ -23,17 +22,14 @@ import {
   PinOff,
   Archive,
   ArchiveRestore,
-  Edit3,
-  Copy,
   Palette,
   Trash2,
-  Settings,
 } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { useNavigate } from 'react-router-dom'
 import AuthService from '@/services/authService'
+import { usePersistentTodoLists } from '@/services/todoService';
 
 interface Color {
   name: string;
@@ -91,7 +87,6 @@ const ListMenuItem = memo(
     updateListName,
     togglePinList,
     toggleArchiveList,
-    cloneList,
     updateListColor,
     deleteList,
     todoLists,
@@ -322,27 +317,16 @@ const AppSidebar = memo(({
   deleteList,
   colors,
   userProfile,
-  tempProfile,
-  setTempProfile,
   isEditingProfile,
   setIsEditingProfile,
-  saveProfile,
   editingListId,
   setEditingListId,
   onLogout,
 }: AppSidebarProps) => {
   const navigate = useNavigate()
   const [authService] = useState(() => new AuthService())
-  const [currentUser, setCurrentUser] = useState(authService.getCurrentUser())
-  
-  // Get authenticated user on component mount
-  useEffect(() => {
-    const user = authService.getCurrentUser()
-    if (user) {
-      setCurrentUser(user)
-    }
-  }, [authService])
-  
+  const { clearAllLocalData } = usePersistentTodoLists();
+
   const handleLogout = () => {
     if (onLogout) {
       onLogout()
@@ -532,6 +516,20 @@ const AppSidebar = memo(({
 
       {/* Footer */}
       <SidebarFooter className="relative z-10 border-t border-white/15 px-4 py-3 bg-white/5">
+        {/* Debug: Clear Local Data Button */}
+        <div className="mb-2 flex justify-center">
+          <button
+            onClick={() => {
+              if (window.confirm('Are you sure you want to clear all local data? This cannot be undone.')) {
+                clearAllLocalData();
+              }
+            }}
+            style={{ color: 'red', fontWeight: 600, border: '1px solid #f87171', borderRadius: 6, padding: '4px 12px', background: 'rgba(255,255,255,0.7)' }}
+            title="Debug: Remove all local data"
+          >
+            Clear All Local Data
+          </button>
+        </div>
         <SidebarMenu>
           <SidebarMenuItem>
             <Dialog open={isEditingProfile} onOpenChange={setIsEditingProfile}>

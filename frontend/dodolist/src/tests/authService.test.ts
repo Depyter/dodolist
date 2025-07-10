@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { pb, mockAuthStore, mockCollectionCreate, mockCollectionAuthWithPassword, mockUsersRequestPasswordReset, mockUsersConfirmPasswordReset, mockUsersRequestVerification, mockUsersConfirmVerification } from './setup'
+import { mockAuthStore, mockCollectionCreate, mockCollectionAuthWithPassword, mockUsersRequestPasswordReset, mockUsersConfirmPasswordReset, mockUsersRequestVerification, mockUsersConfirmVerification } from './setup'
 import AuthService, { type RegisterData, type LoginData } from '../services/authService'
 
 describe('AuthService', () => {
