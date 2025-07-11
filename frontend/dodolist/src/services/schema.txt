@@ -29,6 +29,7 @@ const data = {
     "archived": true,
     "yjsUpdate": "test",
     "deleted": true
+    "yjsClientId" "test"
 };
 
 const record = await pb.collection('task_lists').create(data);

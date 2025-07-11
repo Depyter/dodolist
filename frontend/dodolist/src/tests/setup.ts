@@ -1,7 +1,7 @@
 import { afterEach, vi, beforeEach } from 'vitest'
 import { cleanup } from '@testing-library/react'
 import '@testing-library/jest-dom/vitest'
-
+import 'fake-indexeddb/auto';
 // Set VITE_API_URL for tests to prevent config error
 process.env.VITE_API_URL = 'http://127.0.0.1:8080';
 
@@ -9,11 +9,11 @@ process.env.VITE_API_URL = 'http://127.0.0.1:8080';
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
   value: vi.fn().mockImplementation(query => ({
-    matches: true,
+    matches: false,
     media: query,
     onchange: null,
-    addListener: vi.fn(),
-    removeListener: vi.fn(),
+    addListener: vi.fn(), // deprecated
+    removeListener: vi.fn(), // deprecated
     addEventListener: vi.fn(),
     removeEventListener: vi.fn(),
     dispatchEvent: vi.fn(),

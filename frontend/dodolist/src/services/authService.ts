@@ -31,6 +31,8 @@ class AuthService {
 
   constructor() {
     this.pb = new PocketBase(PB_URL)
+    // Store the auth store globally for sharing with other PocketBase instances
+    ;(window as any).__pb_auth_store = this.pb.authStore
   }
 
   // Register new user
@@ -57,6 +59,10 @@ class AuthService {
         data.identity,
         data.password
       )
+      
+      // Update the global auth store
+      ;(window as any).__pb_auth_store = this.pb.authStore
+      
       return {
         token: authData.token,
         record: {

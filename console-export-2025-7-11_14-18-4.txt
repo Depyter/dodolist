@@ -1,0 +1,388 @@
+GET
+http://localhost:3000/list/b6c7cf48-ddc8-4326-b0d5-36aa8747e532
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/@vite/client
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/src/main.tsx?t=1752157060671
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/@react-refresh
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/node_modules/vite/dist/client/env.mjs
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=be6be70e
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=be6be70e
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/node_modules/.vite/deps/react.js?v=be6be70e
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/node_modules/.vite/deps/@capacitor_status-bar.js?v=be6be70e
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/src/index.css?t=1752157060671
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/src/App.tsx?t=1752157060671
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/node_modules/.vite/deps/pocketbase.js?v=be6be70e
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/src/config.ts
+[HTTP/1.1 200 OK 0ms]
+
+[vite] connecting... client:789:9
+GET
+http://localhost:3000/node_modules/.vite/deps/chunk-UGC3UZ7L.js?v=be6be70e
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/node_modules/.vite/deps/chunk-G3PMV62Z.js?v=be6be70e
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/node_modules/.vite/deps/chunk-NXBGYFMC.js?v=be6be70e
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/src/pages/TodoListPage.tsx?t=1752157060671
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/node_modules/.vite/deps/react-router-dom.js?v=be6be70e
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/src/pages/LoginPage.tsx
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/src/components/ProtectedRoute.tsx
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/src/pages/RegisterPage.tsx
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/node_modules/.vite/deps/@capacitor_core.js?v=61cf6f6e
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/node_modules/.vite/deps/chunk-HE4GKDYE.js?v=be6be70e
+[HTTP/1.1 200 OK 0ms]
+
+GET
+ws://localhost:3000/?token=PvN89m9ROMg6
+NS_ERROR_OFFLINE
+
+Firefox can’t establish a connection to the server at ws://localhost:3000/?token=PvN89m9ROMg6. client:802:31
+[vite] failed to connect to websocket (Error: WebSocket closed without opened.). client:841:19
+Uncaught (in promise) Error: WebSocket closed without opened.
+    connect client:454
+    connect client:452
+    connect client:443
+    connect client:811
+    connect client:290
+    connect client:383
+    <anonymous> client:908
+client:454:22
+GET
+http://localhost:3000/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=61cf6f6e
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/node_modules/.vite/deps/react-router-dom.js?v=61cf6f6e
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/node_modules/.vite/deps/react.js?v=61cf6f6e
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/src/components/ui/card.tsx
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/src/components/LoginForm.tsx
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/src/components/TexturedBackground.tsx
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/src/services/authService.ts
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/src/hooks/useTodoLists.ts?t=1752157060671
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/src/components/ui/button.tsx
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/src/components/ui/input.tsx
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/src/components/ui/dropdown-menu.tsx
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/node_modules/.vite/deps/lucide-react.js?v=be6be70e
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/src/components/ui/sidebar.tsx
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/src/components/AppSidebar.tsx
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/src/components/ui/Notification.tsx
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/src/components/ui/label.tsx
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/src/components/SyncStatusIndicator.tsx
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/node_modules/.vite/deps/chunk-NXBGYFMC.js?v=61cf6f6e
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/node_modules/.vite/deps/chunk-G3PMV62Z.js?v=61cf6f6e
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/node_modules/.vite/deps/chunk-UGC3UZ7L.js?v=61cf6f6e
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/node_modules/.vite/deps/chunk-HE4GKDYE.js?v=61cf6f6e
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/src/lib/utils.ts
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/node_modules/.vite/deps/pocketbase.js?v=61cf6f6e
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/src/hooks/useYjsTodoList.ts?t=1752157060671
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/node_modules/.vite/deps/class-variance-authority.js?v=61cf6f6e
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/node_modules/.vite/deps/@radix-ui_react-slot.js?v=61cf6f6e
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/node_modules/.vite/deps/@radix-ui_react-dropdown-menu.js?v=61cf6f6e
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/src/components/ui/loader.tsx
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/node_modules/.vite/deps/lucide-react.js?v=61cf6f6e
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/src/hooks/use-mobile.ts
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/src/components/ui/dialog.tsx
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/src/components/ui/separator.tsx
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/src/components/ui/sheet.tsx
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/src/components/ui/tooltip.tsx
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/src/components/ui/skeleton.tsx
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/node_modules/.vite/deps/@radix-ui_react-label.js?v=61cf6f6e
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/node_modules/.vite/deps/clsx.js?v=61cf6f6e
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/node_modules/.vite/deps/tailwind-merge.js?v=61cf6f6e
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/node_modules/.vite/deps/uuid.js?v=61cf6f6e
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/src/services/yjsPocketBase.ts?t=1752157060671
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/node_modules/.vite/deps/yjs.js?v=be6be70e
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/node_modules/.vite/deps/chunk-ITJMDIN4.js?v=61cf6f6e
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/node_modules/.vite/deps/chunk-U7P2NEEE.js?v=61cf6f6e
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/node_modules/.vite/deps/chunk-MJNCUEZK.js?v=61cf6f6e
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/node_modules/.vite/deps/chunk-FONJNSY5.js?v=61cf6f6e
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/node_modules/.vite/deps/chunk-24BDUIN4.js?v=61cf6f6e
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/node_modules/.vite/deps/chunk-J67QE77S.js?v=61cf6f6e
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/node_modules/.vite/deps/chunk-FS6LTFKN.js?v=61cf6f6e
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/node_modules/.vite/deps/chunk-ZQTDNDHP.js?v=61cf6f6e
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/node_modules/.vite/deps/chunk-4MXQJKEX.js?v=61cf6f6e
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/node_modules/.vite/deps/chunk-FV6F57PV.js?v=61cf6f6e
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/src/hooks/use-media-query.tsx
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/node_modules/.vite/deps/@radix-ui_react-separator.js?v=61cf6f6e
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/node_modules/.vite/deps/@radix-ui_react-dialog.js?v=61cf6f6e
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=61cf6f6e
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/node_modules/.vite/deps/chunk-NIR4DFCD.js?v=be6be70e
+[HTTP/1.1 200 OK 0ms]
+
+GET
+http://localhost:3000/node_modules/.vite/deps/y-indexeddb.js?v=be6be70e
+[HTTP/1.1 200 OK 0ms]
+
+Download the React DevTools for a better development experience: https://react.dev/link/react-devtools react-dom_client.js:17987:54
+Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
+1. You might have mismatching versions of React and the renderer (such as React DOM)
+2. You might be breaking the Rules of Hooks
+3. You might have more than one copy of React in the same app
+See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem. chunk-UGC3UZ7L.js:373:40
+Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
+1. You might have mismatching versions of React and the renderer (such as React DOM)
+2. You might be breaking the Rules of Hooks
+3. You might have more than one copy of React in the same app
+See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem. chunk-UGC3UZ7L.js:373:40
+Uncaught TypeError: dispatcher is null
+    useContext React
+    useInRouterContext chunk-NL6KNZEE.mjs:4830
+    useLocation chunk-NL6KNZEE.mjs:4834
+    ProtectedRoute ProtectedRoute.tsx:10
+    React 10
+    performWorkUntilDeadline scheduler.development.js:45
+    js scheduler.development.js:223
+    js scheduler.development.js:364
+    __require chunk-G3PMV62Z.js:8
+    js index.js:6
+    __require chunk-G3PMV62Z.js:8
+    React 2
+    __require chunk-G3PMV62Z.js:8
+    js React
+    __require chunk-G3PMV62Z.js:8
+    <anonymous> react-dom_client.js:18075
+chunk-UGC3UZ7L.js:877:9
+An error occurred in the <ProtectedRoute> component.
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://react.dev/link/error-boundaries to learn more about error boundaries.
+react-dom_client.js:6229:17
+Uncaught (in promise) Error: "StatusBar" plugin is not implemented on web
+    CapacitorException util.js:21
+    createPluginMethod runtime.js:69
+    p runtime.js:76
+    promise callback*wrapper runtime.js:75
+    <anonymous> main.tsx:9
+chunk-NXBGYFMC.js:9:5
+Uncaught (in promise) Error: "StatusBar" plugin is not implemented on web
+    CapacitorException util.js:21
+    createPluginMethod runtime.js:69
+    p runtime.js:76
+    promise callback*wrapper runtime.js:75
+    <anonymous> main.tsx:10
+chunk-NXBGYFMC.js:9:5
+GET
+http://localhost:3000/vite.svg
+[HTTP/1.1 200 OK 0ms]
+

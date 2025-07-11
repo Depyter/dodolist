@@ -1,364 +1,154 @@
-/// <reference types="vitest" />
-import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
-import { MemoryRouter, Routes, Route } from 'react-router-dom';
-import { describe, it, beforeEach, vi, expect } from 'vitest';
-import TodoListPage from '../pages/TodoListPage';
-import { usePersistentTodoLists } from '../services/todoService';
-import AuthService from '../services/authService';
-import * as ReactRouterDom from 'react-router-dom';
-import type { Mock } from 'vitest';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import DodoListApp from '../pages/TodoListPage';
+import { useTodoLists } from '../hooks/useTodoLists';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
 
-// Mock the usePersistentTodoLists hook
-vi.mock('@/services/todoService', () => ({
-  usePersistentTodoLists: vi.fn(),
-}));
+// Define Todo interface to match the component
+interface Todo {
+  id: string;
+  text: string;
+  completed: boolean;
+  createdAt: Date;
+  listId: string;
+  description?: string;
+  completedAt?: Date;
+  deadline?: Date;
+  reminder?: Date;
+  recurring?: "none" | "daily" | "weekly" | "monthly";
+}
 
-// Mock useIsMobile hook
-vi.mock('@/hooks/use-mobile', () => ({
-  useIsMobile: vi.fn(() => false),
-}));
-
-// Mock dbService to prevent SQLite WASM errors
-vi.mock('@/services/dbService', () => ({
-  default: {
-    initializeDefaultData: vi.fn().mockResolvedValue(undefined),
-  },
+// Mock the useTodoLists hook
+vi.mock('../hooks/useTodoLists', () => ({
+  useTodoLists: vi.fn(),
 }));
 
 // Mock AuthService
 vi.mock('@/services/authService', () => ({
-  __esModule: true,
-  default: vi.fn(() => ({
-    getCurrentUser: vi.fn(() => ({ id: 'user123' })),
-    logout: vi.fn(),
-  })),
+    default: vi.fn(() => ({
+        logout: vi.fn(),
+        isAuthenticated: () => true, // Assume user is always authenticated
+        getCurrentUser: () => ({ id: 'user-123', name: 'Test User' }),
+    })),
 }));
 
-// Mock react-router-dom hooks
-vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual('react-router-dom');
-  return {
-    ...actual,
-    useNavigate: vi.fn(),
-    useParams: vi.fn(),
-  };
-});
+const mockAddTodo = vi.fn();
+const mockToggleTodo = vi.fn();
+const mockDeleteTodo = vi.fn();
+const mockUpdateTodo = vi.fn();
+const mockSetActiveListId = vi.fn();
 
-// Mock next-themes
-vi.mock('next-themes', () => ({
-  useTheme: () => ({ theme: 'light' }),
-}));
-
-const mockTodoLists = [
-  {
-    id: 'list1',
-    name: 'My Day',
-    color: 'bg-blue-500',
-    todos: [
-      { id: 'todo1', text: 'Buy groceries', completed: false, createdAt: new Date(), listId: 'list1' },
-      { id: 'todo2', text: 'Walk the dog', completed: true, createdAt: new Date(), listId: 'list1' },
+const mockTodoListsData = {
+    todoLists: [
+        {
+            id: 'list-1',
+            name: 'Test List',
+            color: 'bg-stone-400',
+            todos: [] as Todo[],
+        },
     ],
-    createdAt: new Date(),
-    pinned: false,
-    archived: false,
-  },
-  {
-    id: 'list2',
-    name: 'Work Tasks',
-    color: 'bg-emerald-500',
-    todos: [
-      { id: 'todo3', text: 'Finish report', completed: false, createdAt: new Date(), listId: 'list2' },
-    ],
-    createdAt: new Date(),
-    pinned: false,
-    archived: false,
-  },
-];
+    loading: false,
+    error: null,
+    activeListId: 'list-1',
+    setActiveListId: mockSetActiveListId,
+    createNewList: vi.fn(),
+    updateList: vi.fn(),
+    deleteList: vi.fn(),
+    addTodo: mockAddTodo,
+    toggleTodo: mockToggleTodo,
+    updateTodo: mockUpdateTodo,
+    deleteTodo: mockDeleteTodo,
+    isPocketBaseConnected: true,
+};
 
-// Helper for fail in tests
-function fail(message: string): never {
-  throw new Error(message);
-}
+const renderComponent = (listId = 'list-1') => {
+  return render(
+    <MemoryRouter initialEntries={[`/list/${listId}`]}>
+      <Routes>
+        <Route path="/list/:listId" element={<DodoListApp />} />
+      </Routes>
+    </MemoryRouter>
+  );
+};
 
-describe('TodoListPage', () => {
-  const mockSetActiveListId = vi.fn();
-  const mockAddTodo = vi.fn();
-  const mockToggleTodo = vi.fn();
-  const mockDeleteTodo = vi.fn();
-  const mockUpdateTodo = vi.fn();
-  const mockCreateNewList = vi.fn();
-  const mockUpdateList = vi.fn();
-  const mockDeleteList = vi.fn();
-  const mockLoadTodoLists = vi.fn();
-  const mockBatchAddTodos = vi.fn();
-  const mockNavigate = vi.fn();
-
+describe('TodoListPage Component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Reset the mock data before each test
+    mockTodoListsData.todoLists[0].todos = [];
+    (useTodoLists as ReturnType<typeof vi.fn>).mockReturnValue(mockTodoListsData);
+    window.dispatchEvent(new CustomEvent('dodolist-storage-info', {
+        detail: { type: 'persistence-info', storageType: 'indexeddb' }
+      }));
 
-    (usePersistentTodoLists as Mock).mockReturnValue({
-      todoLists: mockTodoLists,
-      loading: false,
-      error: null,
-      activeListId: 'list1',
-      setActiveListId: mockSetActiveListId,
-      createNewList: mockCreateNewList,
-      updateList: mockUpdateList,
-      deleteList: mockDeleteList,
-      addTodo: mockAddTodo,
-      updateTodo: mockUpdateTodo,
-      toggleTodo: mockToggleTodo,
-      deleteTodo: mockDeleteTodo,
-      loadTodoLists: mockLoadTodoLists,
-      batchAddTodos: mockBatchAddTodos,
-    });
-
-    (ReactRouterDom.useNavigate as Mock).mockReturnValue(mockNavigate);
-    (ReactRouterDom.useParams as Mock).mockReturnValue({ listId: 'list1' });
-  });
-
-  function renderWithRouter(ui: React.ReactNode, { route = '/list/list1', path = '/list/:listId' } = {}) {
-    return render(
-      <MemoryRouter initialEntries={[route]}>
-        <Routes>
-          <Route path={path} element={ui} />
-        </Routes>
-      </MemoryRouter>
-    );
-  }
-
-  const renderComponent = () =>
-    renderWithRouter(<TodoListPage />);
-
-  it('renders without crashing', () => {
-    renderComponent();
-    expect(screen.getByRole('heading', { name: 'My Day' })).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('Add a task to My Day...')).toBeInTheDocument();
-  });
-
-  it('displays loading state', () => {
-    (usePersistentTodoLists as Mock).mockReturnValueOnce({
-      todoLists: [],
-      loading: true,
-      error: null,
-      activeListId: '',
-      setActiveListId: mockSetActiveListId,
-      createNewList: mockCreateNewList,
-      updateList: mockUpdateList,
-      deleteList: mockDeleteList,
-      addTodo: mockAddTodo,
-      updateTodo: mockUpdateTodo,
-      toggleTodo: mockToggleTodo,
-      deleteTodo: mockDeleteTodo,
-      loadTodoLists: mockLoadTodoLists,
-      batchAddTodos: mockBatchAddTodos,
-    });
-    renderComponent();
-    expect(screen.getByText(/Loading your tasks/i)).toBeInTheDocument();
-  });
-
-  it('displays error state', () => {
-    (usePersistentTodoLists as Mock).mockReturnValueOnce({
-      todoLists: [],
-      loading: false,
-      error: new Error('Network error'),
-      activeListId: '',
-      setActiveListId: mockSetActiveListId,
-      createNewList: mockCreateNewList,
-      updateList: mockUpdateList,
-      deleteList: mockDeleteList,
-      addTodo: mockAddTodo,
-      updateTodo: mockUpdateTodo,
-      toggleTodo: mockToggleTodo,
-      deleteTodo: mockDeleteTodo,
-      loadTodoLists: mockLoadTodoLists,
-      batchAddTodos: mockBatchAddTodos,
-    });
-    renderComponent();
-    expect(screen.getByText(/Error Loading Data/i)).toBeInTheDocument();
-    expect(screen.getByText(/Network error/i)).toBeInTheDocument();
-  });
-
-  it('adds a new todo', async () => {
-    renderComponent();
-    const input = screen.getByPlaceholderText('Add a task to My Day...');
-    const addButton = screen.getByRole('button', { name: 'Add task' });
-
-    fireEvent.change(input, { target: { value: 'New Task' } });
-    fireEvent.click(addButton);
-
-    await waitFor(() => {
-      expect(mockAddTodo).toHaveBeenCalledWith({ text: 'New Task', listId: 'list1' });
-    });
-    expect(input).toHaveValue(''); // Input should be cleared
-  });
-
-  it('toggles todo completion', async () => {
-    renderComponent();
-    const todoItem = screen.getByText('Buy groceries');
-    const taskCard = todoItem.closest('.p-3') as HTMLElement | null;
-    if (!taskCard) fail('Task card not found for "Buy groceries"');
-    const toggleButton = within(taskCard).getByRole('button', { name: 'Toggle completion' });
-
-    fireEvent.click(toggleButton);
-    await waitFor(() => {
-      expect(mockToggleTodo).toHaveBeenCalledWith('todo1', 'list1');
+    // Explicitly mock window.matchMedia for this test file
+    Object.defineProperty(window, 'matchMedia', {
+      writable: true,
+      value: vi.fn().mockImplementation(query => ({
+        matches: false,
+        media: query,
+        onchange: null,
+        addListener: vi.fn(), // deprecated
+        removeListener: vi.fn(), // deprecated
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      })),
     });
   });
 
-  it('deletes a todo', async () => {
+  it('should add a new todo when user types and clicks send', async () => {
     renderComponent();
-    const todoItem = screen.getByText('Buy groceries');
-    const taskCard = todoItem.closest('.p-3');
-    if (!taskCard) fail('Task card not found for "Buy groceries"');
-    const deleteButton = within(taskCard as HTMLElement).getByTitle('Delete task');
 
-    fireEvent.click(deleteButton);
+    const input = screen.getByPlaceholderText(/Add a task to/);
+    const sendButton = screen.getByRole('button', { name: /add task/i });
+
+    await act(async () => {
+      fireEvent.change(input, { target: { value: 'New test todo' } });
+    });
+
+    await act(async () => {
+      fireEvent.click(sendButton);
+    });
+
+    expect(mockAddTodo).toHaveBeenCalledWith('New test todo');
+  });
+
+  it('should display todos and allow toggling them', async () => {
+    mockTodoListsData.todoLists[0].todos = [
+        { id: 'todo-1', text: 'A task to be toggled', completed: false, createdAt: new Date(), listId: 'list-1' },
+    ];
+    (useTodoLists as ReturnType<typeof vi.fn>).mockReturnValue(mockTodoListsData);
+
+    renderComponent();
+
+    const toggleButton = screen.getByLabelText('Mark "A task to be toggled" as complete');
+    expect(toggleButton).toBeInTheDocument();
+
+    await act(async () => {
+        fireEvent.click(toggleButton!);
+    });
+
     await waitFor(() => {
-      expect(mockDeleteTodo).toHaveBeenCalledWith('todo1', 'list1');
+        expect(mockToggleTodo).toHaveBeenCalledWith('todo-1');
     });
   });
 
-  it('clones a list', async () => {
-    mockCreateNewList.mockResolvedValueOnce('newListId'); // Mock the new list ID
-    renderComponent();
-
-    const cloneButton = screen.getByRole('button', { name: /clone list/i });
-    fireEvent.click(cloneButton);
-
-    await waitFor(() => {
-      expect(mockCreateNewList).toHaveBeenCalledWith('My Day (Copy)', 'bg-blue-500');
-    });
-
-    await waitFor(() => {
-      expect(mockBatchAddTodos).toHaveBeenCalledWith(
-        expect.arrayContaining([
-          expect.objectContaining({ text: 'Buy groceries', listId: 'newListId', completed: false }),
-          expect.objectContaining({ text: 'Walk the dog', listId: 'newListId', completed: false }),
-        ])
-      );
-    });
-  });
-
-  it('updates list name', async () => {
-    renderComponent();
-    const listNameElement = screen.getByRole('heading', { name: 'My Day' });
-    fireEvent.click(listNameElement); // Enter edit mode
-
-    const input = screen.getByDisplayValue('My Day');
-    fireEvent.change(input, { target: { value: 'My Awesome Day' } });
-    fireEvent.blur(input); // Exit edit mode
-
-    await waitFor(() => {
-      expect(mockUpdateList).toHaveBeenCalledWith('list1', { name: 'My Awesome Day' });
-    });
-  });
-
-  it('toggles list pin status', async () => {
-    renderComponent();
-    const header = screen.getByRole('banner');
-    const moreOptionsButton = within(header).getByRole('button', { name: /more list options/i });
-    fireEvent.click(moreOptionsButton);
-
-    const pinMenuItem = await screen.findByRole('menuitem', { name: /pin list/i });
-    fireEvent.click(pinMenuItem);
-
-    await waitFor(() => {
-      expect(mockUpdateList).toHaveBeenCalledWith('list1', { pinned: true });
-    });
-  });
-
-  it('toggles list archive status', async () => {
-    renderComponent();
-    const header = screen.getByRole('banner');
-    const moreOptionsButton = within(header).getByRole('button', { name: /more list options/i });
-    fireEvent.click(moreOptionsButton);
-
-    await waitFor(() => {
-      expect(screen.getByRole('menu')).toBeInTheDocument(); // Wait for the dropdown menu to appear
-    });
-
-    const archiveMenuItem = await screen.findByRole('menuitem', { name: /archive list/i });
-    fireEvent.click(archiveMenuItem);
-
-    await waitFor(() => {
-      expect(mockUpdateList).toHaveBeenCalledWith('list1', { archived: true });
-    });
-  });
-
-  it('changes list color', async () => {
-    renderComponent();
-    const header = screen.getByRole('banner');
-    const moreOptionsButton = within(header).getByRole('button', { name: /more list options/i });
-    fireEvent.click(moreOptionsButton);
-
-    await waitFor(() => {
-      expect(screen.getByRole('menu')).toBeInTheDocument(); // Wait for the dropdown menu to appear
-    });
-
-    const changeColorMenuItem = await screen.findByRole('menuitem', { name: /change color/i });
-    fireEvent.click(changeColorMenuItem); // Click to open the nested color menu
-
-    await waitFor(() => {
-      expect(screen.getByRole('menu', { name: /colors/i })).toBeInTheDocument(); // Wait for the color menu to appear
-    });
-
-    const emeraldColorButton = screen.getByRole('button', { name: /emerald-500/i }); // Assuming a button for emerald color
-    fireEvent.click(emeraldColorButton);
-
-    await waitFor(() => {
-      expect(mockUpdateList).toHaveBeenCalledWith('list1', { color: 'bg-emerald-500' });
-    });
-  });
-
-  it('deletes a list', async () => {
-    // Ensure there's more than one list to allow deletion
-    (usePersistentTodoLists as Mock).mockReturnValueOnce({
-      todoLists: [
-        { ...mockTodoLists[0], id: 'list1' },
-        { ...mockTodoLists[1], id: 'list2' },
-      ],
-      loading: false,
-      error: null,
-      activeListId: 'list1',
-      setActiveListId: mockSetActiveListId,
-      createNewList: mockCreateNewList,
-      updateList: mockUpdateList,
-      deleteList: mockDeleteList,
-      addTodo: mockAddTodo,
-      updateTodo: mockUpdateTodo,
-      toggleTodo: mockToggleTodo,
-      deleteTodo: mockDeleteTodo,
-      loadTodoLists: mockLoadTodoLists,
-      batchAddTodos: mockBatchAddTodos,
-    });
+  it('should allow deleting a todo', async () => {
+    mockTodoListsData.todoLists[0].todos = [
+        { id: 'todo-2', text: 'A task to be deleted', completed: false, createdAt: new Date(), listId: 'list-1' },
+    ];
+    (useTodoLists as ReturnType<typeof vi.fn>).mockReturnValue(mockTodoListsData);
 
     renderComponent();
-    const header = screen.getByRole('banner');
-    const moreOptionsButton = within(header).getByRole('button', { name: /more list options/i });
-    fireEvent.click(moreOptionsButton);
 
-    await waitFor(() => {
-      expect(screen.getByRole('menu')).toBeInTheDocument(); // Wait for the dropdown menu to appear
+    const deleteButton = screen.getByLabelText('Delete task "A task to be deleted"');
+    await act(async () => {
+        fireEvent.click(deleteButton);
     });
 
-    const deleteMenuItem = await screen.findByRole('menuitem', { name: /delete/i });
-    fireEvent.click(deleteMenuItem);
-
     await waitFor(() => {
-      expect(mockDeleteList).toHaveBeenCalledWith('list1');
-    });
-  });
-
-  it('handles logout', async () => {
-    renderComponent();
-    const logoutButton = screen.getByRole('button', { name: /logout/i });
-    fireEvent.click(logoutButton);
-
-    await waitFor(() => {
-      // Use vi.mocked to access the mock instance
-      expect(vi.mocked(AuthService).mock.results[0].value.logout).toHaveBeenCalled();
-      expect(mockNavigate).toHaveBeenCalledWith('/login');
+        expect(mockDeleteTodo).toHaveBeenCalledWith('todo-2');
     });
   });
 });

@@ -9,7 +9,6 @@ import {
   SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
-  SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
@@ -115,7 +114,7 @@ const ListMenuItem = memo(
     }, [editingListId, list.id]);
 
     const listColor = colors.find((color) => color.value === list.color) || colors[0];
-    const activeTaskCount = list.todos.filter((todo) => !todo.completed).length;
+    const activeTaskCount = (list.todos || []).filter((todo) => !todo.completed).length;
 
     // Memoized navigation handler with guards
     const handleListClick = useCallback(() => {
@@ -198,7 +197,7 @@ const ListMenuItem = memo(
         </SidebarMenuButton>
 
         {/* Hide menu actions on mobile */}
-        <SidebarMenuAction showOnHover>
+        <div className="absolute right-1 top-1/2 -translate-y-1/2 opacity-0 group-hover/menu-item:opacity-100 transition-opacity duration-200">
             <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -262,7 +261,7 @@ const ListMenuItem = memo(
                 )}
               </DropdownMenuContent>
             </DropdownMenu>
-          </SidebarMenuAction>
+          </div>
       </SidebarMenuItem>
     );
   }

@@ -1,19 +1,18 @@
 "use client"
 
-import type React from "react"
-import { useState, useEffect, useCallback } from "react"
-import { useParams, useNavigate } from "react-router-dom"
-import AuthService from "@/services/authService"
-import { useTodoLists } from "@/hooks/useTodoLists"
-
-import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
+import { useState, useEffect, useMemo, useCallback } from "react"
+import { useParams, useNavigate } from "react-router-dom"
 import {
   DropdownMenu, // Import DropdownMenu components
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger, // Keep this
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuPortal,
 } from "@/components/ui/dropdown-menu" // Correct path for DropdownMenu components
 import {
   Archive,
@@ -39,159 +38,63 @@ import {
   Copy, // Import Copy icon
   Palette, // Import Palette icon
 } from "lucide-react"
-
+import { useTodoLists } from "@/hooks/useTodoLists"
+import { useYjsTodoList } from "@/hooks/useYjsTodoList"
+import AuthService from "@/services/authService"
+import { type Todo, type UserProfile } from "@/lib/types"
+import { colors } from "@/lib/colors"
 import AppSidebar from "@/components/AppSidebar"
+import { SidebarProvider } from "@/components/ui/sidebar"
+import { SidebarInset } from "@/components/ui/sidebar"
+import { SidebarTrigger } from "@/components/ui/sidebar"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Notification } from "@/components/ui/Notification"
+import SyncStatusIndicator from "@/components/SyncStatusIndicator"
 import TexturedBackground from "@/components/TexturedBackground"
-import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
-import { Notification } from "@/components/ui/Notification";
-import SyncStatusIndicator from "@/components/SyncStatusIndicator";
-
-interface Todo {
-  id: string
-  text: string
-  description?: string
-  completed: boolean
-  createdAt: Date
-  completedAt?: Date
-  deadline?: Date
-  reminder?: Date
-  recurring?: "none" | "daily" | "weekly" | "monthly"
-  listId: string
-}
-
-interface UserProfile {
-  name: string
-  email: string
-  avatar?: string
-}
-
-const colors = [
-  {
-    name: "Taupe",
-    value: "bg-stone-400",
-    light: "bg-stone-50",
-    border: "border-stone-200",
-    text: "text-stone-700",
-    dark: "bg-gradient-to-br from-stone-500 to-stone-700",
-    darkText: "text-stone-50",
-    texture: "bg-stone-400/10",
-  },
-  {
-    name: "Olive",
-    value: "bg-emerald-600",
-    light: "bg-emerald-50",
-    border: "border-emerald-300",
-    text: "text-emerald-800",
-    dark: "bg-gradient-to-br from-emerald-700 to-emerald-900",
-    darkText: "text-emerald-50",
-    texture: "bg-emerald-600/10",
-  },
-  {
-    name: "Sand",
-    value: "bg-amber-300",
-    light: "bg-amber-50",
-    border: "border-amber-200",
-    text: "text-amber-700",
-    dark: "bg-gradient-to-br from-amber-400 to-amber-600",
-    darkText: "text-amber-50",
-    texture: "bg-amber-300/10",
-  },
-  {
-    name: "Clay",
-    value: "bg-orange-300",
-    light: "bg-orange-50",
-    border: "border-orange-200",
-    text: "text-orange-700",
-    dark: "bg-gradient-to-br from-orange-400 to-orange-600",
-    darkText: "text-orange-50",
-    texture: "bg-orange-300/10",
-  },
-  {
-    name: "Stone",
-    value: "bg-blue-400",
-    light: "bg-blue-50",
-    border: "border-blue-200",
-    text: "text-blue-800",
-    dark: "bg-gradient-to-br from-blue-500 to-blue-700",
-    darkText: "text-blue-50",
-    texture: "bg-blue-400/10",
-  },
-  {
-    name: "Moss",
-    value: "bg-lime-400",
-    light: "bg-lime-50",
-    border: "border-lime-200",
-    text: "text-lime-700",
-    dark: "bg-gradient-to-br from-lime-500 to-lime-700",
-    darkText: "text-lime-50",
-    texture: "bg-lime-400/10",
-  },
-  {
-    name: "Slate",
-    value: "bg-slate-500",
-    light: "bg-slate-50",
-    border: "border-slate-200",
-    text: "text-slate-700",
-    dark: "bg-gradient-to-br from-slate-600 to-slate-800",
-    darkText: "text-slate-50",
-    texture: "bg-slate-500/10",
-  },
-  {
-    name: "Terracotta",
-    value: "bg-rose-400",
-    light: "bg-rose-50",
-    border: "border-rose-200",
-    text: "text-rose-700",
-    dark: "bg-gradient-to-br from-rose-500 to-rose-700",
-    darkText: "text-rose-50",
-    texture: "bg-rose-400/10",
-  },
-]
 
 export default function DodoListApp() {
-  const { listId } = useParams();
-  const navigate = useNavigate();
+  const { listId } = useParams()
+  const navigate = useNavigate()
   const authService = new AuthService()
-  
+
   // Logout function
   const handleLogout = () => {
     authService.logout()
     navigate('/login')
   }
-  
+
   // State for persistence notification
-  const [showPersistenceWarning, setShowPersistenceWarning] = useState(false);
-  const [persistenceType, setPersistenceType] = useState<'memory' | 'indexeddb' | 'opfs' | null>(null);
-  const [persistenceError, setPersistenceError] = useState<string | null>(null);
-  
+  const [showPersistenceWarning, setShowPersistenceWarning] = useState(false)
+  const [persistenceType, setPersistenceType] = useState<'memory' | 'indexeddb' | 'opfs' | null>(null)
+  const [persistenceError, setPersistenceError] = useState<string | null>(null)
+
   // Persistence detection
   useEffect(() => {
     // Listen for messages from dbService about persistence type
     const handleStorageInfo = (event: any) => {
       if (event.detail?.type === 'persistence-info') {
-        setPersistenceType(event.detail.storageType);
-        setShowPersistenceWarning(event.detail.storageType === 'memory');
-        setPersistenceError(event.detail.error || null);
-        
+        setPersistenceType(event.detail.storageType)
+        setShowPersistenceWarning(event.detail.storageType === 'memory')
+        setPersistenceError(event.detail.error || null)
+
         // Log detailed info for debugging
         console.log('Storage persistence info:', {
           type: event.detail.storageType,
           persistent: event.detail.persistent,
           error: event.detail.error
-        });
+        })
       }
-    };
-    
+    }
+
     // Add event listener for custom event
-    window.addEventListener('dodolist-storage-info', handleStorageInfo);
-    
+    window.addEventListener('dodolist-storage-info', handleStorageInfo)
+
     // Cleanup
     return () => {
-      window.removeEventListener('dodolist-storage-info', handleStorageInfo);
-    };
-  }, []);
-  
-  
+      window.removeEventListener('dodolist-storage-info', handleStorageInfo)
+    }
+  }, [])
 
   // Use the persistence hook, passing the collaborative mode flag
   const {
@@ -203,13 +106,19 @@ export default function DodoListApp() {
     createNewList,
     updateList,
     deleteList,
+    cloneList,
+  } = useTodoLists()
+
+  // Use the Yjs hook for the active list
+  const {
+    listData: activeListData,
     addTodo,
-    updateTodo: updateTodoItem,
     toggleTodo,
     deleteTodo,
-    isPocketBaseConnected, // <-- add this
-  } = useTodoLists();
-  
+    updateTodo: updateTodoItem,
+    isConnected: isPocketBaseConnected,
+  } = useYjsTodoList(activeListId)
+
   const [inputValue, setInputValue] = useState("")
   const [newListName, setNewListName] = useState("")
   const [showNewListInput, setShowNewListInput] = useState(false)
@@ -229,6 +138,32 @@ export default function DodoListApp() {
   const [editingListId, setEditingListId] = useState<string | null>(null)
   const [isEditingHeader, setIsEditingHeader] = useState(false);
 
+  // --- Notification System ---
+  type NotificationType = "success" | "error" | "info" | "warning";
+  interface NotificationState {
+    id: number;
+    message: string;
+    type: NotificationType;
+    duration?: number;
+  }
+
+  function useNotification() {
+    const [notifications, setNotifications] = useState<NotificationState[]>([]);
+
+    const addNotification = useCallback((notification: Omit<NotificationState, 'id'>) => {
+      const id = Date.now();
+      setNotifications(prev => [...prev, { ...notification, id }]);
+    }, []);
+
+    const removeNotification = useCallback((id: number) => {
+      setNotifications(prev => prev.filter(n => n.id !== id));
+    }, []);
+
+    return { notifications, addNotification, removeNotification };
+  }
+
+  const { notifications, addNotification, removeNotification } = useNotification();
+
   // When the activeListId from the URL changes, update the hook's state
   useEffect(() => {
     if (listId && listId !== activeListId) {
@@ -238,9 +173,23 @@ export default function DodoListApp() {
 
   const activeList = todoLists.find((list) => list.id === activeListId)
   const activeColor = colors.find((color) => color.value === activeList?.color) || colors[0]
-  const todosToUse = activeList?.todos || [];
+
+  // Combine local yjs state with server state for a seamless experience
+  const todosToUse = useMemo(() => {
+    if (activeListId && activeListData && activeListData.todos.length > 0) {
+      return activeListData.todos;
+    }
+    return activeList?.todos || [];
+  }, [activeListId, activeListData, activeList?.todos]);
+
   const activeTodos = todosToUse.filter((todo) => !todo.completed)
   const completedTodos = todosToUse.filter((todo) => todo.completed)
+
+  // Utility function to check for valid Date
+  function isValidDate(date: any): date is Date {
+    return date instanceof Date && !isNaN(date.getTime());
+  }
+
   const sortedActiveTodos = [...activeTodos].sort((a, b) => {
     if (!isValidDate(a.deadline) && !isValidDate(b.deadline)) return 0
     if (!isValidDate(a.deadline)) return 1
@@ -258,7 +207,7 @@ export default function DodoListApp() {
     console.log("Sorted active todos:", sortedActiveTodos)
   }, [activeListId, activeList, todosToUse, activeTodos, sortedActiveTodos]) // Use isCollaborativeMode dependency
 
-  const totalCount = activeList?.todos.length || 0
+  const totalCount = todosToUse.length || 0
   const activeCount = activeTodos.length
 
   useEffect(() => {
@@ -271,16 +220,25 @@ export default function DodoListApp() {
 
   // Handle adding a new todo (updated to directly use the hook's function)
   const handleAddTodo = async () => {
-    if (inputValue.trim() && activeListId) {
-      setIsAddingTodo(true);
-      try {
-        await addTodo(inputValue.trim());
-        setInputValue("")
-      } catch (err) {
-        console.error("Error adding todo:", err)
-      } finally {
-        setIsAddingTodo(false);
-      }
+    if (inputValue.trim() === "" || !activeListId) return
+    setIsAddingTodo(true)
+    try {
+      await addTodo(inputValue)
+      setInputValue("")
+      addNotification({
+        message: "Task added successfully!",
+        type: "success",
+        duration: 3000,
+      });
+    } catch (error) {
+      console.error("Failed to add todo:", error)
+      addNotification({
+        message: "Failed to add task.",
+        type: "error",
+        duration: 3000,
+      });
+    } finally {
+      setIsAddingTodo(false)
     }
   }
 
@@ -289,168 +247,216 @@ export default function DodoListApp() {
 
   // Handle task toggle (updated to directly use the hook's function)
   const handleToggleTodo = async (todoId: string) => {
-    if (activeListId) {
-      try {
-        await toggleTodo(todoId) // Directly call the hook's function
-      } catch (err) {
-        console.error("Error toggling todo:", err)
+    try {
+      await toggleTodo(todoId);
+      const todo = todosToUse.find(t => t.id === todoId);
+      if (todo && !todo.completed) {
+        addNotification({
+          message: "Task marked as complete!",
+          type: "success",
+          duration: 3000,
+        });
       }
+    } catch (error) {
+      console.error("Failed to toggle todo:", error);
+      addNotification({
+        message: "Failed to update task.",
+        type: "error",
+        duration: 3000,
+      });
     }
-  }
+  };
 
   // Handle task deletion (updated to directly use the hook's function)
   const handleDeleteTodo = async (todoId: string) => {
-    if (activeListId) {
-      try {
-        await deleteTodo(todoId) // Directly call the hook's function
-      } catch (err) {
-        console.error("Error deleting todo:", err)
-      }
+    try {
+      await deleteTodo(todoId);
+      addNotification({
+        message: "Task deleted.",
+        type: "info",
+        duration: 3000,
+      });
+    } catch (error) {
+      console.error("Failed to delete todo:", error);
+      addNotification({
+        message: "Failed to delete task.",
+        type: "error",
+        duration: 3000,
+      });
     }
-  }
+  };
 
   // In handleUpdateTodo, ensure we pass the correct date values to the service
   const handleUpdateTodo = async (todoId: string, updates: Partial<Todo>) => {
-    if (activeListId) {
-      // Convert deadline/reminder to ISO string if present and valid
-      const updatesToSend: Partial<Todo> = { ...updates };
-      if ('deadline' in updates && updates.deadline instanceof Date && !isNaN(updates.deadline.getTime())) {
-        updatesToSend.deadline = new Date(updates.deadline); // keep as Date, todoService handles conversion
-      }
-      if ('reminder' in updates && updates.reminder instanceof Date && !isNaN(updates.reminder.getTime())) {
-        updatesToSend.reminder = new Date(updates.reminder); // keep as Date, todoService handles conversion
-      }
-      try {
-        await updateTodoItem(todoId, updatesToSend)
-      } catch (err) {
-        console.error("Error updating todo:", err)
-      }
+    try {
+      await updateTodoItem(todoId, updates);
+      addNotification({
+        message: "Task updated.",
+        type: "success",
+        duration: 3000,
+      });
+    } catch (error) {
+      console.error("Failed to update todo:", error);
+      addNotification({
+        message: "Failed to update task.",
+        type: "error",
+        duration: 3000,
+      });
     }
-  }
+  };
 
   // Handle creating a new list (updated to use our persistence service)
   const handleCreateNewList = async () => {
-    if (newListName.trim()) {
-      setIsAddingList(true);
-      try {
-        const color = colors[Math.floor(Math.random() * colors.length)].value;
-        await createNewList(newListName.trim(), color);
-        setNewListName("");
-        setShowNewListInput(false);
-      } catch (err) {
-        console.error("Error creating list:", err);
-      } finally {
-        setIsAddingList(false);
-      }
+    if (newListName.trim() === "") return;
+    setIsAddingList(true);
+    try {
+      const newId = await createNewList(newListName, colors[0].value);
+      setNewListName("");
+      setShowNewListInput(false);
+      navigate(`/list/${newId}`);
+      addNotification({
+        message: `List "${newListName}" created.`,
+        type: "success",
+        duration: 3000,
+      });
+    } catch (error) {
+      console.error("Failed to create list:", error);
+      addNotification({
+        message: "Failed to create list.",
+        type: "error",
+        duration: 3000,
+      });
+    } finally {
+      setIsAddingList(false);
     }
-  }
+  };
 
   // Clone a list (updated to use our persistence service)
-  const cloneList = async (listId: string) => {
-    const listToClone = todoLists.find((list) => list.id === listId)
-    if (!listToClone) return
-
+  const handleCloneList = async (listId: string) => {
     try {
-      // Create a new list with a copy name
-      const newListId = await createNewList(`${listToClone.name} (Copy)`, listToClone.color);
-      
-      // If the new list was created, clone the todos
-      if (newListId) {
-        const todosToClone = listToClone.todos.map(todo => ({
-          text: todo.text,
-        }));
-        
-        // Since batchAddTodos is removed, we add them one by one
-        for (const todo of todosToClone) {
-          await addTodo(todo.text);
-        }
-      }
-    } catch (err) {
-      console.error("Error cloning list:", err);
+      const newId = await cloneList(listId);
+      navigate(`/list/${newId}`);
+      addNotification({
+        message: "List cloned successfully.",
+        type: "success",
+        duration: 3000,
+      });
+    } catch (error) {
+      console.error("Failed to clone list:", error);
+      addNotification({
+        message: "Failed to clone list.",
+        type: "error",
+        duration: 3000,
+      });
     }
-  }
+  };
 
   // Handle deleting a list (updated to use our persistence service)
   const handleDeleteList = async (listId: string) => {
     try {
       await deleteList(listId);
-    } catch (err) {
-      console.error("Error deleting list:", err);
+      addNotification({
+        message: "List deleted.",
+        type: "info",
+        duration: 3000,
+      });
+      // The hook now handles navigating to the next available list
+    } catch (error) {
+      console.error("Failed to delete list:", error);
+      addNotification({
+        message: "Failed to delete list.",
+        type: "error",
+        duration: 3000,
+      });
     }
-  }
+  };
 
   // Update list name (updated to use our persistence service)
   const handleUpdateListName = useCallback(async (listId: string, newName: string | null) => {
-    const trimmedName = newName?.trim();
-    if (!trimmedName) {
-      addNotification({
-        message: "List name cannot be empty.",
-        description: "Please enter a valid name for your list.",
-        type: "error",
-      });
-      return;
+    if (newName && newName.trim() !== "") {
+      try {
+        await updateList(listId, { name: newName });
+        addNotification({
+          message: "List name updated.",
+          type: "success",
+          duration: 3000,
+        });
+      } catch (error) {
+        console.error("Failed to update list name:", error);
+        addNotification({
+          message: "Failed to update list name.",
+          type: "error",
+          duration: 3000,
+        });
+      }
     }
-    try {
-      await updateList(listId, { name: trimmedName });
-      setEditingListId(null);
-      setEditingListName(null);
-      (document.activeElement as HTMLElement)?.blur();
-    } catch (err) {
-      console.error("Error updating list name:", err);
-      addNotification({
-        message: "Failed to update list name.",
-        description: "Please try again.",
-        type: "error",
-      });
-    }
-  }, [updateList]);
+    setEditingListId(null);
+    setIsEditingHeader(false);
+  }, [updateList, addNotification]);
 
   // Update list color (updated to use our persistence service)
   const updateListColor = async (listId: string, newColor: string) => {
     try {
       await updateList(listId, { color: newColor });
-    } catch (err) {
-      console.error("Error updating list color:", err);
+      addNotification({
+        message: "List color updated.",
+        type: "success",
+        duration: 3000,
+      });
+    } catch (error) {
+      console.error("Failed to update list color:", error);
+      addNotification({
+        message: "Failed to update list color.",
+        type: "error",
+        duration: 3000,
+      });
     }
-  }
+  };
 
   // Toggle pin list (updated to use our persistence service)
   const togglePinList = async (listId: string) => {
     const list = todoLists.find(l => l.id === listId);
-    if (list) {
-      try {
-        await updateList(listId, { pinned: !list.pinned });
-      } catch (err) {
-        console.error("Error toggling list pin:", err);
-      }
+    if (!list) return;
+    try {
+      await updateList(listId, { pinned: !list.pinned });
+      addNotification({
+        message: list.pinned ? "List unpinned." : "List pinned.",
+        type: "success",
+        duration: 3000,
+      });
+    } catch (error) {
+      console.error("Failed to toggle pin:", error);
+      addNotification({
+        message: "Failed to update pin status.",
+        type: "error",
+        duration: 3000,
+      });
     }
-  }
+  };
 
   // Toggle archive list (updated to use our persistence service)
   const toggleArchiveList = async (listId: string) => {
-    const listToArchive = todoLists.find((list) => list.id === listId)
-    if (!listToArchive) return
-
+    const list = todoLists.find(l => l.id === listId);
+    if (!list) return;
     try {
-      await updateList(listId, { archived: !listToArchive.archived });
-      
-      // If archiving the active list, switch to another non-archived list
-      if (listId === activeListId && !listToArchive.archived) {
-        const activeLists = todoLists.filter((list) => !list.archived && list.id !== listId);
-        if (activeLists.length > 0) {
-          setActiveListId(activeLists[0].id);
-        } else {
-          // If no non-archived lists remain, create a new one
-          await createNewList("New List", colors[0].value);
-        }
-      }
-    } catch (err) {
-      console.error("Error toggling list archive:", err);
+      await updateList(listId, { archived: !list.archived });
+      addNotification({
+        message: list.archived ? "List unarchived." : "List archived.",
+        type: "success",
+        duration: 3000,
+      });
+    } catch (error) {
+      console.error("Failed to toggle archive:", error);
+      addNotification({
+        message: "Failed to update archive status.",
+        type: "error",
+        duration: 3000,
+      });
     }
-  }
+  };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
+    if (e.key === "Enter" && !isAddingTodo) {
       handleAddTodo()
     }
   }
@@ -975,56 +981,23 @@ export default function DodoListApp() {
         navigate(`/list/${activeListId}`, { replace: true });
       }
     }
-    // Only run on mount or when lists change
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [listId, todoLists.length, navigate]);
+  }, [listId, todoLists.length, navigate, activeListId]);
 
   // --- Notification System ---
-  type NotificationType = "success" | "error" | "info" | "warning";
-  interface NotificationState {
-    id: number;
-    message: string;
-    description?: string;
-    type?: NotificationType;
-  }
-
-  function useNotification() {
-    const [notifications, setNotifications] = useState<NotificationState[]>([]);
-    const addNotification = (n: Omit<NotificationState, "id">) => {
-      setNotifications((prev) => [
-        ...prev,
-        { ...n, id: Date.now() + Math.random() },
-      ]);
-    };
-    const removeNotification = (id: number) => {
-      setNotifications((prev) => prev.filter((n) => n.id !== id));
-    };
-    return { notifications, addNotification, removeNotification };
-  }
-
   const NotificationPortal: React.FC<{
     notifications: NotificationState[];
     removeNotification: (id: number) => void;
   }> = ({ notifications, removeNotification }) => (
-    <div
-      className="fixed top-6 right-6 z-[9999] flex flex-col items-end gap-2"
-      style={{ pointerEvents: "none" }}
-    >
-      {notifications.map((n) => (
-        <div key={n.id} style={{ pointerEvents: "auto" }}>
-          <Notification
-            message={n.message}
-            description={n.description}
-            type={n.type}
-            onClose={() => removeNotification(n.id)}
-          />
-        </div>
+    <div className="fixed top-4 right-4 z-[100] w-80 space-y-2">
+      {notifications.map((notification) => (
+        <Notification
+          key={notification.id}
+          {...notification}
+          onClose={() => removeNotification(notification.id)}
+        />
       ))}
     </div>
   );
-
-  const notificationApi = useNotification();
-  const { notifications, addNotification, removeNotification } = notificationApi;
 
   // --- Sync Indicator State ---
   // Derive sync status from isPocketBaseConnected and connectionDebug
@@ -1036,7 +1009,7 @@ export default function DodoListApp() {
 
   return (
     <div className={`min-h-screen relative overflow-hidden ${activeColor.light}`}>
-      <NotificationPortal notifications={notifications} removeNotification={removeNotification} />
+      {/* <NotificationPortal notifications={notifications} removeNotification={removeNotification} /> */}
       <TexturedBackground className="absolute inset-0" intensity="normal" />
       <SidebarProvider>
         <AppSidebar
@@ -1052,7 +1025,7 @@ export default function DodoListApp() {
           updateListName={handleUpdateListName}
           togglePinList={togglePinList}
           toggleArchiveList={toggleArchiveList}
-          cloneList={cloneList}
+          cloneList={handleCloneList}
           updateListColor={updateListColor}
           deleteList={handleDeleteList}
           colors={colors}
@@ -1076,7 +1049,7 @@ export default function DodoListApp() {
               </div>
             </div>
           )}
-          
+
           {/* Error message */}
           {error && (
             <div className="fixed inset-0 flex items-center justify-center bg-white/50 z-50">
@@ -1086,8 +1059,8 @@ export default function DodoListApp() {
                   <h3 className="text-lg font-semibold">Error Loading Data</h3>
                 </div>
                 <p className="text-slate-600 mb-4">{error.message || "Failed to load your tasks. Please try refreshing the page."}</p>
-                <Button 
-                  onClick={() => window.location.reload()} 
+                <Button
+                  onClick={() => window.location.reload()}
                   className="w-full"
                 >
                   Refresh Page
@@ -1095,7 +1068,7 @@ export default function DodoListApp() {
               </div>
             </div>
           )}
-          
+
           {/* Persistence Warning */}
           {showPersistenceWarning && (
             <div className="px-4 py-2 bg-amber-50 border-b border-amber-200">
@@ -1104,8 +1077,8 @@ export default function DodoListApp() {
                 <div className="flex-1">
                   <p className="text-sm font-medium text-amber-800">Your data is not being saved permanently</p>
                   <p className="text-xs text-amber-700 mt-0.5">
-                    {persistenceError ? 
-                      `Database error: ${persistenceError}` : 
+                    {persistenceError ?
+                      `Database error: ${persistenceError}` :
                       "Your browser doesn't support persistent storage. Your tasks will be lost when you close this tab or refresh the page."}
                   </p>
                   {persistenceType === 'memory' && !persistenceError && (
@@ -1136,8 +1109,8 @@ export default function DodoListApp() {
             <div className="px-4 py-1 bg-slate-50 border-b border-slate-200 flex items-center gap-2">
               <Database className="w-4 h-4 text-slate-500" />
               <span className="text-xs text-slate-600">
-                {persistenceType === 'opfs' ? 'Using Origin Private File System for storage' : 
-                 persistenceType === 'indexeddb' ? 'Using IndexedDB for storage' : 
+                {persistenceType === 'opfs' ? 'Using Origin Private File System for storage' :
+                 persistenceType === 'indexeddb' ? 'Using IndexedDB for storage' :
                  'Using in-memory storage (data will be lost when page is closed)'}
               </span>
             </div>
@@ -1216,9 +1189,6 @@ export default function DodoListApp() {
 
                 {/* List Options Menu */}
                 <div className="ml-auto flex items-center gap-1">
-                  
-
-                  {/* Clone List Button */}
                   <Button
                       variant="ghost"
                       size="icon"
@@ -1245,40 +1215,67 @@ export default function DodoListApp() {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="bg-white/95 backdrop-blur-sm">
                       {!activeList.archived && (
-                        <DropdownMenuItem onClick={() => togglePinList(activeList.id)}>
-                          {activeList.pinned ? <PinOff className="w-4 h-4 mr-2" /> : <Pin className="w-4 h-4 mr-2" />}
-                          {activeList.pinned ? "Unpin" : "Pin"} List
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setShowTaskOptions(null) // Close any open task options
+                            // Logic to show options for creating a recurring task
+                            // This could open a dialog or another overlay
+                            addNotification({
+                              message: "Recurring task setup coming soon!",
+                              type: "info",
+                            })
+                          }}
+                        >
+                          <Repeat className="w-4 h-4 mr-2" />
+                          <span>Make Recurring</span>
                         </DropdownMenuItem>
                       )}
-                      <DropdownMenuItem onClick={() => toggleArchiveList(activeList.id)}>
-                        {activeList.archived ? <ArchiveRestore className="w-4 h-4 mr-2" /> : <Archive className="w-4 h-4 mr-2" />}
-                        {activeList.archived ? "Unarchive" : "Archive"} List
+                      <DropdownMenuItem
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          cloneList(activeList.id)
+                        }}
+                      >
+                        <Copy className="w-4 h-4 mr-2" />
+                        <span>Clone List</span>
                       </DropdownMenuItem>
-                      <DropdownMenu> {/* Nested Dropdown for Change Color */}
-                        <DropdownMenuTrigger asChild>
-                          <DropdownMenuItem onSelect={(e) => e.preventDefault()}> {/* Prevent closing parent */}
-                            <Palette className="w-4 h-4 mr-2" />
-                            Change Color
-                          </DropdownMenuItem>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent side="right">
-                          <div className="grid grid-cols-4 gap-2 p-2">
-                            {colors.map((color) => (
-                              <button
-                                key={color.value}
-                                className={`w-6 h-6 rounded-full ${color.value} hover:scale-110 transition-transform`}
-                                onClick={() => updateListColor(activeList.id, color.value)}
-                              />
-                            ))}
-                          </div>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                      {todoLists.length > 1 && ( // Only allow deleting if more than one list exists
-                        <DropdownMenuItem onClick={() => deleteList(activeList.id)} className="text-red-600">
-                          <Trash2 className="w-4 h-4 mr-2" />
-                          Delete
-                        </DropdownMenuItem>
-                      )}
+                      <DropdownMenuSub>
+                        <DropdownMenuSubTrigger>
+                          <Palette className="w-4 h-4 mr-2" />
+                          <span>Change Color</span>
+                        </DropdownMenuSubTrigger>
+                        <DropdownMenuPortal>
+                          <DropdownMenuSubContent>
+                            <div className="grid grid-cols-5 gap-2 p-2">
+                              {colors.map((color) => (
+                                <button
+                                  key={color.value}
+                                  className={`w-6 h-6 rounded-full ${color.value} hover:scale-110 transition-transform ${
+                                    activeList.color === color.value ? "ring-2 ring-offset-2 ring-slate-800" : ""
+                                  }`}
+                                  onClick={() => updateListColor(activeList.id, color.value)}
+                                />
+                              ))}
+                            </div>
+                          </DropdownMenuSubContent>
+                        </DropdownMenuPortal>
+                      </DropdownMenuSub>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => toggleArchiveList(activeList.id)}>
+                        {activeList.archived ? (
+                          <ArchiveRestore className="w-4 h-4 mr-2" />
+                        ) : (
+                          <Archive className="w-4 h-4 mr-2" />
+                        )}
+                        <span>{activeList.archived ? "Unarchive" : "Archive"} List</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => deleteList(activeList.id)}
+                        className="text-red-500 hover:!text-red-600 focus:!bg-red-50 focus:!text-red-600"
+                      >
+                        <Trash2 className="w-4 h-4 mr-2" />
+                        <span>Delete List</span>
+                      </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
@@ -1421,9 +1418,4 @@ export default function DodoListApp() {
       </SidebarProvider>
     </div>
   )
-}
-
-// Utility function to check for valid Date
-function isValidDate(date: any): date is Date {
-  return date instanceof Date && !isNaN(date.getTime());
 }

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import * as Y from 'yjs';
 import { PocketBaseProvider } from '../services/yjsPocketBase';
 
@@ -44,25 +44,23 @@ export function useYjsTodoList(listId: string | null) {
         providerRef.current = newProvider;
 
         const ylist = newProvider.doc.getMap('list') as Y.Map<any>;
-        
-        // Initialize the document structure if it doesn't exist
-        console.log('[useYjsTodoList] Initializing Yjs document structure');
-        if (!ylist.has('name')) {
-            ylist.set('name', new Y.Text());
-        }
-        if (!ylist.has('todos')) {
-            ylist.set('todos', new Y.Array());
-        }
-        if (!ylist.has('color')) {
-            ylist.set('color', new Y.Text());
-        }
-
-        const ytodos = ylist.get('todos') as Y.Array<YTodo>;
-        const yname = ylist.get('name') as Y.Text;
 
         const updateState = () => {
             try {
                 console.log('[useYjsTodoList] Updating state from Yjs document');
+
+                // Get the latest references inside the update function
+                const ytodos = ylist.get('todos') as Y.Array<YTodo>;
+                const yname = ylist.get('name') as Y.Text;
+
+                // Initialize the document structure if it doesn't exist
+                if (!yname) {
+                    ylist.set('name', new Y.Text());
+                }
+                if (!ytodos) {
+                    ylist.set('todos', new Y.Array());
+                }
+
                 const todos = ytodos ? ytodos.toArray().map(t => {
                     try {
                         const todo = t.toJSON();
@@ -81,7 +79,7 @@ export function useYjsTodoList(listId: string | null) {
                 }).filter(Boolean) : [];
                 
                 const newListData = {
-                    name: yname.toString() || '',
+                    name: yname ? yname.toString() : '',
                     todos,
                 };
                 
@@ -96,10 +94,7 @@ export function useYjsTodoList(listId: string | null) {
 
         // Subscribe to local Yjs changes
         console.log('[useYjsTodoList] Setting up Yjs observers');
-        if (ytodos) {
-            ytodos.observe(updateState);
-        }
-        ylist.observe(updateState);
+        newProvider.doc.on('update', updateState);
         
         // Wait for IndexedDB to sync before updating state
         newProvider.persistence.whenSynced.then(() => {
@@ -116,14 +111,8 @@ export function useYjsTodoList(listId: string | null) {
             
             if (providerRef.current) {
                 try {
-                    const ylist = providerRef.current.doc.getMap('list');
-                    const ytodos = ylist.get('todos') as Y.Array<YTodo>;
-                    
-                    if (ytodos && updateStateRef.current) {
-                        ytodos.unobserve(updateStateRef.current);
-                    }
                     if (updateStateRef.current) {
-                        ylist.unobserve(updateStateRef.current);
+                        providerRef.current.doc.off('update', updateStateRef.current);
                     }
                     
                     providerRef.current.destroy();
@@ -138,10 +127,8 @@ export function useYjsTodoList(listId: string | null) {
             updateStateRef.current = null;
         };
     }, [listId]);
-
-    // --- Functions to modify the Yjs document ---
     
-    const addTodo = (text: string) => {
+    const addTodo = useCallback((text: string) => {
         if (!provider) return;
         const ylist = provider.doc.getMap('list');
         
@@ -161,9 +148,9 @@ export function useYjsTodoList(listId: string | null) {
         provider.doc.transact(() => {
             ytodos.push([newTodo]);
         });
-    };
+    }, [provider]);
 
-    const toggleTodo = (todoId: string) => {
+    const toggleTodo = useCallback((todoId: string) => {
         if (!provider) return;
         const ylist = provider.doc.getMap('list');
         const ytodos = ylist.get('todos') as Y.Array<YTodo>;
@@ -175,9 +162,9 @@ export function useYjsTodoList(listId: string | null) {
                 todo.set('completed', !todo.get('completed'));
             });
         }
-    };
+    }, [provider]);
 
-    const updateTodo = (todoId: string, updates: Partial<{ text: string; completed: boolean; [key: string]: any }>) => {
+    const updateTodo = useCallback((todoId: string, updates: Partial<{ text: string; completed: boolean; [key: string]: any }>) => {
         if (!provider) return;
         const ylist = provider.doc.getMap('list');
         const ytodos = ylist.get('todos') as Y.Array<YTodo>;
@@ -196,9 +183,9 @@ export function useYjsTodoList(listId: string | null) {
                 }
             });
         }
-    };
+    }, [provider]);
 
-    const deleteTodo = (todoId: string) => {
+    const deleteTodo = useCallback((todoId: string) => {
         if (!provider) return;
         const ylist = provider.doc.getMap('list');
         const ytodos = ylist.get('todos') as Y.Array<YTodo>;
@@ -210,9 +197,9 @@ export function useYjsTodoList(listId: string | null) {
                 ytodos.delete(todoIndex, 1);
             });
         }
-    };
+    }, [provider]);
 
-    const updateListName = (newName: string) => {
+    const updateListName = useCallback((newName: string) => {
         if (!provider) return;
         const ylist = provider.doc.getMap('list');
         
@@ -228,7 +215,24 @@ export function useYjsTodoList(listId: string | null) {
                 yName.insert(0, newName);
             });
         }
-    };
+    }, [provider]);
 
-    return { listData, isConnected, addTodo, toggleTodo, updateTodo, deleteTodo, updateListName };
+    const updateListColor = useCallback((newColor: string) => {
+        if (!provider) return;
+        const ylist = provider.doc.getMap('list');
+
+        if (!ylist.has('color')) {
+          ylist.set('color', new Y.Text());
+        }
+
+        const yColor = ylist.get('color') as Y.Text;
+        if (yColor) {
+          provider.doc.transact(() => {
+            yColor.delete(0, yColor.length);
+            yColor.insert(0, newColor);
+          });
+        }
+      }, [provider]);
+
+    return { listData, isConnected, addTodo, toggleTodo, updateTodo, deleteTodo, updateListName, updateListColor };
 }
