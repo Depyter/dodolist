@@ -117,6 +117,7 @@ export default function DodoListApp() {
     deleteTodo,
     updateTodo: updateTodoItem,
     isConnected: isPocketBaseConnected,
+    syncStatus, // Add this
   } = useYjsTodoList(activeListId)
 
   const [inputValue, setInputValue] = useState("")
@@ -999,14 +1000,6 @@ export default function DodoListApp() {
     </div>
   );
 
-  // --- Sync Indicator State ---
-  // Derive sync status from isPocketBaseConnected and connectionDebug
-  const getSyncStatus = () => {
-    if (!isPocketBaseConnected) return 'offline';
-    return 'synced';
-  };
-  const syncStatus = getSyncStatus();
-
   return (
     <div className={`min-h-screen relative overflow-hidden ${activeColor.light}`}>
       {/* <NotificationPortal notifications={notifications} removeNotification={removeNotification} /> */}
@@ -1200,7 +1193,7 @@ export default function DodoListApp() {
                       <Copy className="w-4 h-4" />
                   </Button>
 
-                  <SyncStatusIndicator status={syncStatus} activeColor={activeColor} />
+                  <SyncStatusIndicator syncStatus={syncStatus} activeColor={activeColor} />
 
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>

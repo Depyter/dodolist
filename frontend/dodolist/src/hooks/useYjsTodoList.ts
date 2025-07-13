@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import * as Y from 'yjs';
-import { PocketBaseProvider } from '../services/yjsPocketBase';
+import { PocketBaseProvider, type SyncStatusInfo } from '@/services/yjsPocketBase';
 
 // Define the structure of a Todo item within Yjs
 export type YTodo = Y.Map<any>;
@@ -16,11 +16,19 @@ export interface YListDoc {
 export function useYjsTodoList(listId: string | null) {
     const [provider, setProvider] = useState<PocketBaseProvider | null>(null);
     const [listData, setListData] = useState<{ name: string; todos: any[] }>({ name: '', todos: [] });
-    const [isConnected, setIsConnected] = useState(false);
+    const [syncStatus, setSyncStatus] = useState<SyncStatusInfo>({
+        status: 'offline',
+        isConnected: false,
+        queueLength: 0,
+        isSyncing: false,
+        lastSyncTime: null,
+        hasError: false
+    });
     
     // Use refs to avoid stale closure issues in cleanup
     const providerRef = useRef<PocketBaseProvider | null>(null);
     const updateStateRef = useRef<(() => void) | null>(null);
+    const unsubscribeStatusRef = useRef<(() => void) | null>(null);
 
     useEffect(() => {
         console.log(`[useYjsTodoList] Effect triggered for listId: ${listId}`);
@@ -32,9 +40,16 @@ export function useYjsTodoList(listId: string | null) {
                 providerRef.current.destroy();
                 providerRef.current = null;
                 setProvider(null);
-                setIsConnected(false);
             }
             setListData({ name: '', todos: [] });
+            setSyncStatus({
+                status: 'offline',
+                isConnected: false,
+                queueLength: 0,
+                isSyncing: false,
+                lastSyncTime: null,
+                hasError: false
+            });
             return;
         }
 
@@ -100,14 +115,27 @@ export function useYjsTodoList(listId: string | null) {
         newProvider.persistence.whenSynced.then(() => {
             console.log('[useYjsTodoList] IndexedDB synced, updating state');
             updateState(); // Load from local storage first
-            setIsConnected(true); // Mark as ready for operations
+            // Don't set isConnected here - let the sync status from provider handle this
         }).catch((error) => {
             console.error('[useYjsTodoList] Error waiting for IndexedDB sync:', error);
-            setIsConnected(true); // Still mark as connected even if there's an error
+            // Still try to update state even if there's an error
+            updateState();
         });
+
+        // Subscribe to sync status changes
+        const unsubscribe = newProvider.onStatusChange((status) => {
+            setSyncStatus(status);
+        });
+        unsubscribeStatusRef.current = unsubscribe;
 
         return () => {
             console.log(`[useYjsTodoList] Cleanup for listId: ${listId}`);
+            
+            // Unsubscribe from status changes first
+            if (unsubscribeStatusRef.current) {
+                unsubscribeStatusRef.current();
+                unsubscribeStatusRef.current = null;
+            }
             
             if (providerRef.current) {
                 try {
@@ -123,7 +151,6 @@ export function useYjsTodoList(listId: string | null) {
             }
             
             setProvider(null);
-            setIsConnected(false);
             updateStateRef.current = null;
         };
     }, [listId]);
@@ -234,5 +261,15 @@ export function useYjsTodoList(listId: string | null) {
         }
       }, [provider]);
 
-    return { listData, isConnected, addTodo, toggleTodo, updateTodo, deleteTodo, updateListName, updateListColor };
+    return {
+        listData,
+        addTodo,
+        toggleTodo,
+        deleteTodo,
+        updateTodo,
+        updateListName,
+        updateListColor,
+        isConnected: syncStatus.isConnected,
+        syncStatus,
+    };
 }
