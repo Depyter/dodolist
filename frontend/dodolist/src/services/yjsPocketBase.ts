@@ -128,6 +128,12 @@ export class PocketBaseProvider {
       } else if (realtimeConnected) {
         this.isConnected = true;
         this.wasConnected = true;
+        
+        // If we have a sync queue and we're not currently syncing, process it
+        if (this.syncQueue.length > 0 && !this.isSyncing) {
+          console.log(`[Yjs] Connection restored, processing pending sync queue for list ${this.listId}`);
+          this.processSyncQueue();
+        }
       }
     }, 3000);
   };
@@ -163,32 +169,44 @@ export class PocketBaseProvider {
       if (this.syncQueue.length > 0) {
         console.log(`[Yjs] Processing ${this.syncQueue.length} queued offline changes for list ${this.listId}`);
         
-        // Instead of just processing the queue, force a full sync
-        const fullState = Y.encodeStateAsUpdate(this.doc);
-        const base64Update = uint8ArrayToBase64(fullState);
-        
-        // Extract metadata
-        const ylist = this.doc.getMap('list');
-        const name = (ylist.get('name') as Y.Text)?.toString();
-        const color = (ylist.get('color') as Y.Text)?.toString();
+        try {
+          // Store the current queue length to avoid race conditions
+          const queueLength = this.syncQueue.length;
+          
+          // Instead of just processing the queue, force a full sync
+          const fullState = Y.encodeStateAsUpdate(this.doc);
+          const base64Update = uint8ArrayToBase64(fullState);
+          
+          // Extract metadata
+          const ylist = this.doc.getMap('list');
+          const name = (ylist.get('name') as Y.Text)?.toString();
+          const color = (ylist.get('color') as Y.Text)?.toString();
 
-        const dataToUpdate: { [key: string]: any } = {
-          'yjsUpdate': base64Update,
-          'yjsClientId': this.doc.clientID.toString(),
-        };
+          const dataToUpdate: { [key: string]: any } = {
+            'yjsUpdate': base64Update,
+            'yjsClientId': this.doc.clientID.toString(),
+          };
 
-        if (name) dataToUpdate.name = name;
-        if (color) dataToUpdate.color = color;
+          if (name) dataToUpdate.name = name;
+          if (color) dataToUpdate.color = color;
 
-        // Send the complete state to ensure offline changes are synced
-        await this.pb.collection(this.collectionName).update(this.listId, dataToUpdate, { requestKey: null });
-        console.log(`[Yjs] Successfully pushed offline changes for list ${this.listId}`);
-        
-        // Clear the queue since we've sent the complete state
-        this.syncQueue = [];
+          // Send the complete state to ensure offline changes are synced
+          await this.pb.collection(this.collectionName).update(this.listId, dataToUpdate, { requestKey: null });
+          console.log(`[Yjs] Successfully pushed offline changes for list ${this.listId}`);
+          
+          // Only remove the operations that were queued before this sync
+          // This prevents clearing operations that might have been added during this process
+          this.syncQueue.splice(0, queueLength);
+        } catch (syncError: any) {
+          console.error(`[Yjs] Failed to push offline changes during forced read-merge-write for list ${this.listId}:`, syncError);
+          // Don't clear the queue if the sync failed - let the normal sync queue processing handle retries
+        }
       }
       
       console.log(`[Yjs] Successfully completed forced read-merge-write for list ${this.listId}`);
+      
+      // Process any remaining operations in the queue after reconnection
+      this.processSyncQueue();
       
     } catch (error) {
       console.error(`[Yjs] Failed forced read-merge-write for list ${this.listId}:`, error);
@@ -269,6 +287,9 @@ export class PocketBaseProvider {
   private queueSync = (operation: () => Promise<void>) => {
     // Always queue, even if offline. The queue will be processed on reconnect.
     this.syncQueue.push(operation);
+    console.log(`[Yjs] Queued sync operation for list ${this.listId}, queue length: ${this.syncQueue.length}`);
+    
+    // Only process if we're connected and not already syncing
     if (!this.isSyncing && this.getRealtimeConnected()) {
       this.processSyncQueue();
     }
@@ -278,19 +299,70 @@ export class PocketBaseProvider {
     if (this.isSyncing || this.syncQueue.length === 0) {
       return;
     }
+    
+    console.log(`[Yjs] Processing sync queue for list ${this.listId}, ${this.syncQueue.length} operations pending`);
     this.isSyncing = true;
+    
+    let processedCount = 0;
+    let failedCount = 0;
+    let consecutiveFailures = 0;
+    
     while (this.syncQueue.length > 0 && this.getRealtimeConnected()) {
-      const operation = this.syncQueue.shift();
+      // Get the first operation without removing it from the queue yet
+      const operation = this.syncQueue[0];
       if (operation) {
         try {
           await operation();
-        } catch (error) {
-          console.error(`[Yjs] Sync operation failed:`, error);
-          // Continue with next operation even if one fails
+          // Only remove the operation if it succeeded
+          this.syncQueue.shift();
+          processedCount++;
+          consecutiveFailures = 0; // Reset consecutive failures on success
+          console.log(`[Yjs] Successfully processed sync operation ${processedCount} for list ${this.listId}`);
+        } catch (error: any) {
+          console.error(`[Yjs] Sync operation failed for list ${this.listId}:`, error);
+          failedCount++;
+          consecutiveFailures++;
+          
+          // Check if this is a critical error that suggests we should stop processing
+          if (error?.status === 401 || error?.status === 403) {
+            console.error(`[Yjs] Authentication error, stopping sync queue processing for list ${this.listId}`);
+            break;
+          }
+          
+          // For network errors, implement backoff and keep the operation in queue for retry
+          if (error?.status === 0 || error?.status === 500 || error?.status >= 502) {
+            console.warn(`[Yjs] Network error detected, will retry later for list ${this.listId}`);
+            
+            // If we have too many consecutive failures, add a delay before retrying
+            if (consecutiveFailures >= 3) {
+              const backoffDelay = Math.min(1000 * Math.pow(2, consecutiveFailures - 3), 30000); // Max 30s
+              console.log(`[Yjs] Too many consecutive failures (${consecutiveFailures}), backing off for ${backoffDelay}ms`);
+              
+              // Break the processing loop to add delay, but don't remove the operation
+              setTimeout(() => {
+                if (this.getRealtimeConnected() && !this.isSyncing) {
+                  this.processSyncQueue();
+                }
+              }, backoffDelay);
+              break;
+            }
+            // For fewer consecutive failures, just continue with the operation still in queue
+            break;
+          }
+          
+          // For other errors (like validation errors), remove the failed operation
+          // This prevents the same operation from blocking the queue indefinitely
+          this.syncQueue.shift();
+          console.warn(`[Yjs] Removed failed sync operation from queue for list ${this.listId} (non-network error)`);
         }
+      } else {
+        // Remove null/undefined operations
+        this.syncQueue.shift();
       }
     }
+    
     this.isSyncing = false;
+    console.log(`[Yjs] Finished processing sync queue for list ${this.listId}. Processed: ${processedCount}, Failed: ${failedCount}, Remaining: ${this.syncQueue.length}`);
   };
 
   private handleDocUpdate = (_update: Uint8Array, origin: any) => {
@@ -298,6 +370,8 @@ export class PocketBaseProvider {
     if (origin === 'server-init' || origin === 'server-update' || origin === 'server-merge' || origin === 'server-reconnect') {
       return;
     }
+
+    console.log(`[Yjs] Local document updated for list ${this.listId}, origin: ${origin}`);
 
     // Always queue the sync operation, even if offline
     this.queueSync(async () => {
@@ -308,12 +382,17 @@ export class PocketBaseProvider {
           return;
         }
 
+        console.log(`[Yjs] Starting read-merge-write cycle for list ${this.listId}`);
+
         // 1. Fetch the latest state from the server
         const remoteDoc = await this.pb.collection(this.collectionName).getOne(this.listId, { requestKey: null });
         const remoteUpdate = remoteDoc.yjsUpdate ? base64ToUint8Array(remoteDoc.yjsUpdate) : new Uint8Array();
 
         // 2. Merge remote state into the local document
-        Y.applyUpdate(this.doc, remoteUpdate, 'server-merge');
+        if (remoteUpdate.length > 0) {
+          Y.applyUpdate(this.doc, remoteUpdate, 'server-merge');
+          console.log(`[Yjs] Merged remote state for list ${this.listId}`);
+        }
 
         // 3. Now that the local doc is up-to-date, encode the full state
         const mergedState = Y.encodeStateAsUpdate(this.doc);
@@ -335,9 +414,17 @@ export class PocketBaseProvider {
         // 5. Send the merged update back to the server
         await this.pb.collection(this.collectionName).update(this.listId, dataToUpdate, { requestKey: null });
         console.log(`[Yjs] Successfully synced merged state for list ${this.listId}`);
-      } catch (error) {
+      } catch (error: any) {
         console.error(`[Yjs] Failed to sync state for list ${this.listId}:`, error);
-        // Do not set isConnected to false here, rely on realtime connection state
+        
+        // Check if this is a connection issue and mark as disconnected
+        if (error?.status === 0 || error?.status === 500 || error?.status >= 502) {
+          console.warn(`[Yjs] Network/server error detected, marking as disconnected for list ${this.listId}`);
+          this.isConnected = false;
+        }
+        
+        // Re-throw the error so the sync queue can handle it properly
+        throw error;
       }
     });
   };
