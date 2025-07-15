@@ -104,9 +104,9 @@ export default function DodoListApp() {
     activeListId,
     setActiveListId,
     createNewList,
-    updateList,
     deleteList,
     cloneList,
+    updateListMetadata,
   } = useTodoLists()
 
   // Use the Yjs hook for the active list
@@ -116,6 +116,12 @@ export default function DodoListApp() {
     toggleTodo,
     deleteTodo,
     updateTodo: updateTodoItem,
+    updateListName: updateListNameYjs,
+    updateListColor: updateListColorYjs,
+    updateListPinned: updateListPinnedYjs,
+    updateListArchived: updateListArchivedYjs,
+    updateListDeleted: updateListDeletedYjs,
+    initializeListMetadata,
     isConnected: isPocketBaseConnected,
     syncStatus, // Add this
   } = useYjsTodoList(activeListId)
@@ -164,6 +170,47 @@ export default function DodoListApp() {
   }
 
   const { notifications, addNotification, removeNotification } = useNotification();
+
+  // Initialize Yjs metadata for newly created lists
+  useEffect(() => {
+    if (activeListId && activeListData) {
+      const activeList = todoLists.find(list => list.id === activeListId);
+      if (activeList && !activeListData.name && !activeListData.color) {
+        // This appears to be a newly created list that needs initialization
+        initializeListMetadata({
+          name: activeList.name,
+          color: activeList.color,
+          pinned: activeList.pinned,
+          archived: activeList.archived
+        });
+      }
+    }
+  }, [activeListId, activeListData, todoLists, initializeListMetadata]);
+
+  // Bridge to sync Yjs metadata changes to todoLists state for offline UI updates
+  useEffect(() => {
+    if (activeListId && activeListData && (activeListData.name || activeListData.color)) {
+      const activeList = todoLists.find(list => list.id === activeListId);
+      if (activeList) {
+        // Check if any metadata has changed compared to what's in todoLists
+        const hasChanges = 
+          activeList.name !== activeListData.name ||
+          activeList.color !== activeListData.color ||
+          activeList.pinned !== activeListData.pinned ||
+          activeList.archived !== activeListData.archived;
+
+        if (hasChanges) {
+          console.log('[TodoListPage] Syncing Yjs metadata changes to todoLists state for list:', activeListId);
+          updateListMetadata(activeListId, {
+            name: activeListData.name,
+            color: activeListData.color,
+            pinned: activeListData.pinned,
+            archived: activeListData.archived,
+          });
+        }
+      }
+    }
+  }, [activeListId, activeListData.name, activeListData.color, activeListData.pinned, activeListData.archived, todoLists, updateListMetadata]);
 
   // When the activeListId from the URL changes, update the hook's state
   useEffect(() => {
@@ -352,16 +399,31 @@ export default function DodoListApp() {
     }
   };
 
-  // Handle deleting a list (updated to use our persistence service)
+  // Handle deleting a list (updated to use soft delete via Yjs)
   const handleDeleteList = async (listId: string) => {
     try {
-      await deleteList(listId);
-      addNotification({
-        message: "List deleted.",
-        type: "info",
-        duration: 3000,
-      });
-      // The hook now handles navigating to the next available list
+      if (activeListId === listId) {
+        // Use soft delete for the active list
+        updateListDeletedYjs(true);
+        addNotification({
+          message: "List archived (soft deleted).",
+          type: "info",
+          duration: 3000,
+        });
+        // Navigate to another list if available
+        const remainingLists = todoLists.filter(list => list.id !== listId && !list.deleted);
+        if (remainingLists.length > 0) {
+          navigate(`/list/${remainingLists[0].id}`);
+        }
+      } else {
+        // For non-active lists, use hard delete
+        await deleteList(listId);
+        addNotification({
+          message: "List deleted.",
+          type: "info",
+          duration: 3000,
+        });
+      }
     } catch (error) {
       console.error("Failed to delete list:", error);
       addNotification({
@@ -372,11 +434,11 @@ export default function DodoListApp() {
     }
   };
 
-  // Update list name (updated to use our persistence service)
+  // Update list name (updated to use Yjs operations)
   const handleUpdateListName = useCallback(async (listId: string, newName: string | null) => {
-    if (newName && newName.trim() !== "") {
+    if (newName && newName.trim() !== "" && activeListId === listId) {
       try {
-        await updateList(listId, { name: newName });
+        updateListNameYjs(newName);
         addNotification({
           message: "List name updated.",
           type: "success",
@@ -393,33 +455,35 @@ export default function DodoListApp() {
     }
     setEditingListId(null);
     setIsEditingHeader(false);
-  }, [updateList, addNotification]);
+  }, [updateListNameYjs, addNotification, activeListId]);
 
-  // Update list color (updated to use our persistence service)
+  // Update list color (updated to use Yjs operations)
   const updateListColor = async (listId: string, newColor: string) => {
-    try {
-      await updateList(listId, { color: newColor });
-      addNotification({
-        message: "List color updated.",
-        type: "success",
-        duration: 3000,
-      });
-    } catch (error) {
-      console.error("Failed to update list color:", error);
-      addNotification({
-        message: "Failed to update list color.",
-        type: "error",
-        duration: 3000,
-      });
+    if (activeListId === listId) {
+      try {
+        updateListColorYjs(newColor);
+        addNotification({
+          message: "List color updated.",
+          type: "success",
+          duration: 3000,
+        });
+      } catch (error) {
+        console.error("Failed to update list color:", error);
+        addNotification({
+          message: "Failed to update list color.",
+          type: "error",
+          duration: 3000,
+        });
+      }
     }
   };
 
-  // Toggle pin list (updated to use our persistence service)
+  // Toggle pin list (updated to use Yjs operations)
   const togglePinList = async (listId: string) => {
     const list = todoLists.find(l => l.id === listId);
-    if (!list) return;
+    if (!list || activeListId !== listId) return;
     try {
-      await updateList(listId, { pinned: !list.pinned });
+      updateListPinnedYjs(!list.pinned);
       addNotification({
         message: list.pinned ? "List unpinned." : "List pinned.",
         type: "success",
@@ -435,12 +499,12 @@ export default function DodoListApp() {
     }
   };
 
-  // Toggle archive list (updated to use our persistence service)
+  // Toggle archive list (updated to use Yjs operations)
   const toggleArchiveList = async (listId: string) => {
     const list = todoLists.find(l => l.id === listId);
-    if (!list) return;
+    if (!list || activeListId !== listId) return;
     try {
-      await updateList(listId, { archived: !list.archived });
+      updateListArchivedYjs(!list.archived);
       addNotification({
         message: list.archived ? "List unarchived." : "List archived.",
         type: "success",

@@ -9,12 +9,35 @@ export type YTodo = Y.Map<any>;
 export interface YListDoc {
     name: Y.Text;
     color: Y.Text;
+    pinned: Y.Map<boolean>; // Using Y.Map for complex types
+    archived: Y.Map<boolean>;
+    deleted: Y.Map<boolean>; // Soft delete flag
+    createdAt: Y.Text;
     todos: Y.Array<YTodo>;
-    // other metadata fields can be Y.Text, Y.Number etc.
+    // Metadata versioning for migration tracking
+    metadataVersion: Y.Map<number>;
 }
 
 export function useYjsTodoList(listId: string | null) {
-    const [listData, setListData] = useState<{ name: string; color: string; todos: any[] }>({ name: '', color: '', todos: [] });
+    const [listData, setListData] = useState<{ 
+        name: string; 
+        color: string; 
+        pinned: boolean;
+        archived: boolean;
+        deleted: boolean;
+        createdAt: string;
+        metadataVersion: number;
+        todos: any[] 
+    }>({ 
+        name: '', 
+        color: '', 
+        pinned: false,
+        archived: false,
+        deleted: false,
+        createdAt: '',
+        metadataVersion: 0,
+        todos: [] 
+    });
     const [syncStatus, setSyncStatus] = useState<SyncStatusInfo>({
         status: 'offline',
         isConnected: false,
@@ -52,7 +75,16 @@ export function useYjsTodoList(listId: string | null) {
 
         if (!listId) {
             cleanup();
-            setListData({ name: '', color: '', todos: [] });
+            setListData({ 
+                name: '', 
+                color: '', 
+                pinned: false,
+                archived: false,
+                deleted: false,
+                createdAt: '',
+                metadataVersion: 0,
+                todos: [] 
+            });
             setSyncStatus({
                 status: 'offline',
                 isConnected: false,
@@ -77,16 +109,52 @@ export function useYjsTodoList(listId: string | null) {
                 const ytodos = ylist.get('todos') as Y.Array<YTodo>;
                 const yname = ylist.get('name') as Y.Text;
                 const ycolor = ylist.get('color') as Y.Text;
+                const ypinned = ylist.get('pinned') as Y.Map<boolean>;
+                const yarchived = ylist.get('archived') as Y.Map<boolean>;
+                const ydeleted = ylist.get('deleted') as Y.Map<boolean>;
+                const ycreatedAt = ylist.get('createdAt') as Y.Text;
+                const ymetadataVersion = ylist.get('metadataVersion') as Y.Map<number>;
 
+                // Initialize missing fields with defaults
                 if (!yname) ylist.set('name', new Y.Text());
                 if (!ycolor) ylist.set('color', new Y.Text());
                 if (!ytodos) ylist.set('todos', new Y.Array());
+                if (!ypinned) {
+                    const pinnedMap = new Y.Map();
+                    pinnedMap.set('value', false);
+                    ylist.set('pinned', pinnedMap);
+                }
+                if (!yarchived) {
+                    const archivedMap = new Y.Map();
+                    archivedMap.set('value', false);
+                    ylist.set('archived', archivedMap);
+                }
+                if (!ydeleted) {
+                    const deletedMap = new Y.Map();
+                    deletedMap.set('value', false);
+                    ylist.set('deleted', deletedMap);
+                }
+                if (!ycreatedAt) {
+                    const createdAtText = new Y.Text();
+                    createdAtText.insert(0, new Date().toISOString());
+                    ylist.set('createdAt', createdAtText);
+                }
+                if (!ymetadataVersion) {
+                    const versionMap = new Y.Map();
+                    versionMap.set('value', 1);
+                    ylist.set('metadataVersion', versionMap);
+                }
 
                 const todos = ytodos ? ytodos.toArray().map(t => t.toJSON()) : [];
                 
                 const newListData = {
                     name: yname ? yname.toString() : '',
                     color: ycolor ? ycolor.toString() : '',
+                    pinned: ypinned ? ypinned.get('value') ?? false : false,
+                    archived: yarchived ? yarchived.get('value') ?? false : false,
+                    deleted: ydeleted ? ydeleted.get('value') ?? false : false,
+                    createdAt: ycreatedAt ? ycreatedAt.toString() : new Date().toISOString(),
+                    metadataVersion: ymetadataVersion ? ymetadataVersion.get('value') ?? 1 : 1,
                     todos,
                 };
                 
@@ -216,6 +284,95 @@ export function useYjsTodoList(listId: string | null) {
         }
       }, []);
 
+    const updateListPinned = useCallback((pinned: boolean) => {
+        if (!providerRef.current) return;
+        const ylist = providerRef.current.doc.getMap('list');
+
+        if (!ylist.has('pinned')) {
+            const pinnedMap = new Y.Map();
+            pinnedMap.set('value', false);
+            ylist.set('pinned', pinnedMap);
+        }
+
+        const yPinned = ylist.get('pinned') as Y.Map<boolean>;
+        if (yPinned) {
+            providerRef.current.doc.transact(() => {
+                yPinned.set('value', pinned);
+            });
+        }
+    }, []);
+
+    const updateListArchived = useCallback((archived: boolean) => {
+        if (!providerRef.current) return;
+        const ylist = providerRef.current.doc.getMap('list');
+
+        if (!ylist.has('archived')) {
+            const archivedMap = new Y.Map();
+            archivedMap.set('value', false);
+            ylist.set('archived', archivedMap);
+        }
+
+        const yArchived = ylist.get('archived') as Y.Map<boolean>;
+        if (yArchived) {
+            providerRef.current.doc.transact(() => {
+                yArchived.set('value', archived);
+            });
+        }
+    }, []);
+
+    const updateListDeleted = useCallback((deleted: boolean) => {
+        if (!providerRef.current) return;
+        const ylist = providerRef.current.doc.getMap('list');
+
+        if (!ylist.has('deleted')) {
+            const deletedMap = new Y.Map();
+            deletedMap.set('value', false);
+            ylist.set('deleted', deletedMap);
+        }
+
+        const yDeleted = ylist.get('deleted') as Y.Map<boolean>;
+        if (yDeleted) {
+            providerRef.current.doc.transact(() => {
+                yDeleted.set('value', deleted);
+            });
+        }
+    }, []);
+
+    const initializeListMetadata = useCallback((metadata: { name?: string; color?: string; pinned?: boolean; archived?: boolean }) => {
+        if (!providerRef.current) return;
+        const ylist = providerRef.current.doc.getMap('list');
+
+        providerRef.current.doc.transact(() => {
+            // Initialize name
+            if (metadata.name && !ylist.has('name')) {
+                const nameText = new Y.Text();
+                nameText.insert(0, metadata.name);
+                ylist.set('name', nameText);
+            }
+
+            // Initialize color
+            if (metadata.color && !ylist.has('color')) {
+                const colorText = new Y.Text();
+                colorText.insert(0, metadata.color);
+                ylist.set('color', colorText);
+            }
+
+            // Initialize pinned
+            if (metadata.pinned !== undefined && !ylist.has('pinned')) {
+                const pinnedMap = new Y.Map();
+                pinnedMap.set('value', metadata.pinned);
+                ylist.set('pinned', pinnedMap);
+            }
+
+            // Initialize archived
+            if (metadata.archived !== undefined && !ylist.has('archived')) {
+                const archivedMap = new Y.Map();
+                archivedMap.set('value', metadata.archived);
+                ylist.set('archived', archivedMap);
+            }
+        });
+    }, []);
+
     return {
         listData,
         addTodo,
@@ -224,6 +381,10 @@ export function useYjsTodoList(listId: string | null) {
         updateTodo,
         updateListName,
         updateListColor,
+        updateListPinned,
+        updateListArchived,
+        updateListDeleted,
+        initializeListMetadata,
         isConnected: syncStatus.isConnected,
         syncStatus,
     };
