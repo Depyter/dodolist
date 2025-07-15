@@ -14,8 +14,7 @@ export interface YListDoc {
 }
 
 export function useYjsTodoList(listId: string | null) {
-    const [provider, setProvider] = useState<PocketBaseProvider | null>(null);
-    const [listData, setListData] = useState<{ name: string; todos: any[] }>({ name: '', todos: [] });
+    const [listData, setListData] = useState<{ name: string; color: string; todos: any[] }>({ name: '', color: '', todos: [] });
     const [syncStatus, setSyncStatus] = useState<SyncStatusInfo>({
         status: 'offline',
         isConnected: false,
@@ -25,23 +24,35 @@ export function useYjsTodoList(listId: string | null) {
         hasError: false
     });
     
-    // Use refs to avoid stale closure issues in cleanup
     const providerRef = useRef<PocketBaseProvider | null>(null);
-    const updateStateRef = useRef<(() => void) | null>(null);
-    const unsubscribeStatusRef = useRef<(() => void) | null>(null);
 
     useEffect(() => {
         console.log(`[useYjsTodoList] Effect triggered for listId: ${listId}`);
         
-        if (!listId) {
-            // Clean up if there's no active list
+        let isMounted = true;
+        let doc: Y.Doc | null = null;
+        let statusUnsubscribe: (() => void) | null = null;
+        let updateState: (() => void) | null = null;
+
+        const cleanup = () => {
+            console.log(`[useYjsTodoList] Cleanup for listId: ${listId}`);
+            if (statusUnsubscribe) {
+                statusUnsubscribe();
+            }
+            if (doc && updateState) {
+                doc.off('update', updateState);
+            }
             if (providerRef.current) {
-                console.log('[useYjsTodoList] Cleaning up provider for null listId');
+                // The global provider will manage the actual document lifecycle.
+                // This just signals that this hook instance is no longer using it.
                 providerRef.current.destroy();
                 providerRef.current = null;
-                setProvider(null);
             }
-            setListData({ name: '', todos: [] });
+        };
+
+        if (!listId) {
+            cleanup();
+            setListData({ name: '', color: '', todos: [] });
             setSyncStatus({
                 status: 'offline',
                 isConnected: false,
@@ -53,113 +64,58 @@ export function useYjsTodoList(listId: string | null) {
             return;
         }
 
-        // Create provider for local-first operations with IndexedDB persistence
         const newProvider = new PocketBaseProvider(listId);
-        setProvider(newProvider);
         providerRef.current = newProvider;
+        
+        doc = newProvider.doc;
+        const ylist = doc.getMap('list') as Y.Map<any>;
 
-        const ylist = newProvider.doc.getMap('list') as Y.Map<any>;
-
-        const updateState = () => {
+        updateState = () => {
+            if (!isMounted) return;
+            
             try {
-                console.log('[useYjsTodoList] Updating state from Yjs document');
-
-                // Get the latest references inside the update function
                 const ytodos = ylist.get('todos') as Y.Array<YTodo>;
                 const yname = ylist.get('name') as Y.Text;
+                const ycolor = ylist.get('color') as Y.Text;
 
-                // Initialize the document structure if it doesn't exist
-                if (!yname) {
-                    ylist.set('name', new Y.Text());
-                }
-                if (!ytodos) {
-                    ylist.set('todos', new Y.Array());
-                }
+                if (!yname) ylist.set('name', new Y.Text());
+                if (!ycolor) ylist.set('color', new Y.Text());
+                if (!ytodos) ylist.set('todos', new Y.Array());
 
-                const todos = ytodos ? ytodos.toArray().map(t => {
-                    try {
-                        const todo = t.toJSON();
-                        console.log('[useYjsTodoList] Converting todo:', todo);
-                        return {
-                            ...todo,
-                            createdAt: todo.createdAt ? new Date(todo.createdAt) : undefined,
-                            completedAt: todo.completedAt ? new Date(todo.completedAt) : undefined,
-                            deadline: todo.deadline ? new Date(todo.deadline) : undefined,
-                            reminder: todo.reminder ? new Date(todo.reminder) : undefined,
-                        };
-                    } catch (error) {
-                        console.error('[useYjsTodoList] Error converting todo:', error);
-                        return null;
-                    }
-                }).filter(Boolean) : [];
+                const todos = ytodos ? ytodos.toArray().map(t => t.toJSON()) : [];
                 
                 const newListData = {
                     name: yname ? yname.toString() : '',
+                    color: ycolor ? ycolor.toString() : '',
                     todos,
                 };
                 
-                console.log(`[useYjsTodoList] State updated - name: "${newListData.name}", todos count: ${newListData.todos.length}`, newListData.todos);
                 setListData(newListData);
             } catch (error) {
                 console.error('[useYjsTodoList] Error in updateState:', error);
             }
         };
-        
-        updateStateRef.current = updateState;
 
-        // Subscribe to local Yjs changes
-        console.log('[useYjsTodoList] Setting up Yjs observers');
-        newProvider.doc.on('update', updateState);
-        
-        // Wait for IndexedDB to sync before updating state
-        newProvider.persistence.whenSynced.then(() => {
-            console.log('[useYjsTodoList] IndexedDB synced, updating state');
-            updateState(); // Load from local storage first
-            // Don't set isConnected here - let the sync status from provider handle this
-        }).catch((error) => {
-            console.error('[useYjsTodoList] Error waiting for IndexedDB sync:', error);
-            // Still try to update state even if there's an error
-            updateState();
-        });
+        updateState();
 
-        // Subscribe to sync status changes
-        const unsubscribe = newProvider.onStatusChange((status) => {
-            setSyncStatus(status);
+        doc.on('update', updateState);
+        
+        statusUnsubscribe = newProvider.onStatusChange((status) => {
+            if (isMounted) {
+                setSyncStatus(status);
+            }
         });
-        unsubscribeStatusRef.current = unsubscribe;
 
         return () => {
-            console.log(`[useYjsTodoList] Cleanup for listId: ${listId}`);
-            
-            // Unsubscribe from status changes first
-            if (unsubscribeStatusRef.current) {
-                unsubscribeStatusRef.current();
-                unsubscribeStatusRef.current = null;
-            }
-            
-            if (providerRef.current) {
-                try {
-                    if (updateStateRef.current) {
-                        providerRef.current.doc.off('update', updateStateRef.current);
-                    }
-                    
-                    providerRef.current.destroy();
-                    providerRef.current = null;
-                } catch (error) {
-                    console.error('[useYjsTodoList] Error during cleanup:', error);
-                }
-            }
-            
-            setProvider(null);
-            updateStateRef.current = null;
+            isMounted = false;
+            cleanup();
         };
     }, [listId]);
     
     const addTodo = useCallback((text: string) => {
-        if (!provider) return;
-        const ylist = provider.doc.getMap('list');
+        if (!providerRef.current) return;
+        const ylist = providerRef.current.doc.getMap('list');
         
-        // Ensure todos array exists
         if (!ylist.has('todos')) {
             ylist.set('todos', new Y.Array());
         }
@@ -172,34 +128,34 @@ export function useYjsTodoList(listId: string | null) {
         newTodo.set('completed', false);
         newTodo.set('createdAt', new Date().toISOString());
 
-        provider.doc.transact(() => {
+        providerRef.current.doc.transact(() => {
             ytodos.push([newTodo]);
         });
-    }, [provider]);
+    }, []);
 
     const toggleTodo = useCallback((todoId: string) => {
-        if (!provider) return;
-        const ylist = provider.doc.getMap('list');
+        if (!providerRef.current) return;
+        const ylist = providerRef.current.doc.getMap('list');
         const ytodos = ylist.get('todos') as Y.Array<YTodo>;
         if (!ytodos) return;
         
         const todo = ytodos.toArray().find(t => t.get('id') === todoId);
         if (todo) {
-            provider.doc.transact(() => {
+            providerRef.current.doc.transact(() => {
                 todo.set('completed', !todo.get('completed'));
             });
         }
-    }, [provider]);
+    }, []);
 
     const updateTodo = useCallback((todoId: string, updates: Partial<{ text: string; completed: boolean; [key: string]: any }>) => {
-        if (!provider) return;
-        const ylist = provider.doc.getMap('list');
+        if (!providerRef.current) return;
+        const ylist = providerRef.current.doc.getMap('list');
         const ytodos = ylist.get('todos') as Y.Array<YTodo>;
         if (!ytodos) return;
         
         const todo = ytodos.toArray().find(t => t.get('id') === todoId);
         if (todo) {
-            provider.doc.transact(() => {
+            providerRef.current.doc.transact(() => {
                 for (const key in updates) {
                     if (Object.prototype.hasOwnProperty.call(updates, key)) {
                         const value = updates[key as keyof typeof updates];
@@ -210,43 +166,42 @@ export function useYjsTodoList(listId: string | null) {
                 }
             });
         }
-    }, [provider]);
+    }, []);
 
     const deleteTodo = useCallback((todoId: string) => {
-        if (!provider) return;
-        const ylist = provider.doc.getMap('list');
+        if (!providerRef.current) return;
+        const ylist = providerRef.current.doc.getMap('list');
         const ytodos = ylist.get('todos') as Y.Array<YTodo>;
         if (!ytodos) return;
         
         const todoIndex = ytodos.toArray().findIndex(t => t.get('id') === todoId);
         if (todoIndex > -1) {
-            provider.doc.transact(() => {
+            providerRef.current.doc.transact(() => {
                 ytodos.delete(todoIndex, 1);
             });
         }
-    }, [provider]);
+    }, []);
 
     const updateListName = useCallback((newName: string) => {
-        if (!provider) return;
-        const ylist = provider.doc.getMap('list');
+        if (!providerRef.current) return;
+        const ylist = providerRef.current.doc.getMap('list');
         
-        // Ensure name exists
         if (!ylist.has('name')) {
             ylist.set('name', new Y.Text());
         }
         
         const yName = ylist.get('name') as Y.Text;
         if (yName) {
-            provider.doc.transact(() => {
+            providerRef.current.doc.transact(() => {
                 yName.delete(0, yName.length);
                 yName.insert(0, newName);
             });
         }
-    }, [provider]);
+    }, []);
 
     const updateListColor = useCallback((newColor: string) => {
-        if (!provider) return;
-        const ylist = provider.doc.getMap('list');
+        if (!providerRef.current) return;
+        const ylist = providerRef.current.doc.getMap('list');
 
         if (!ylist.has('color')) {
           ylist.set('color', new Y.Text());
@@ -254,12 +209,12 @@ export function useYjsTodoList(listId: string | null) {
 
         const yColor = ylist.get('color') as Y.Text;
         if (yColor) {
-          provider.doc.transact(() => {
+            providerRef.current.doc.transact(() => {
             yColor.delete(0, yColor.length);
             yColor.insert(0, newColor);
           });
         }
-      }, [provider]);
+      }, []);
 
     return {
         listData,

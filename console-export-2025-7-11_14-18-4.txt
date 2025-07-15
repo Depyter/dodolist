@@ -1,356 +1,459 @@
-GET
-http://localhost:3000/list/b6c7cf48-ddc8-4326-b0d5-36aa8747e532
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/@vite/client
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/src/main.tsx?t=1752157060671
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/@react-refresh
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/vite/dist/client/env.mjs
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=be6be70e
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=be6be70e
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/react.js?v=be6be70e
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/@capacitor_status-bar.js?v=be6be70e
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/src/index.css?t=1752157060671
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/src/App.tsx?t=1752157060671
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/pocketbase.js?v=be6be70e
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/src/config.ts
-[HTTP/1.1 200 OK 0ms]
-
-[vite] connecting... client:789:9
-GET
-http://localhost:3000/node_modules/.vite/deps/chunk-UGC3UZ7L.js?v=be6be70e
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/chunk-G3PMV62Z.js?v=be6be70e
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/chunk-NXBGYFMC.js?v=be6be70e
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/src/pages/TodoListPage.tsx?t=1752157060671
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/react-router-dom.js?v=be6be70e
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/src/pages/LoginPage.tsx
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/src/components/ProtectedRoute.tsx
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/src/pages/RegisterPage.tsx
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/@capacitor_core.js?v=61cf6f6e
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/chunk-HE4GKDYE.js?v=be6be70e
-[HTTP/1.1 200 OK 0ms]
-
-GET
-ws://localhost:3000/?token=PvN89m9ROMg6
-NS_ERROR_OFFLINE
-
-Firefox can’t establish a connection to the server at ws://localhost:3000/?token=PvN89m9ROMg6. client:802:31
-[vite] failed to connect to websocket (Error: WebSocket closed without opened.). client:841:19
-Uncaught (in promise) Error: WebSocket closed without opened.
-    connect client:454
-    connect client:452
-    connect client:443
-    connect client:811
-    connect client:290
-    connect client:383
-    <anonymous> client:908
-client:454:22
-GET
-http://localhost:3000/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=61cf6f6e
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/react-router-dom.js?v=61cf6f6e
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/react.js?v=61cf6f6e
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/src/components/ui/card.tsx
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/src/components/LoginForm.tsx
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/src/components/TexturedBackground.tsx
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/src/services/authService.ts
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/src/hooks/useTodoLists.ts?t=1752157060671
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/src/components/ui/button.tsx
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/src/components/ui/input.tsx
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/src/components/ui/dropdown-menu.tsx
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/lucide-react.js?v=be6be70e
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/src/components/ui/sidebar.tsx
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/src/components/AppSidebar.tsx
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/src/components/ui/Notification.tsx
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/src/components/ui/label.tsx
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/src/components/SyncStatusIndicator.tsx
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/chunk-NXBGYFMC.js?v=61cf6f6e
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/chunk-G3PMV62Z.js?v=61cf6f6e
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/chunk-UGC3UZ7L.js?v=61cf6f6e
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/chunk-HE4GKDYE.js?v=61cf6f6e
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/src/lib/utils.ts
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/pocketbase.js?v=61cf6f6e
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/src/hooks/useYjsTodoList.ts?t=1752157060671
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/class-variance-authority.js?v=61cf6f6e
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/@radix-ui_react-slot.js?v=61cf6f6e
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/@radix-ui_react-dropdown-menu.js?v=61cf6f6e
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/src/components/ui/loader.tsx
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/lucide-react.js?v=61cf6f6e
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/src/hooks/use-mobile.ts
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/src/components/ui/dialog.tsx
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/src/components/ui/separator.tsx
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/src/components/ui/sheet.tsx
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/src/components/ui/tooltip.tsx
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/src/components/ui/skeleton.tsx
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/@radix-ui_react-label.js?v=61cf6f6e
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/clsx.js?v=61cf6f6e
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/tailwind-merge.js?v=61cf6f6e
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/uuid.js?v=61cf6f6e
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/src/services/yjsPocketBase.ts?t=1752157060671
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/yjs.js?v=be6be70e
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/chunk-ITJMDIN4.js?v=61cf6f6e
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/chunk-U7P2NEEE.js?v=61cf6f6e
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/chunk-MJNCUEZK.js?v=61cf6f6e
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/chunk-FONJNSY5.js?v=61cf6f6e
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/chunk-24BDUIN4.js?v=61cf6f6e
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/chunk-J67QE77S.js?v=61cf6f6e
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/chunk-FS6LTFKN.js?v=61cf6f6e
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/chunk-ZQTDNDHP.js?v=61cf6f6e
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/chunk-4MXQJKEX.js?v=61cf6f6e
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/chunk-FV6F57PV.js?v=61cf6f6e
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/src/hooks/use-media-query.tsx
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/@radix-ui_react-separator.js?v=61cf6f6e
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/@radix-ui_react-dialog.js?v=61cf6f6e
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=61cf6f6e
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/chunk-NIR4DFCD.js?v=be6be70e
-[HTTP/1.1 200 OK 0ms]
-
-GET
-http://localhost:3000/node_modules/.vite/deps/y-indexeddb.js?v=be6be70e
-[HTTP/1.1 200 OK 0ms]
-
-Download the React DevTools for a better development experience: https://react.dev/link/react-devtools react-dom_client.js:17987:54
-Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
-1. You might have mismatching versions of React and the renderer (such as React DOM)
-2. You might be breaking the Rules of Hooks
-3. You might have more than one copy of React in the same app
-See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem. chunk-UGC3UZ7L.js:373:40
-Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
-1. You might have mismatching versions of React and the renderer (such as React DOM)
-2. You might be breaking the Rules of Hooks
-3. You might have more than one copy of React in the same app
-See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem. chunk-UGC3UZ7L.js:373:40
-Uncaught TypeError: dispatcher is null
-    useContext React
-    useInRouterContext chunk-NL6KNZEE.mjs:4830
-    useLocation chunk-NL6KNZEE.mjs:4834
-    ProtectedRoute ProtectedRoute.tsx:10
-    React 10
+[GlobalPocketBaseProvider] Lost PocketBase connection yjsPocketBase.ts:189:16
+Active List ID: 3f168b1f-5e2d-43bc-9636-7d03bd95077f TodoListPage.tsx:203:12
+Active List: 
+Object { archived: false, collectionId: "pbc_825406485", collectionName: "task_lists", color: "bg-blue-400", createdAt: "2025-07-09 15:31:27.273Z", deleted: false, id: "3f168b1f-5e2d-43bc-9636-7d03bd95077f", name: "no", pinned: false, user_id: "51612qsjktu0i93", … }
+TodoListPage.tsx:204:12
+Active List Todos: 
+Array(7) [ {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
+TodoListPage.tsx:205:12
+Todos to use: 
+Array(7) [ {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
+TodoListPage.tsx:206:12
+Active todos: 
+Array []
+TodoListPage.tsx:207:12
+Sorted active todos: 
+Array []
+TodoListPage.tsx:208:12
+[GlobalPocketBaseProvider] Local document updated for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f, origin: null yjsPocketBase.ts:296:14
+[GlobalPocketBaseProvider] Queued sync operation for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f, queue length: 1 yjsPocketBase.ts:461:12
+[GlobalPocketBaseProvider] Processing sync queue for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f, 1 operations pending yjsPocketBase.ts:477:12
+Active List ID: 3f168b1f-5e2d-43bc-9636-7d03bd95077f TodoListPage.tsx:203:12
+Active List: 
+Object { archived: false, collectionId: "pbc_825406485", collectionName: "task_lists", color: "bg-blue-400", createdAt: "2025-07-09 15:31:27.273Z", deleted: false, id: "3f168b1f-5e2d-43bc-9636-7d03bd95077f", name: "no", pinned: false, user_id: "51612qsjktu0i93", … }
+TodoListPage.tsx:204:12
+Active List Todos: 
+Array(7) [ {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
+TodoListPage.tsx:205:12
+Todos to use: 
+Array(7) [ {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
+TodoListPage.tsx:206:12
+Active todos: 
+Array [ {…} ]
+TodoListPage.tsx:207:12
+Sorted active todos: 
+Array [ {…} ]
+TodoListPage.tsx:208:12
+[GlobalPocketBaseProvider] Failed to sync document for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f: ClientResponseError 0: Something went wrong while processing your request.
+    _ClientResponseError ClientResponseError.ts:13
+    send Client.ts:376
+    promise callback*send Client.ts:374
+    getOne CrudService.ts:165
+    getOne RecordService.ts:213
+    syncDocumentToServer yjsPocketBase.ts:542
+    handleDocUpdate yjsPocketBase.ts:303
+    processSyncQueue yjsPocketBase.ts:489
+    queueSync yjsPocketBase.ts:464
+    handleDocUpdate yjsPocketBase.ts:302
+    emit observable.js:82
+    emit observable.js:82
+    cleanupTransactions Transaction.js:363
+    transact Transaction.js:439
+    transact Doc.js:185
+    toggleTodo useYjsTodoList.ts:144
+    handleToggleTodo TodoListPage.tsx:252
+    onClick TodoListPage.tsx:893
+    React 13
+    <anonymous> main.tsx:21
+yjsPocketBase.ts:563:14
+[GlobalPocketBaseProvider] Sync operation failed for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f: ClientResponseError 0: Something went wrong while processing your request.
+    _ClientResponseError ClientResponseError.ts:13
+    send Client.ts:376
+    promise callback*send Client.ts:374
+    getOne CrudService.ts:165
+    getOne RecordService.ts:213
+    syncDocumentToServer yjsPocketBase.ts:542
+    handleDocUpdate yjsPocketBase.ts:303
+    processSyncQueue yjsPocketBase.ts:489
+    queueSync yjsPocketBase.ts:464
+    handleDocUpdate yjsPocketBase.ts:302
+    emit observable.js:82
+    emit observable.js:82
+    cleanupTransactions Transaction.js:363
+    transact Transaction.js:439
+    transact Doc.js:185
+    toggleTodo useYjsTodoList.ts:144
+    handleToggleTodo TodoListPage.tsx:252
+    onClick TodoListPage.tsx:893
+    React 13
+    <anonymous> main.tsx:21
+yjsPocketBase.ts:494:18
+[GlobalPocketBaseProvider] Finished processing sync queue for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f. Processed: 0, Failed: 1, Remaining: 0 yjsPocketBase.ts:518:12
+Active List ID: 3f168b1f-5e2d-43bc-9636-7d03bd95077f TodoListPage.tsx:203:12
+Active List: 
+Object { archived: false, collectionId: "pbc_825406485", collectionName: "task_lists", color: "bg-blue-400", createdAt: "2025-07-09 15:31:27.273Z", deleted: false, id: "3f168b1f-5e2d-43bc-9636-7d03bd95077f", name: "no", pinned: false, user_id: "51612qsjktu0i93", … }
+TodoListPage.tsx:204:12
+Active List Todos: 
+Array(7) [ {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
+TodoListPage.tsx:205:12
+Todos to use: 
+Array(7) [ {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
+TodoListPage.tsx:206:12
+Active todos: 
+Array [ {…} ]
+TodoListPage.tsx:207:12
+Sorted active todos: 
+Array [ {…} ]
+TodoListPage.tsx:208:12
+[GlobalPocketBaseProvider] Local document updated for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f, origin: null yjsPocketBase.ts:296:14
+[GlobalPocketBaseProvider] Queued sync operation for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f, queue length: 1 yjsPocketBase.ts:461:12
+[GlobalPocketBaseProvider] Processing sync queue for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f, 1 operations pending yjsPocketBase.ts:477:12
+Active List ID: 3f168b1f-5e2d-43bc-9636-7d03bd95077f TodoListPage.tsx:203:12
+Active List: 
+Object { archived: false, collectionId: "pbc_825406485", collectionName: "task_lists", color: "bg-blue-400", createdAt: "2025-07-09 15:31:27.273Z", deleted: false, id: "3f168b1f-5e2d-43bc-9636-7d03bd95077f", name: "no", pinned: false, user_id: "51612qsjktu0i93", … }
+TodoListPage.tsx:204:12
+Active List Todos: 
+Array(7) [ {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
+TodoListPage.tsx:205:12
+Todos to use: 
+Array(7) [ {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
+TodoListPage.tsx:206:12
+Active todos: 
+Array [ {…}, {…} ]
+TodoListPage.tsx:207:12
+Sorted active todos: 
+Array [ {…}, {…} ]
+TodoListPage.tsx:208:12
+[GlobalPocketBaseProvider] Failed to sync document for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f: ClientResponseError 0: Something went wrong while processing your request.
+    _ClientResponseError ClientResponseError.ts:13
+    send Client.ts:376
+    promise callback*send Client.ts:374
+    getOne CrudService.ts:165
+    getOne RecordService.ts:213
+    syncDocumentToServer yjsPocketBase.ts:542
+    handleDocUpdate yjsPocketBase.ts:303
+    processSyncQueue yjsPocketBase.ts:489
+    queueSync yjsPocketBase.ts:464
+    handleDocUpdate yjsPocketBase.ts:302
+    emit observable.js:82
+    emit observable.js:82
+    cleanupTransactions Transaction.js:363
+    transact Transaction.js:439
+    transact Doc.js:185
+    toggleTodo useYjsTodoList.ts:144
+    handleToggleTodo TodoListPage.tsx:252
+    onClick TodoListPage.tsx:893
+    React 13
+    <anonymous> main.tsx:21
+yjsPocketBase.ts:563:14
+[GlobalPocketBaseProvider] Sync operation failed for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f: ClientResponseError 0: Something went wrong while processing your request.
+    _ClientResponseError ClientResponseError.ts:13
+    send Client.ts:376
+    promise callback*send Client.ts:374
+    getOne CrudService.ts:165
+    getOne RecordService.ts:213
+    syncDocumentToServer yjsPocketBase.ts:542
+    handleDocUpdate yjsPocketBase.ts:303
+    processSyncQueue yjsPocketBase.ts:489
+    queueSync yjsPocketBase.ts:464
+    handleDocUpdate yjsPocketBase.ts:302
+    emit observable.js:82
+    emit observable.js:82
+    cleanupTransactions Transaction.js:363
+    transact Transaction.js:439
+    transact Doc.js:185
+    toggleTodo useYjsTodoList.ts:144
+    handleToggleTodo TodoListPage.tsx:252
+    onClick TodoListPage.tsx:893
+    React 13
+    <anonymous> main.tsx:21
+yjsPocketBase.ts:494:18
+[GlobalPocketBaseProvider] Finished processing sync queue for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f. Processed: 0, Failed: 1, Remaining: 0 yjsPocketBase.ts:518:12
+Active List ID: 3f168b1f-5e2d-43bc-9636-7d03bd95077f TodoListPage.tsx:203:12
+Active List: 
+Object { archived: false, collectionId: "pbc_825406485", collectionName: "task_lists", color: "bg-blue-400", createdAt: "2025-07-09 15:31:27.273Z", deleted: false, id: "3f168b1f-5e2d-43bc-9636-7d03bd95077f", name: "no", pinned: false, user_id: "51612qsjktu0i93", … }
+TodoListPage.tsx:204:12
+Active List Todos: 
+Array(7) [ {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
+TodoListPage.tsx:205:12
+Todos to use: 
+Array(7) [ {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
+TodoListPage.tsx:206:12
+Active todos: 
+Array [ {…}, {…} ]
+TodoListPage.tsx:207:12
+Sorted active todos: 
+Array [ {…}, {…} ]
+TodoListPage.tsx:208:12
+[useYjsTodoList] Cleanup for listId: 3f168b1f-5e2d-43bc-9636-7d03bd95077f useYjsTodoList.ts:38:20
+[GlobalPocketBaseProvider] Destroying document for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f yjsPocketBase.ts:689:12
+[GlobalPocketBaseProvider] Disconnected from PocketBase for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f yjsPocketBase.ts:437:16
+[useYjsTodoList] Effect triggered for listId: f82cb78a-b308-48d2-b669-c2e5599eb508 useYjsTodoList.ts:30:16
+[GlobalPocketBaseProvider] Creating document for list f82cb78a-b308-48d2-b669-c2e5599eb508 yjsPocketBase.ts:251:12
+[GlobalPocketBaseProvider] Local document updated for list f82cb78a-b308-48d2-b669-c2e5599eb508, origin: null yjsPocketBase.ts:296:14
+[GlobalPocketBaseProvider] Queued sync operation for list f82cb78a-b308-48d2-b669-c2e5599eb508, queue length: 1 yjsPocketBase.ts:461:12
+[GlobalPocketBaseProvider] Processing sync queue for list f82cb78a-b308-48d2-b669-c2e5599eb508, 1 operations pending yjsPocketBase.ts:477:12
+[GlobalPocketBaseProvider] Local document updated for list f82cb78a-b308-48d2-b669-c2e5599eb508, origin: null yjsPocketBase.ts:296:14
+[GlobalPocketBaseProvider] Queued sync operation for list f82cb78a-b308-48d2-b669-c2e5599eb508, queue length: 2 yjsPocketBase.ts:461:12
+[GlobalPocketBaseProvider] Local document updated for list f82cb78a-b308-48d2-b669-c2e5599eb508, origin: null yjsPocketBase.ts:296:14
+[GlobalPocketBaseProvider] Queued sync operation for list f82cb78a-b308-48d2-b669-c2e5599eb508, queue length: 3 yjsPocketBase.ts:461:12
+Active List ID: f82cb78a-b308-48d2-b669-c2e5599eb508 TodoListPage.tsx:203:12
+Active List: 
+Object { archived: false, collectionId: "pbc_825406485", collectionName: "task_lists", color: "bg-amber-300", createdAt: "2025-07-10 14:41:35.916Z", deleted: false, id: "f82cb78a-b308-48d2-b669-c2e5599eb508", name: "test", pinned: true, user_id: "51612qsjktu0i93", … }
+TodoListPage.tsx:204:12
+Active List Todos: 
+Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
+TodoListPage.tsx:205:12
+Todos to use: 
+Array(7) [ {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
+TodoListPage.tsx:206:12
+Active todos: 
+Array [ {…}, {…} ]
+TodoListPage.tsx:207:12
+Sorted active todos: 
+Array [ {…}, {…} ]
+TodoListPage.tsx:208:12
+[useYjsTodoList] Cleanup for listId: f82cb78a-b308-48d2-b669-c2e5599eb508 useYjsTodoList.ts:38:20
+[GlobalPocketBaseProvider] Destroying document for list f82cb78a-b308-48d2-b669-c2e5599eb508 yjsPocketBase.ts:689:12
+[GlobalPocketBaseProvider] Disconnected from PocketBase for list f82cb78a-b308-48d2-b669-c2e5599eb508 yjsPocketBase.ts:437:16
+[useYjsTodoList] Effect triggered for listId: 3f168b1f-5e2d-43bc-9636-7d03bd95077f useYjsTodoList.ts:30:16
+[GlobalPocketBaseProvider] Creating document for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f yjsPocketBase.ts:251:12
+[GlobalPocketBaseProvider] Local document updated for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f, origin: null yjsPocketBase.ts:296:14
+[GlobalPocketBaseProvider] Queued sync operation for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f, queue length: 1 yjsPocketBase.ts:461:12
+[GlobalPocketBaseProvider] Processing sync queue for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f, 1 operations pending yjsPocketBase.ts:477:12
+[GlobalPocketBaseProvider] Local document updated for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f, origin: null yjsPocketBase.ts:296:14
+[GlobalPocketBaseProvider] Queued sync operation for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f, queue length: 2 yjsPocketBase.ts:461:12
+[GlobalPocketBaseProvider] Local document updated for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f, origin: null yjsPocketBase.ts:296:14
+[GlobalPocketBaseProvider] Queued sync operation for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f, queue length: 3 yjsPocketBase.ts:461:12
+Active List ID: 3f168b1f-5e2d-43bc-9636-7d03bd95077f TodoListPage.tsx:203:12
+Active List: 
+Object { archived: false, collectionId: "pbc_825406485", collectionName: "task_lists", color: "bg-blue-400", createdAt: "2025-07-09 15:31:27.273Z", deleted: false, id: "3f168b1f-5e2d-43bc-9636-7d03bd95077f", name: "no", pinned: false, user_id: "51612qsjktu0i93", … }
+TodoListPage.tsx:204:12
+Active List Todos: 
+Array(7) [ {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
+TodoListPage.tsx:205:12
+Todos to use: 
+Array(7) [ {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
+TodoListPage.tsx:206:12
+Active todos: 
+Array []
+TodoListPage.tsx:207:12
+Sorted active todos: 
+Array []
+TodoListPage.tsx:208:12
+Active List ID: 3f168b1f-5e2d-43bc-9636-7d03bd95077f TodoListPage.tsx:203:12
+Active List: 
+Object { archived: false, collectionId: "pbc_825406485", collectionName: "task_lists", color: "bg-blue-400", createdAt: "2025-07-09 15:31:27.273Z", deleted: false, id: "3f168b1f-5e2d-43bc-9636-7d03bd95077f", name: "no", pinned: false, user_id: "51612qsjktu0i93", … }
+TodoListPage.tsx:204:12
+Active List Todos: 
+Array(7) [ {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
+TodoListPage.tsx:205:12
+Todos to use: 
+Array(7) [ {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
+TodoListPage.tsx:206:12
+Active todos: 
+Array []
+TodoListPage.tsx:207:12
+Sorted active todos: 
+Array []
+TodoListPage.tsx:208:12
+[GlobalPocketBaseProvider] Failed to sync document for list f82cb78a-b308-48d2-b669-c2e5599eb508: ClientResponseError 0: Something went wrong while processing your request.
+    _ClientResponseError ClientResponseError.ts:13
+    send Client.ts:376
+    promise callback*send Client.ts:374
+    getOne CrudService.ts:165
+    getOne RecordService.ts:213
+    syncDocumentToServer yjsPocketBase.ts:542
+    handleDocUpdate yjsPocketBase.ts:303
+    processSyncQueue yjsPocketBase.ts:489
+    queueSync yjsPocketBase.ts:464
+    handleDocUpdate yjsPocketBase.ts:302
+yjsPocketBase.ts:563:14
+[GlobalPocketBaseProvider] Sync operation failed for list f82cb78a-b308-48d2-b669-c2e5599eb508: ClientResponseError 0: Something went wrong while processing your request.
+    _ClientResponseError ClientResponseError.ts:13
+    send Client.ts:376
+    promise callback*send Client.ts:374
+    getOne CrudService.ts:165
+    getOne RecordService.ts:213
+    syncDocumentToServer yjsPocketBase.ts:542
+    handleDocUpdate yjsPocketBase.ts:303
+    processSyncQueue yjsPocketBase.ts:489
+    queueSync yjsPocketBase.ts:464
+    handleDocUpdate yjsPocketBase.ts:302
+yjsPocketBase.ts:494:18
+[GlobalPocketBaseProvider] Finished processing sync queue for list f82cb78a-b308-48d2-b669-c2e5599eb508. Processed: 0, Failed: 1, Remaining: 0 yjsPocketBase.ts:518:12
+[GlobalPocketBaseProvider] Failed to sync document for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f: ClientResponseError 0: Something went wrong while processing your request.
+    _ClientResponseError ClientResponseError.ts:13
+    send Client.ts:376
+    promise callback*send Client.ts:374
+    getOne CrudService.ts:165
+    getOne RecordService.ts:213
+    syncDocumentToServer yjsPocketBase.ts:542
+    handleDocUpdate yjsPocketBase.ts:303
+    processSyncQueue yjsPocketBase.ts:489
+    queueSync yjsPocketBase.ts:464
+    handleDocUpdate yjsPocketBase.ts:302
+yjsPocketBase.ts:563:14
+[GlobalPocketBaseProvider] Sync operation failed for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f: ClientResponseError 0: Something went wrong while processing your request.
+    _ClientResponseError ClientResponseError.ts:13
+    send Client.ts:376
+    promise callback*send Client.ts:374
+    getOne CrudService.ts:165
+    getOne RecordService.ts:213
+    syncDocumentToServer yjsPocketBase.ts:542
+    handleDocUpdate yjsPocketBase.ts:303
+    processSyncQueue yjsPocketBase.ts:489
+    queueSync yjsPocketBase.ts:464
+    handleDocUpdate yjsPocketBase.ts:302
+yjsPocketBase.ts:494:18
+[GlobalPocketBaseProvider] Local document updated for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f, origin: [object Object] yjsPocketBase.ts:296:14
+[GlobalPocketBaseProvider] Queued sync operation for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f, queue length: 3 yjsPocketBase.ts:461:12
+[GlobalPocketBaseProvider] Local persistence for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f is ready yjsPocketBase.ts:275:14
+[GlobalPocketBaseProvider] Connecting to PocketBase for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f yjsPocketBase.ts:321:14
+Uncaught (in promise) ClientResponseError 0: Something went wrong while processing your request.
+    _ClientResponseError ClientResponseError.ts:13
+    send Client.ts:376
+    promise callback*send Client.ts:374
+    submitSubscriptions RealtimeService.ts:269
+    unsubscribe pocketbase.js:421
+    unsubscribe pocketbase.js:546
+    disconnectDocument yjsPocketBase.ts:340
+    destroyDocument yjsPocketBase.ts:555
+    destroy yjsPocketBase.ts:183
+    destroy yjsPocketBase.ts:619
+    cleanup useYjsTodoList.ts:30
+ClientResponseError.ts:13:8
+Active List ID: 3f168b1f-5e2d-43bc-9636-7d03bd95077f TodoListPage.tsx:203:12
+Active List: 
+Object { archived: false, collectionId: "pbc_825406485", collectionName: "task_lists", color: "bg-blue-400", createdAt: "2025-07-09 15:31:27.273Z", deleted: false, id: "3f168b1f-5e2d-43bc-9636-7d03bd95077f", name: "no", pinned: false, user_id: "51612qsjktu0i93", … }
+TodoListPage.tsx:204:12
+Active List Todos: 
+Array(7) [ {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
+TodoListPage.tsx:205:12
+Todos to use: 
+Array(7) [ {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
+TodoListPage.tsx:206:12
+Active todos: 
+Array []
+TodoListPage.tsx:207:12
+Sorted active todos: 
+Array []
+TodoListPage.tsx:208:12
+[useYjsTodoList] Cleanup for listId: 3f168b1f-5e2d-43bc-9636-7d03bd95077f useYjsTodoList.ts:38:20
+[GlobalPocketBaseProvider] Destroying document for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f yjsPocketBase.ts:689:12
+[useYjsTodoList] Effect triggered for listId: f82cb78a-b308-48d2-b669-c2e5599eb508 useYjsTodoList.ts:30:16
+[GlobalPocketBaseProvider] Creating document for list f82cb78a-b308-48d2-b669-c2e5599eb508 yjsPocketBase.ts:251:12
+[GlobalPocketBaseProvider] Local document updated for list f82cb78a-b308-48d2-b669-c2e5599eb508, origin: null yjsPocketBase.ts:296:14
+[GlobalPocketBaseProvider] Queued sync operation for list f82cb78a-b308-48d2-b669-c2e5599eb508, queue length: 1 yjsPocketBase.ts:461:12
+[GlobalPocketBaseProvider] Processing sync queue for list f82cb78a-b308-48d2-b669-c2e5599eb508, 1 operations pending yjsPocketBase.ts:477:12
+[GlobalPocketBaseProvider] Local document updated for list f82cb78a-b308-48d2-b669-c2e5599eb508, origin: null yjsPocketBase.ts:296:14
+[GlobalPocketBaseProvider] Queued sync operation for list f82cb78a-b308-48d2-b669-c2e5599eb508, queue length: 2 yjsPocketBase.ts:461:12
+[GlobalPocketBaseProvider] Local document updated for list f82cb78a-b308-48d2-b669-c2e5599eb508, origin: null yjsPocketBase.ts:296:14
+[GlobalPocketBaseProvider] Queued sync operation for list f82cb78a-b308-48d2-b669-c2e5599eb508, queue length: 3 yjsPocketBase.ts:461:12
+Active List ID: f82cb78a-b308-48d2-b669-c2e5599eb508 TodoListPage.tsx:203:12
+Active List: 
+Object { archived: false, collectionId: "pbc_825406485", collectionName: "task_lists", color: "bg-amber-300", createdAt: "2025-07-10 14:41:35.916Z", deleted: false, id: "f82cb78a-b308-48d2-b669-c2e5599eb508", name: "test", pinned: true, user_id: "51612qsjktu0i93", … }
+TodoListPage.tsx:204:12
+Active List Todos: 
+Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
+TodoListPage.tsx:205:12
+Todos to use: 
+Array(7) [ {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
+TodoListPage.tsx:206:12
+Active todos: 
+Array [ {…}, {…} ]
+TodoListPage.tsx:207:12
+Sorted active todos: 
+Array [ {…}, {…} ]
+TodoListPage.tsx:208:12
+Active List ID: f82cb78a-b308-48d2-b669-c2e5599eb508 TodoListPage.tsx:203:12
+Active List: 
+Object { archived: false, collectionId: "pbc_825406485", collectionName: "task_lists", color: "bg-amber-300", createdAt: "2025-07-10 14:41:35.916Z", deleted: false, id: "f82cb78a-b308-48d2-b669-c2e5599eb508", name: "test", pinned: true, user_id: "51612qsjktu0i93", … }
+TodoListPage.tsx:204:12
+Active List Todos: 
+Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
+TodoListPage.tsx:205:12
+Todos to use: 
+Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
+TodoListPage.tsx:206:12
+Active todos: 
+Array [ {…} ]
+TodoListPage.tsx:207:12
+Sorted active todos: 
+Array [ {…} ]
+TodoListPage.tsx:208:12
+[GlobalPocketBaseProvider] Failed to sync document for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f: ClientResponseError 0: Something went wrong while processing your request.
+    _ClientResponseError ClientResponseError.ts:13
+    send Client.ts:376
+    promise callback*send Client.ts:374
+    getOne CrudService.ts:165
+    getOne RecordService.ts:213
+    syncDocumentToServer yjsPocketBase.ts:542
+    handleDocUpdate yjsPocketBase.ts:303
+    processSyncQueue yjsPocketBase.ts:489
+    queueSync yjsPocketBase.ts:464
+    handleDocUpdate yjsPocketBase.ts:302
+    emit observable.js:82
+    emit observable.js:82
+    cleanupTransactions Transaction.js:363
+    transact Transaction.js:439
+    set chunk-NIR4DFCD.js:5348
+    updateState useYjsTodoList.ts:57
+    useYjsTodoList useYjsTodoList.ts:71
+    React 20
+yjsPocketBase.ts:563:14
+[GlobalPocketBaseProvider] Sync operation failed for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f: ClientResponseError 0: Something went wrong while processing your request.
+    _ClientResponseError ClientResponseError.ts:13
+    send Client.ts:376
+    promise callback*send Client.ts:374
+    getOne CrudService.ts:165
+    getOne RecordService.ts:213
+    syncDocumentToServer yjsPocketBase.ts:542
+    handleDocUpdate yjsPocketBase.ts:303
+    processSyncQueue yjsPocketBase.ts:489
+    queueSync yjsPocketBase.ts:464
+    handleDocUpdate yjsPocketBase.ts:302
+    emit observable.js:82
+    emit observable.js:82
+    cleanupTransactions Transaction.js:363
+    transact Transaction.js:439
+    set chunk-NIR4DFCD.js:5348
+    updateState useYjsTodoList.ts:57
+    useYjsTodoList useYjsTodoList.ts:71
+    React 20
+yjsPocketBase.ts:494:18
+[GlobalPocketBaseProvider] Finished processing sync queue for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f. Processed: 0, Failed: 2, Remaining: 0 yjsPocketBase.ts:518:12
+[GlobalPocketBaseProvider] Failed to connect for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f: ClientResponseError 0: Something went wrong while processing your request.
+    _ClientResponseError ClientResponseError.ts:13
+    send Client.ts:376
+    promise callback*send Client.ts:374
+    submitSubscriptions RealtimeService.ts:269
+    subscribe RealtimeService.ts:90
+    subscribe RecordService.ts:130
+    connectDocument yjsPocketBase.ts:324
+    createDocument yjsPocketBase.ts:281
+    emit observable.js:154
+    emit observable.js:154
+    afterApplyUpdatesCallback y-indexeddb.js:91
+    fetchUpdates y-indexeddb.js:24
+    promise callback*fetchUpdates y-indexeddb.js:18
+    IndexeddbPersistence y-indexeddb.js:93
+    promise callback*IndexeddbPersistence y-indexeddb.js:82
+    createDocument yjsPocketBase.ts:255
+    getDocumentProvider yjsPocketBase.ts:232
+    PocketBaseProvider yjsPocketBase.ts:769
+    useYjsTodoList useYjsTodoList.ts:67
+    React 25
+yjsPocketBase.ts:341:14
+[GlobalPocketBaseProvider] Failed to sync document for list f82cb78a-b308-48d2-b669-c2e5599eb508: ClientResponseError 0: Something went wrong while processing your request.
+    _ClientResponseError ClientResponseError.ts:13
+    send Client.ts:376
+    promise callback*send Client.ts:374
+    getOne CrudService.ts:165
+    getOne RecordService.ts:213
+    syncDocumentToServer yjsPocketBase.ts:542
+    handleDocUpdate yjsPocketBase.ts:303
+    processSyncQueue yjsPocketBase.ts:489
+    queueSync yjsPocketBase.ts:464
+    handleDocUpdate yjsPocketBase.ts:302
+    emit observable.js:82
+    emit observable.js:82
+    cleanupTransactions Transaction.js:363
+    transact Transaction.js:439
+    set chunk-NIR4DFCD.js:5348
+    updateState useYjsTodoList.ts:57
+    useYjsTodoList useYjsTodoList.ts:71
+    React 40
     performWorkUntilDeadline scheduler.development.js:45
     js scheduler.development.js:223
     js scheduler.development.js:364
@@ -362,27 +465,593 @@ Uncaught TypeError: dispatcher is null
     js React
     __require chunk-G3PMV62Z.js:8
     <anonymous> react-dom_client.js:18075
-chunk-UGC3UZ7L.js:877:9
-An error occurred in the <ProtectedRoute> component.
-
-Consider adding an error boundary to your tree to customize error handling behavior.
-Visit https://react.dev/link/error-boundaries to learn more about error boundaries.
-react-dom_client.js:6229:17
-Uncaught (in promise) Error: "StatusBar" plugin is not implemented on web
-    CapacitorException util.js:21
-    createPluginMethod runtime.js:69
-    p runtime.js:76
-    promise callback*wrapper runtime.js:75
-    <anonymous> main.tsx:9
-chunk-NXBGYFMC.js:9:5
-Uncaught (in promise) Error: "StatusBar" plugin is not implemented on web
-    CapacitorException util.js:21
-    createPluginMethod runtime.js:69
-    p runtime.js:76
-    promise callback*wrapper runtime.js:75
-    <anonymous> main.tsx:10
-chunk-NXBGYFMC.js:9:5
-GET
-http://localhost:3000/vite.svg
-[HTTP/1.1 200 OK 0ms]
-
+yjsPocketBase.ts:563:14
+[GlobalPocketBaseProvider] Sync operation failed for list f82cb78a-b308-48d2-b669-c2e5599eb508: ClientResponseError 0: Something went wrong while processing your request.
+    _ClientResponseError ClientResponseError.ts:13
+    send Client.ts:376
+    promise callback*send Client.ts:374
+    getOne CrudService.ts:165
+    getOne RecordService.ts:213
+    syncDocumentToServer yjsPocketBase.ts:542
+    handleDocUpdate yjsPocketBase.ts:303
+    processSyncQueue yjsPocketBase.ts:489
+    queueSync yjsPocketBase.ts:464
+    handleDocUpdate yjsPocketBase.ts:302
+    emit observable.js:82
+    emit observable.js:82
+    cleanupTransactions Transaction.js:363
+    transact Transaction.js:439
+    set chunk-NIR4DFCD.js:5348
+    updateState useYjsTodoList.ts:57
+    useYjsTodoList useYjsTodoList.ts:71
+    React 40
+    performWorkUntilDeadline scheduler.development.js:45
+    js scheduler.development.js:223
+    js scheduler.development.js:364
+    __require chunk-G3PMV62Z.js:8
+    js index.js:6
+    __require chunk-G3PMV62Z.js:8
+    React 2
+    __require chunk-G3PMV62Z.js:8
+    js React
+    __require chunk-G3PMV62Z.js:8
+    <anonymous> react-dom_client.js:18075
+yjsPocketBase.ts:494:18
+[GlobalPocketBaseProvider] Local document updated for list f82cb78a-b308-48d2-b669-c2e5599eb508, origin: [object Object] yjsPocketBase.ts:296:14
+[GlobalPocketBaseProvider] Queued sync operation for list f82cb78a-b308-48d2-b669-c2e5599eb508, queue length: 3 yjsPocketBase.ts:461:12
+[GlobalPocketBaseProvider] Local persistence for list f82cb78a-b308-48d2-b669-c2e5599eb508 is ready yjsPocketBase.ts:275:14
+[GlobalPocketBaseProvider] Connecting to PocketBase for list f82cb78a-b308-48d2-b669-c2e5599eb508 yjsPocketBase.ts:321:14
+Active List ID: f82cb78a-b308-48d2-b669-c2e5599eb508 TodoListPage.tsx:203:12
+Active List: 
+Object { archived: false, collectionId: "pbc_825406485", collectionName: "task_lists", color: "bg-amber-300", createdAt: "2025-07-10 14:41:35.916Z", deleted: false, id: "f82cb78a-b308-48d2-b669-c2e5599eb508", name: "test", pinned: true, user_id: "51612qsjktu0i93", … }
+TodoListPage.tsx:204:12
+Active List Todos: 
+Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
+TodoListPage.tsx:205:12
+Todos to use: 
+Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
+TodoListPage.tsx:206:12
+Active todos: 
+Array [ {…} ]
+TodoListPage.tsx:207:12
+Sorted active todos: 
+Array [ {…} ]
+TodoListPage.tsx:208:12
+[GlobalPocketBaseProvider] Failed to sync document for list f82cb78a-b308-48d2-b669-c2e5599eb508: ClientResponseError 0: Something went wrong while processing your request.
+    _ClientResponseError ClientResponseError.ts:13
+    send Client.ts:376
+    promise callback*send Client.ts:374
+    getOne CrudService.ts:165
+    getOne RecordService.ts:213
+    syncDocumentToServer yjsPocketBase.ts:542
+    handleDocUpdate yjsPocketBase.ts:303
+    processSyncQueue yjsPocketBase.ts:489
+    queueSync yjsPocketBase.ts:464
+    handleDocUpdate yjsPocketBase.ts:302
+    emit observable.js:82
+    emit observable.js:82
+    cleanupTransactions Transaction.js:363
+    transact Transaction.js:439
+    set chunk-NIR4DFCD.js:5348
+    updateState useYjsTodoList.ts:57
+    useYjsTodoList useYjsTodoList.ts:71
+    React 20
+yjsPocketBase.ts:563:14
+[GlobalPocketBaseProvider] Sync operation failed for list f82cb78a-b308-48d2-b669-c2e5599eb508: ClientResponseError 0: Something went wrong while processing your request.
+    _ClientResponseError ClientResponseError.ts:13
+    send Client.ts:376
+    promise callback*send Client.ts:374
+    getOne CrudService.ts:165
+    getOne RecordService.ts:213
+    syncDocumentToServer yjsPocketBase.ts:542
+    handleDocUpdate yjsPocketBase.ts:303
+    processSyncQueue yjsPocketBase.ts:489
+    queueSync yjsPocketBase.ts:464
+    handleDocUpdate yjsPocketBase.ts:302
+    emit observable.js:82
+    emit observable.js:82
+    cleanupTransactions Transaction.js:363
+    transact Transaction.js:439
+    set chunk-NIR4DFCD.js:5348
+    updateState useYjsTodoList.ts:57
+    useYjsTodoList useYjsTodoList.ts:71
+    React 20
+yjsPocketBase.ts:494:18
+[GlobalPocketBaseProvider] Failed to connect for list f82cb78a-b308-48d2-b669-c2e5599eb508: ClientResponseError 0: Something went wrong while processing your request.
+    _ClientResponseError ClientResponseError.ts:13
+    send Client.ts:376
+    promise callback*send Client.ts:374
+    submitSubscriptions RealtimeService.ts:269
+    subscribe RealtimeService.ts:90
+    subscribe RecordService.ts:130
+    connectDocument yjsPocketBase.ts:324
+    createDocument yjsPocketBase.ts:281
+    emit observable.js:154
+    emit observable.js:154
+    afterApplyUpdatesCallback y-indexeddb.js:91
+    fetchUpdates y-indexeddb.js:24
+    promise callback*fetchUpdates y-indexeddb.js:18
+    IndexeddbPersistence y-indexeddb.js:93
+    promise callback*IndexeddbPersistence y-indexeddb.js:82
+    createDocument yjsPocketBase.ts:255
+    getDocumentProvider yjsPocketBase.ts:232
+    PocketBaseProvider yjsPocketBase.ts:769
+    useYjsTodoList useYjsTodoList.ts:67
+    React 40
+    performWorkUntilDeadline scheduler.development.js:45
+    js scheduler.development.js:223
+    js scheduler.development.js:364
+    __require chunk-G3PMV62Z.js:8
+    js index.js:6
+    __require chunk-G3PMV62Z.js:8
+    React 2
+    __require chunk-G3PMV62Z.js:8
+    js React
+    __require chunk-G3PMV62Z.js:8
+    <anonymous> react-dom_client.js:18075
+yjsPocketBase.ts:341:14
+Active List ID: f82cb78a-b308-48d2-b669-c2e5599eb508 TodoListPage.tsx:203:12
+Active List: 
+Object { archived: false, collectionId: "pbc_825406485", collectionName: "task_lists", color: "bg-amber-300", createdAt: "2025-07-10 14:41:35.916Z", deleted: false, id: "f82cb78a-b308-48d2-b669-c2e5599eb508", name: "test", pinned: true, user_id: "51612qsjktu0i93", … }
+TodoListPage.tsx:204:12
+Active List Todos: 
+Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
+TodoListPage.tsx:205:12
+Todos to use: 
+Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
+TodoListPage.tsx:206:12
+Active todos: 
+Array [ {…} ]
+TodoListPage.tsx:207:12
+Sorted active todos: 
+Array [ {…} ]
+TodoListPage.tsx:208:12
+[GlobalPocketBaseProvider] Failed to sync document for list f82cb78a-b308-48d2-b669-c2e5599eb508: ClientResponseError 0: Something went wrong while processing your request.
+    _ClientResponseError ClientResponseError.ts:13
+    send Client.ts:376
+    promise callback*send Client.ts:374
+    getOne CrudService.ts:165
+    getOne RecordService.ts:213
+    syncDocumentToServer yjsPocketBase.ts:542
+    handleDocUpdate yjsPocketBase.ts:303
+    processSyncQueue yjsPocketBase.ts:489
+    queueSync yjsPocketBase.ts:464
+    handleDocUpdate yjsPocketBase.ts:302
+    emit observable.js:82
+    emit observable.js:82
+    cleanupTransactions Transaction.js:363
+    transact Transaction.js:439
+    set chunk-NIR4DFCD.js:5348
+    updateState useYjsTodoList.ts:57
+    useYjsTodoList useYjsTodoList.ts:71
+    React 20
+yjsPocketBase.ts:563:14
+[GlobalPocketBaseProvider] Sync operation failed for list f82cb78a-b308-48d2-b669-c2e5599eb508: ClientResponseError 0: Something went wrong while processing your request.
+    _ClientResponseError ClientResponseError.ts:13
+    send Client.ts:376
+    promise callback*send Client.ts:374
+    getOne CrudService.ts:165
+    getOne RecordService.ts:213
+    syncDocumentToServer yjsPocketBase.ts:542
+    handleDocUpdate yjsPocketBase.ts:303
+    processSyncQueue yjsPocketBase.ts:489
+    queueSync yjsPocketBase.ts:464
+    handleDocUpdate yjsPocketBase.ts:302
+    emit observable.js:82
+    emit observable.js:82
+    cleanupTransactions Transaction.js:363
+    transact Transaction.js:439
+    set chunk-NIR4DFCD.js:5348
+    updateState useYjsTodoList.ts:57
+    useYjsTodoList useYjsTodoList.ts:71
+    React 20
+yjsPocketBase.ts:494:18
+[GlobalPocketBaseProvider] Too many consecutive failures for list f82cb78a-b308-48d2-b669-c2e5599eb508, stopping queue processing yjsPocketBase.ts:395:21
+[GlobalPocketBaseProvider] Finished processing sync queue for list f82cb78a-b308-48d2-b669-c2e5599eb508. Processed: 0, Failed: 3, Remaining: 2 yjsPocketBase.ts:518:12
+Active List ID: f82cb78a-b308-48d2-b669-c2e5599eb508 TodoListPage.tsx:203:12
+Active List: 
+Object { archived: false, collectionId: "pbc_825406485", collectionName: "task_lists", color: "bg-amber-300", createdAt: "2025-07-10 14:41:35.916Z", deleted: false, id: "f82cb78a-b308-48d2-b669-c2e5599eb508", name: "test", pinned: true, user_id: "51612qsjktu0i93", … }
+TodoListPage.tsx:204:12
+Active List Todos: 
+Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
+TodoListPage.tsx:205:12
+Todos to use: 
+Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
+TodoListPage.tsx:206:12
+Active todos: 
+Array [ {…} ]
+TodoListPage.tsx:207:12
+Sorted active todos: 
+Array [ {…} ]
+TodoListPage.tsx:208:12
+[GlobalPocketBaseProvider] Retrying connection for list f82cb78a-b308-48d2-b669-c2e5599eb508 (attempt 1) yjsPocketBase.ts:585:14
+[GlobalPocketBaseProvider] Connecting to PocketBase for list f82cb78a-b308-48d2-b669-c2e5599eb508 yjsPocketBase.ts:321:14
+[GlobalPocketBaseProvider] Successfully connected to PocketBase for list f82cb78a-b308-48d2-b669-c2e5599eb508 yjsPocketBase.ts:338:14
+[GlobalPocketBaseProvider] Local document updated for list f82cb78a-b308-48d2-b669-c2e5599eb508, origin: null yjsPocketBase.ts:296:14
+[GlobalPocketBaseProvider] Queued sync operation for list f82cb78a-b308-48d2-b669-c2e5599eb508, queue length: 3 yjsPocketBase.ts:461:12
+[GlobalPocketBaseProvider] Processing sync queue for list f82cb78a-b308-48d2-b669-c2e5599eb508, 3 operations pending yjsPocketBase.ts:477:12
+Active List ID: f82cb78a-b308-48d2-b669-c2e5599eb508 TodoListPage.tsx:203:12
+Active List: 
+Object { archived: false, collectionId: "pbc_825406485", collectionName: "task_lists", color: "bg-amber-300", createdAt: "2025-07-10 14:41:35.916Z", deleted: false, id: "f82cb78a-b308-48d2-b669-c2e5599eb508", name: "test", pinned: true, user_id: "51612qsjktu0i93", … }
+TodoListPage.tsx:204:12
+Active List Todos: 
+Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
+TodoListPage.tsx:205:12
+Todos to use: 
+Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
+TodoListPage.tsx:206:12
+Active todos: 
+Array [ {…}, {…} ]
+TodoListPage.tsx:207:12
+Sorted active todos: 
+Array [ {…}, {…} ]
+TodoListPage.tsx:208:12
+[GlobalPocketBaseProvider] Failed to sync document for list f82cb78a-b308-48d2-b669-c2e5599eb508: ClientResponseError 0: Something went wrong while processing your request.
+    _ClientResponseError ClientResponseError.ts:13
+    send Client.ts:376
+    promise callback*send Client.ts:374
+    getOne CrudService.ts:165
+    getOne RecordService.ts:213
+    syncDocumentToServer yjsPocketBase.ts:542
+    handleDocUpdate yjsPocketBase.ts:303
+    processSyncQueue yjsPocketBase.ts:489
+    queueSync yjsPocketBase.ts:464
+    handleDocUpdate yjsPocketBase.ts:302
+    emit observable.js:82
+    emit observable.js:82
+    cleanupTransactions Transaction.js:363
+    transact Transaction.js:439
+    transact Doc.js:185
+    toggleTodo useYjsTodoList.ts:144
+    handleToggleTodo TodoListPage.tsx:252
+    onClick TodoListPage.tsx:893
+    React 13
+    <anonymous> main.tsx:21
+yjsPocketBase.ts:563:14
+[GlobalPocketBaseProvider] Sync operation failed for list f82cb78a-b308-48d2-b669-c2e5599eb508: ClientResponseError 0: Something went wrong while processing your request.
+    _ClientResponseError ClientResponseError.ts:13
+    send Client.ts:376
+    promise callback*send Client.ts:374
+    getOne CrudService.ts:165
+    getOne RecordService.ts:213
+    syncDocumentToServer yjsPocketBase.ts:542
+    handleDocUpdate yjsPocketBase.ts:303
+    processSyncQueue yjsPocketBase.ts:489
+    queueSync yjsPocketBase.ts:464
+    handleDocUpdate yjsPocketBase.ts:302
+    emit observable.js:82
+    emit observable.js:82
+    cleanupTransactions Transaction.js:363
+    transact Transaction.js:439
+    transact Doc.js:185
+    toggleTodo useYjsTodoList.ts:144
+    handleToggleTodo TodoListPage.tsx:252
+    onClick TodoListPage.tsx:893
+    React 13
+    <anonymous> main.tsx:21
+yjsPocketBase.ts:494:18
+[GlobalPocketBaseProvider] Failed to sync document for list f82cb78a-b308-48d2-b669-c2e5599eb508: ClientResponseError 0: Something went wrong while processing your request.
+    _ClientResponseError ClientResponseError.ts:13
+    send Client.ts:376
+    promise callback*send Client.ts:374
+    getOne CrudService.ts:165
+    getOne RecordService.ts:213
+    syncDocumentToServer yjsPocketBase.ts:542
+    handleDocUpdate yjsPocketBase.ts:303
+    processSyncQueue yjsPocketBase.ts:489
+    queueSync yjsPocketBase.ts:464
+    handleDocUpdate yjsPocketBase.ts:302
+    emit observable.js:82
+    emit observable.js:82
+    cleanupTransactions Transaction.js:363
+    transact Transaction.js:439
+    transact Doc.js:185
+    toggleTodo useYjsTodoList.ts:144
+    handleToggleTodo TodoListPage.tsx:252
+    onClick TodoListPage.tsx:893
+    React 13
+    <anonymous> main.tsx:21
+yjsPocketBase.ts:563:14
+[GlobalPocketBaseProvider] Sync operation failed for list f82cb78a-b308-48d2-b669-c2e5599eb508: ClientResponseError 0: Something went wrong while processing your request.
+    _ClientResponseError ClientResponseError.ts:13
+    send Client.ts:376
+    promise callback*send Client.ts:374
+    getOne CrudService.ts:165
+    getOne RecordService.ts:213
+    syncDocumentToServer yjsPocketBase.ts:542
+    handleDocUpdate yjsPocketBase.ts:303
+    processSyncQueue yjsPocketBase.ts:489
+    queueSync yjsPocketBase.ts:464
+    handleDocUpdate yjsPocketBase.ts:302
+    emit observable.js:82
+    emit observable.js:82
+    cleanupTransactions Transaction.js:363
+    transact Transaction.js:439
+    transact Doc.js:185
+    toggleTodo useYjsTodoList.ts:144
+    handleToggleTodo TodoListPage.tsx:252
+    onClick TodoListPage.tsx:893
+    React 13
+    <anonymous> main.tsx:21
+yjsPocketBase.ts:494:18
+[GlobalPocketBaseProvider] Failed to sync document for list f82cb78a-b308-48d2-b669-c2e5599eb508: ClientResponseError 0: Something went wrong while processing your request.
+    _ClientResponseError ClientResponseError.ts:13
+    send Client.ts:376
+    promise callback*send Client.ts:374
+    getOne CrudService.ts:165
+    getOne RecordService.ts:213
+    syncDocumentToServer yjsPocketBase.ts:542
+    handleDocUpdate yjsPocketBase.ts:303
+    processSyncQueue yjsPocketBase.ts:489
+    queueSync yjsPocketBase.ts:464
+    handleDocUpdate yjsPocketBase.ts:302
+    emit observable.js:82
+    emit observable.js:82
+    cleanupTransactions Transaction.js:363
+    transact Transaction.js:439
+    transact Doc.js:185
+    toggleTodo useYjsTodoList.ts:144
+    handleToggleTodo TodoListPage.tsx:252
+    onClick TodoListPage.tsx:893
+    React 13
+    <anonymous> main.tsx:21
+yjsPocketBase.ts:563:14
+[GlobalPocketBaseProvider] Sync operation failed for list f82cb78a-b308-48d2-b669-c2e5599eb508: ClientResponseError 0: Something went wrong while processing your request.
+    _ClientResponseError ClientResponseError.ts:13
+    send Client.ts:376
+    promise callback*send Client.ts:374
+    getOne CrudService.ts:165
+    getOne RecordService.ts:213
+    syncDocumentToServer yjsPocketBase.ts:542
+    handleDocUpdate yjsPocketBase.ts:303
+    processSyncQueue yjsPocketBase.ts:489
+    queueSync yjsPocketBase.ts:464
+    handleDocUpdate yjsPocketBase.ts:302
+    emit observable.js:82
+    emit observable.js:82
+    cleanupTransactions Transaction.js:363
+    transact Transaction.js:439
+    transact Doc.js:185
+    toggleTodo useYjsTodoList.ts:144
+    handleToggleTodo TodoListPage.tsx:252
+    onClick TodoListPage.tsx:893
+    React 13
+    <anonymous> main.tsx:21
+yjsPocketBase.ts:494:18
+[GlobalPocketBaseProvider] Too many consecutive failures for list f82cb78a-b308-48d2-b669-c2e5599eb508, stopping queue processing yjsPocketBase.ts:395:21
+[GlobalPocketBaseProvider] Finished processing sync queue for list f82cb78a-b308-48d2-b669-c2e5599eb508. Processed: 0, Failed: 3, Remaining: 1 yjsPocketBase.ts:518:12
+Active List ID: f82cb78a-b308-48d2-b669-c2e5599eb508 TodoListPage.tsx:203:12
+Active List: 
+Object { archived: false, collectionId: "pbc_825406485", collectionName: "task_lists", color: "bg-amber-300", createdAt: "2025-07-10 14:41:35.916Z", deleted: false, id: "f82cb78a-b308-48d2-b669-c2e5599eb508", name: "test", pinned: true, user_id: "51612qsjktu0i93", … }
+TodoListPage.tsx:204:12
+Active List Todos: 
+Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
+TodoListPage.tsx:205:12
+Todos to use: 
+Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
+TodoListPage.tsx:206:12
+Active todos: 
+Array [ {…}, {…} ]
+TodoListPage.tsx:207:12
+Sorted active todos: 
+Array [ {…}, {…} ]
+TodoListPage.tsx:208:12
+[GlobalPocketBaseProvider] Local document updated for list f82cb78a-b308-48d2-b669-c2e5599eb508, origin: null yjsPocketBase.ts:296:14
+[GlobalPocketBaseProvider] Queued sync operation for list f82cb78a-b308-48d2-b669-c2e5599eb508, queue length: 2 yjsPocketBase.ts:461:12
+[GlobalPocketBaseProvider] Processing sync queue for list f82cb78a-b308-48d2-b669-c2e5599eb508, 2 operations pending yjsPocketBase.ts:477:12
+Active List ID: f82cb78a-b308-48d2-b669-c2e5599eb508 TodoListPage.tsx:203:12
+Active List: 
+Object { archived: false, collectionId: "pbc_825406485", collectionName: "task_lists", color: "bg-amber-300", createdAt: "2025-07-10 14:41:35.916Z", deleted: false, id: "f82cb78a-b308-48d2-b669-c2e5599eb508", name: "test", pinned: true, user_id: "51612qsjktu0i93", … }
+TodoListPage.tsx:204:12
+Active List Todos: 
+Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
+TodoListPage.tsx:205:12
+Todos to use: 
+Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
+TodoListPage.tsx:206:12
+Active todos: 
+Array(3) [ {…}, {…}, {…} ]
+TodoListPage.tsx:207:12
+Sorted active todos: 
+Array(3) [ {…}, {…}, {…} ]
+TodoListPage.tsx:208:12
+[GlobalPocketBaseProvider] Failed to sync document for list f82cb78a-b308-48d2-b669-c2e5599eb508: ClientResponseError 0: Something went wrong while processing your request.
+    _ClientResponseError ClientResponseError.ts:13
+    send Client.ts:376
+    promise callback*send Client.ts:374
+    getOne CrudService.ts:165
+    getOne RecordService.ts:213
+    syncDocumentToServer yjsPocketBase.ts:542
+    handleDocUpdate yjsPocketBase.ts:303
+    processSyncQueue yjsPocketBase.ts:489
+    queueSync yjsPocketBase.ts:464
+    handleDocUpdate yjsPocketBase.ts:302
+    emit observable.js:82
+    emit observable.js:82
+    cleanupTransactions Transaction.js:363
+    transact Transaction.js:439
+    transact Doc.js:185
+    toggleTodo useYjsTodoList.ts:144
+    handleToggleTodo TodoListPage.tsx:252
+    onClick TodoListPage.tsx:893
+    React 13
+    <anonymous> main.tsx:21
+yjsPocketBase.ts:563:14
+[GlobalPocketBaseProvider] Sync operation failed for list f82cb78a-b308-48d2-b669-c2e5599eb508: ClientResponseError 0: Something went wrong while processing your request.
+    _ClientResponseError ClientResponseError.ts:13
+    send Client.ts:376
+    promise callback*send Client.ts:374
+    getOne CrudService.ts:165
+    getOne RecordService.ts:213
+    syncDocumentToServer yjsPocketBase.ts:542
+    handleDocUpdate yjsPocketBase.ts:303
+    processSyncQueue yjsPocketBase.ts:489
+    queueSync yjsPocketBase.ts:464
+    handleDocUpdate yjsPocketBase.ts:302
+    emit observable.js:82
+    emit observable.js:82
+    cleanupTransactions Transaction.js:363
+    transact Transaction.js:439
+    transact Doc.js:185
+    toggleTodo useYjsTodoList.ts:144
+    handleToggleTodo TodoListPage.tsx:252
+    onClick TodoListPage.tsx:893
+    React 13
+    <anonymous> main.tsx:21
+yjsPocketBase.ts:494:18
+[GlobalPocketBaseProvider] Failed to sync document for list f82cb78a-b308-48d2-b669-c2e5599eb508: ClientResponseError 0: Something went wrong while processing your request.
+    _ClientResponseError ClientResponseError.ts:13
+    send Client.ts:376
+    promise callback*send Client.ts:374
+    getOne CrudService.ts:165
+    getOne RecordService.ts:213
+    syncDocumentToServer yjsPocketBase.ts:542
+    handleDocUpdate yjsPocketBase.ts:303
+    processSyncQueue yjsPocketBase.ts:489
+    queueSync yjsPocketBase.ts:464
+    handleDocUpdate yjsPocketBase.ts:302
+    emit observable.js:82
+    emit observable.js:82
+    cleanupTransactions Transaction.js:363
+    transact Transaction.js:439
+    transact Doc.js:185
+    toggleTodo useYjsTodoList.ts:144
+    handleToggleTodo TodoListPage.tsx:252
+    onClick TodoListPage.tsx:893
+    React 13
+    <anonymous> main.tsx:21
+yjsPocketBase.ts:563:14
+[GlobalPocketBaseProvider] Sync operation failed for list f82cb78a-b308-48d2-b669-c2e5599eb508: ClientResponseError 0: Something went wrong while processing your request.
+    _ClientResponseError ClientResponseError.ts:13
+    send Client.ts:376
+    promise callback*send Client.ts:374
+    getOne CrudService.ts:165
+    getOne RecordService.ts:213
+    syncDocumentToServer yjsPocketBase.ts:542
+    handleDocUpdate yjsPocketBase.ts:303
+    processSyncQueue yjsPocketBase.ts:489
+    queueSync yjsPocketBase.ts:464
+    handleDocUpdate yjsPocketBase.ts:302
+    emit observable.js:82
+    emit observable.js:82
+    cleanupTransactions Transaction.js:363
+    transact Transaction.js:439
+    transact Doc.js:185
+    toggleTodo useYjsTodoList.ts:144
+    handleToggleTodo TodoListPage.tsx:252
+    onClick TodoListPage.tsx:893
+    React 13
+    <anonymous> main.tsx:21
+yjsPocketBase.ts:494:18
+[GlobalPocketBaseProvider] Finished processing sync queue for list f82cb78a-b308-48d2-b669-c2e5599eb508. Processed: 0, Failed: 2, Remaining: 0 yjsPocketBase.ts:518:12
+Active List ID: f82cb78a-b308-48d2-b669-c2e5599eb508 TodoListPage.tsx:203:12
+Active List: 
+Object { archived: false, collectionId: "pbc_825406485", collectionName: "task_lists", color: "bg-amber-300", createdAt: "2025-07-10 14:41:35.916Z", deleted: false, id: "f82cb78a-b308-48d2-b669-c2e5599eb508", name: "test", pinned: true, user_id: "51612qsjktu0i93", … }
+TodoListPage.tsx:204:12
+Active List Todos: 
+Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
+TodoListPage.tsx:205:12
+Todos to use: 
+Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
+TodoListPage.tsx:206:12
+Active todos: 
+Array(3) [ {…}, {…}, {…} ]
+TodoListPage.tsx:207:12
+Sorted active todos: 
+Array(3) [ {…}, {…}, {…} ]
+TodoListPage.tsx:208:12
+[GlobalPocketBaseProvider] PocketBase reconnected, forcing read-merge-write for all documents yjsPocketBase.ts:183:16
+[GlobalPocketBaseProvider] Forcing read-merge-write for list 6debfe6a-296b-450a-b258-39da2a16a868 yjsPocketBase.ts:384:14
+Active List ID: f82cb78a-b308-48d2-b669-c2e5599eb508 TodoListPage.tsx:203:12
+Active List: 
+Object { archived: false, collectionId: "pbc_825406485", collectionName: "task_lists", color: "bg-amber-300", createdAt: "2025-07-10 14:41:35.916Z", deleted: false, id: "f82cb78a-b308-48d2-b669-c2e5599eb508", name: "test", pinned: true, user_id: "51612qsjktu0i93", … }
+TodoListPage.tsx:204:12
+Active List Todos: 
+Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
+TodoListPage.tsx:205:12
+Todos to use: 
+Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
+TodoListPage.tsx:206:12
+Active todos: 
+Array(3) [ {…}, {…}, {…} ]
+TodoListPage.tsx:207:12
+Sorted active todos: 
+Array(3) [ {…}, {…}, {…} ]
+TodoListPage.tsx:208:12
+[GlobalPocketBaseProvider] Merged remote state for list 6debfe6a-296b-450a-b258-39da2a16a868 yjsPocketBase.ts:396:16
+[GlobalPocketBaseProvider] Queuing sync-to-server after merge for list 6debfe6a-296b-450a-b258-39da2a16a868 yjsPocketBase.ts:400:14
+[GlobalPocketBaseProvider] Queued sync operation for list 6debfe6a-296b-450a-b258-39da2a16a868, queue length: 1 yjsPocketBase.ts:461:12
+[GlobalPocketBaseProvider] Processing sync queue for list 6debfe6a-296b-450a-b258-39da2a16a868, 1 operations pending yjsPocketBase.ts:477:12
+[GlobalPocketBaseProvider] Forcing read-merge-write for list f82cb78a-b308-48d2-b669-c2e5599eb508 yjsPocketBase.ts:384:14
+[GlobalPocketBaseProvider] Merged remote state for list f82cb78a-b308-48d2-b669-c2e5599eb508 yjsPocketBase.ts:396:16
+[GlobalPocketBaseProvider] Queuing sync-to-server after merge for list f82cb78a-b308-48d2-b669-c2e5599eb508 yjsPocketBase.ts:400:14
+[GlobalPocketBaseProvider] Queued sync operation for list f82cb78a-b308-48d2-b669-c2e5599eb508, queue length: 1 yjsPocketBase.ts:461:12
+[GlobalPocketBaseProvider] Processing sync queue for list f82cb78a-b308-48d2-b669-c2e5599eb508, 1 operations pending yjsPocketBase.ts:477:12
+Active List ID: f82cb78a-b308-48d2-b669-c2e5599eb508 TodoListPage.tsx:203:12
+Active List: 
+Object { archived: false, collectionId: "pbc_825406485", collectionName: "task_lists", color: "bg-amber-300", createdAt: "2025-07-10 14:41:35.916Z", deleted: false, id: "f82cb78a-b308-48d2-b669-c2e5599eb508", name: "test", pinned: true, user_id: "51612qsjktu0i93", … }
+TodoListPage.tsx:204:12
+Active List Todos: 
+Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
+TodoListPage.tsx:205:12
+Todos to use: 
+Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
+TodoListPage.tsx:206:12
+Active todos: 
+Array(3) [ {…}, {…}, {…} ]
+TodoListPage.tsx:207:12
+Sorted active todos: 
+Array(3) [ {…}, {…}, {…} ]
+TodoListPage.tsx:208:12
+Active List ID: f82cb78a-b308-48d2-b669-c2e5599eb508 TodoListPage.tsx:203:12
+Active List: 
+Object { archived: false, collectionId: "pbc_825406485", collectionName: "task_lists", color: "bg-amber-300", createdAt: "2025-07-10 14:41:35.916Z", deleted: false, id: "f82cb78a-b308-48d2-b669-c2e5599eb508", name: "test", pinned: true, user_id: "51612qsjktu0i93", … }
+TodoListPage.tsx:204:12
+Active List Todos: 
+Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
+TodoListPage.tsx:205:12
+Todos to use: 
+Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
+TodoListPage.tsx:206:12
+Active todos: 
+Array(3) [ {…}, {…}, {…} ]
+TodoListPage.tsx:207:12
+Sorted active todos: 
+Array(3) [ {…}, {…}, {…} ]
+TodoListPage.tsx:208:12
+[GlobalPocketBaseProvider] Successfully synced document for list 6debfe6a-296b-450a-b258-39da2a16a868 yjsPocketBase.ts:560:14
+[GlobalPocketBaseProvider] Finished processing sync queue for list 6debfe6a-296b-450a-b258-39da2a16a868. Processed: 1, Failed: 0, Remaining: 0 yjsPocketBase.ts:518:12
+Active List ID: f82cb78a-b308-48d2-b669-c2e5599eb508 TodoListPage.tsx:203:12
+Active List: 
+Object { archived: false, collectionId: "pbc_825406485", collectionName: "task_lists", color: "bg-amber-300", createdAt: "2025-07-10 14:41:35.916Z", deleted: false, id: "f82cb78a-b308-48d2-b669-c2e5599eb508", name: "test", pinned: true, user_id: "51612qsjktu0i93", … }
+TodoListPage.tsx:204:12
+Active List Todos: 
+Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
+TodoListPage.tsx:205:12
+Todos to use: 
+Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
+TodoListPage.tsx:206:12
+Active todos: 
+Array(3) [ {…}, {…}, {…} ]
+TodoListPage.tsx:207:12
+Sorted active todos: 
+Array(3) [ {…}, {…}, {…} ]
+TodoListPage.tsx:208:12
+[GlobalPocketBaseProvider] Successfully synced document for list f82cb78a-b308-48d2-b669-c2e5599eb508 yjsPocketBase.ts:560:14
+[GlobalPocketBaseProvider] Finished processing sync queue for list f82cb78a-b308-48d2-b669-c2e5599eb508. Processed: 1, Failed: 0, Remaining: 0 yjsPocketBase.ts:518:12
+Active List ID: f82cb78a-b308-48d2-b669-c2e5599eb508 TodoListPage.tsx:203:12
+Active List: 
+Object { archived: false, collectionId: "pbc_825406485", collectionName: "task_lists", color: "bg-amber-300", createdAt: "2025-07-10 14:41:35.916Z", deleted: false, id: "f82cb78a-b308-48d2-b669-c2e5599eb508", name: "test", pinned: true, user_id: "51612qsjktu0i93", … }
+TodoListPage.tsx:204:12
+Active List Todos: 
+Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
+TodoListPage.tsx:205:12
+Todos to use: 
+Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
+TodoListPage.tsx:206:12
+Active todos: 
+Array(3) [ {…}, {…}, {…} ]
+TodoListPage.tsx:207:12
+Sorted active todos: 
+Array(3) [ {…}, {…}, {…} ]
+TodoListPage.tsx:208:12
