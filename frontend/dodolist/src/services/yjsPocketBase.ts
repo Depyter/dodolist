@@ -27,6 +27,16 @@ function uint8ArrayToBase64(bytes: Uint8Array): string {
   return btoa(binary);
 }
 
+// Helper function to wrap async operations with timeout
+function withTimeout<T>(promise: Promise<T>, timeoutMs: number, operation: string): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error(`${operation} timed out after ${timeoutMs}ms`)), timeoutMs)
+    )
+  ]);
+}
+
 // Add interface for sync status
 export interface SyncStatusInfo {
   status: 'synced' | 'syncing' | 'offline' | 'error';
@@ -320,19 +330,23 @@ export class GlobalPocketBaseProvider {
 
       console.log(`[GlobalPocketBaseProvider] Connecting to PocketBase for list ${listId}`);
 
-      // Subscribe to real-time updates
-      await this.pb.collection(this.collectionName).subscribe(listId, (e) => {
-        const docInstance = this.documents.get(listId);
-        if (!docInstance) {
-          console.warn(`[GlobalPocketBaseProvider] Received update for a non-existent document: ${listId}`);
-          return;
-        }
-        if (e.action === 'update' && e.record.yjsUpdate && e.record.yjsClientId !== docInstance.doc.clientID.toString()) {
-          const remoteUpdate = base64ToUint8Array(e.record.yjsUpdate);
-          Y.applyUpdate(docInstance.doc, remoteUpdate, 'server-update');
-          console.log(`[GlobalPocketBaseProvider] Applied real-time update for list ${listId}`);
-        }
-      }, { requestKey: null });
+      // Subscribe to real-time updates with timeout
+      await withTimeout(
+        this.pb.collection(this.collectionName).subscribe(listId, (e) => {
+          const docInstance = this.documents.get(listId);
+          if (!docInstance) {
+            console.warn(`[GlobalPocketBaseProvider] Received update for a non-existent document: ${listId}`);
+            return;
+          }
+          if (e.action === 'update' && e.record.yjsUpdate && e.record.yjsClientId !== docInstance.doc.clientID.toString()) {
+            const remoteUpdate = base64ToUint8Array(e.record.yjsUpdate);
+            Y.applyUpdate(docInstance.doc, remoteUpdate, 'server-update');
+            console.log(`[GlobalPocketBaseProvider] Applied real-time update for list ${listId}`);
+          }
+        }, { requestKey: null }),
+        15000,
+        `subscribe for ${listId}`
+      );
 
       this.subscriptions.set(listId, listId);
       console.log(`[GlobalPocketBaseProvider] Successfully connected to PocketBase for list ${listId}`);
@@ -355,7 +369,11 @@ export class GlobalPocketBaseProvider {
         return;
       }
 
-      const remoteDoc = await this.pb.collection(this.collectionName).getOne(listId, { requestKey: null });
+      const remoteDoc = await withTimeout(
+        this.pb.collection(this.collectionName).getOne(listId, { requestKey: null }),
+        10000,
+        `mergeRemoteState getOne for ${listId}`
+      );
       
       if (remoteDoc.yjsUpdate) {
         const remoteUpdate = base64ToUint8Array(remoteDoc.yjsUpdate);
@@ -378,12 +396,21 @@ export class GlobalPocketBaseProvider {
         const knownListIds = JSON.parse(knownListIdsJson);
         if (Array.isArray(knownListIds)) {
           console.log(`[GlobalPocketBaseProvider] Force syncing ${knownListIds.length} known documents upon reconnection`);
-          for (const listId of knownListIds) {
-            // Ensure document exists before trying to sync it
-            if (!this.documents.has(listId)) {
-              this.createDocument(listId);
-            }
-            await this.forceReadMergeWrite(listId);
+          // Process in parallel with a reasonable limit to avoid overwhelming the server
+          const batchSize = 5;
+          for (let i = 0; i < knownListIds.length; i += batchSize) {
+            const batch = knownListIds.slice(i, i + batchSize);
+            await Promise.allSettled(batch.map(async (listId) => {
+              try {
+                // Ensure document exists before trying to sync it
+                if (!this.documents.has(listId)) {
+                  this.createDocument(listId);
+                }
+                await this.forceReadMergeWrite(listId);
+              } catch (error) {
+                console.error(`[GlobalPocketBaseProvider] Failed to force sync document ${listId}:`, error);
+              }
+            }));
           }
           return;
         }
@@ -393,9 +420,8 @@ export class GlobalPocketBaseProvider {
     }
     
     // Fallback to syncing only currently active documents
-    for (const listId of this.documents.keys()) {
-      await this.forceReadMergeWrite(listId);
-    }
+    const activeDocuments = Array.from(this.documents.keys());
+    await Promise.allSettled(activeDocuments.map(listId => this.forceReadMergeWrite(listId)));
   }
 
   /**
@@ -410,7 +436,11 @@ export class GlobalPocketBaseProvider {
         return;
       }
 
-      const remoteDoc = await this.pb.collection(this.collectionName).getOne(listId, { requestKey: null });
+      const remoteDoc = await withTimeout(
+        this.pb.collection(this.collectionName).getOne(listId, { requestKey: null }),
+        10000,
+        `forceReadMergeWrite getOne for ${listId}`
+      );
       
       if (remoteDoc.yjsUpdate) {
         const remoteUpdate = base64ToUint8Array(remoteDoc.yjsUpdate);
@@ -560,8 +590,12 @@ export class GlobalPocketBaseProvider {
         return;
       }
 
-      // Read-merge-write pattern for conflict resolution
-      const currentDoc = await this.pb.collection(this.collectionName).getOne(listId, { requestKey: null });
+      // Read-merge-write pattern for conflict resolution with timeout
+      const currentDoc = await withTimeout(
+        this.pb.collection(this.collectionName).getOne(listId, { requestKey: null }),
+        10000,
+        `getOne for ${listId}`
+      );
       
       if (currentDoc.yjsUpdate) {
         const remoteUpdate = base64ToUint8Array(currentDoc.yjsUpdate);
@@ -572,10 +606,14 @@ export class GlobalPocketBaseProvider {
       const latestState = Y.encodeStateAsUpdate(docInstance.doc);
       const base64Update = uint8ArrayToBase64(latestState);
       
-      await this.pb.collection(this.collectionName).update(listId, {
-        yjsUpdate: base64Update,
-        yjsClientId: docInstance.doc.clientID.toString()
-      }, { requestKey: null });
+      await withTimeout(
+        this.pb.collection(this.collectionName).update(listId, {
+          yjsUpdate: base64Update,
+          yjsClientId: docInstance.doc.clientID.toString()
+        }, { requestKey: null }),
+        10000,
+        `update for ${listId}`
+      );
       
       docInstance.lastSyncTime = new Date();
       

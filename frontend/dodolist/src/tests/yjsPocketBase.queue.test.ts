@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import { waitFor, act } from '@testing-library/react';
+import { act } from '@testing-library/react';
 import { GlobalPocketBaseProvider } from '../services/yjsPocketBase';
 import * as Y from 'yjs';
 
-// Mock PocketBase
+// Mock PocketBase with synchronous responses
 vi.mock('pocketbase', () => {
   return {
     default: vi.fn().mockImplementation(() => ({
@@ -27,18 +27,17 @@ vi.mock('pocketbase', () => {
   };
 });
 
-// Mock y-indexeddb
+// Mock y-indexeddb with immediate sync
 vi.mock('y-indexeddb', () => ({
   IndexeddbPersistence: vi.fn().mockImplementation((_name, doc) => {
-    setTimeout(() => {
-      if (doc && typeof doc.emit === 'function') {
-        doc.emit('synced', []);
-      }
-    }, 0);
+    // Trigger sync immediately
+    if (doc && typeof doc.emit === 'function') {
+      doc.emit('synced', []);
+    }
     return {
       on: vi.fn((event, callback) => {
         if (event === 'synced') {
-          setTimeout(callback, 0);
+          callback();
         }
       }),
       whenSynced: Promise.resolve(),
@@ -74,23 +73,16 @@ describe('PocketBaseProvider Sync Queue Logic', () => {
 
   afterEach(() => {
     globalProvider.destroy();
+    vi.useRealTimers();
   });
 
-  it('should queue sync operations when document is updated', async () => {
+  it('should queue sync operations when document is updated', () => {
     const docProvider = globalProvider.getDocumentProvider(listId);
 
-    // Wait for docInstance and persistence to be ready
-    let docInstance: any;
-    await waitFor(() => {
-      docInstance = (globalProvider as any).documents.get(listId);
-      expect(docInstance).toBeDefined();
-      expect(docInstance.persistence).toBeDefined();
-    });
-
-    // Wait for persistence to be synced by running timers and flushing promises
-    await act(async () => {
-      await vi.runAllTimersAsync();
-    });
+    // Get the document instance - should be immediately available
+    const docInstance = (globalProvider as any).documents.get(listId);
+    expect(docInstance).toBeDefined();
+    expect(docInstance.persistence).toBeDefined();
 
     const initialQueueLength = docInstance.syncQueue.length;
 
@@ -102,14 +94,7 @@ describe('PocketBaseProvider Sync Queue Logic', () => {
       });
     });
 
-    // Run timers to process the 'update' handler and queueing logic
-    await act(async () => {
-      await vi.runAllTimersAsync();
-    });
-
-    // Wait for the syncQueue to be incremented
-    await waitFor(() => {
-      expect(docInstance.syncQueue.length).toBeGreaterThan(initialQueueLength);
-    });
-  }, 60000);
+    // Check that the sync queue was updated
+    expect(docInstance.syncQueue.length).toBeGreaterThan(initialQueueLength);
+  });
 });

@@ -200,11 +200,15 @@ export function useTodoLists() {
   // Process queue periodically and when conditions change
   useEffect(() => {
     if (pocketBaseQueue.length > 0 && !isProcessingQueue && authService.isAuthenticated()) {
-      // Add a small delay to prevent excessive processing
+      if (process.env.NODE_ENV === 'test') {
+        // Immediate processing in tests
+        processPocketBaseQueue();
+        return;
+      }
+      // Add a small delay to prevent excessive processing (prod only)
       const timeoutId = setTimeout(() => {
         processPocketBaseQueue();
       }, 1000);
-      
       return () => clearTimeout(timeoutId);
     }
   }, [pocketBaseQueue.length, isProcessingQueue, authService, processPocketBaseQueue]);
@@ -213,19 +217,22 @@ export function useTodoLists() {
   useEffect(() => {
     const handleOnline = () => {
       console.log('[useTodoLists] Back online, processing queued operations');
-      
       // Clear the offline queue timeout if it exists
       const offlineTimeout = (window as any).__offlineQueueTimeout;
       if (offlineTimeout) {
         clearTimeout(offlineTimeout);
         delete (window as any).__offlineQueueTimeout;
       }
-      
       if (pocketBaseQueue.length > 0 && !isProcessingQueue && authService.isAuthenticated()) {
-        // Add a delay before processing to allow connection to stabilize
-        setTimeout(() => {
+        if (process.env.NODE_ENV === 'test') {
+          // Immediate processing in tests
           processPocketBaseQueue();
-        }, 2000);
+        } else {
+          // Add a delay before processing to allow connection to stabilize (prod only)
+          setTimeout(() => {
+            processPocketBaseQueue();
+          }, 2000);
+        }
       }
     };
 
@@ -439,22 +446,22 @@ export function useTodoLists() {
     const remainingLists = todoLists.filter(list => list.id !== listId);
     setTodoLists(remainingLists);
     
-    if (activeListId === listId) {
-      if (remainingLists.length > 0) {
-        setActiveListId(remainingLists[0].id);
-      } else {
-        const newId = await createNewList("Default List", "bg-stone-400");
-        setActiveListId(newId);
-        return;
-      }
-    }
-
+    // Always queue the delete operation first
     queuePocketBaseOperation(async () => {
       const freshPb = new PocketBase(PB_URL);
       freshPb.authStore.save(pb.authStore.token, pb.authStore.model);
       await freshPb.collection('task_lists').delete(listId, { requestKey: null });
       console.log(`Successfully synced list deletion ${listId} to PocketBase`);
     });
+    
+    if (activeListId === listId) {
+      if (remainingLists.length > 0) {
+        setActiveListId(remainingLists[0].id);
+      } else {
+        const newId = await createNewList("Default List", "bg-stone-400");
+        setActiveListId(newId);
+      }
+    }
   }, [todoLists, activeListId, createNewList, queuePocketBaseOperation, pb.authStore]);
 
   // Legacy function removed - metadata updates now handled by Yjs

@@ -1,4 +1,6 @@
+// Use the proper waitFor from testing library instead of custom implementation
 import { vi, describe, it, expect, beforeEach, afterEach, type Mock } from 'vitest';
+import { waitFor, act } from '@testing-library/react';
 import PocketBase from 'pocketbase';
 import * as Y from 'yjs';
 import { GlobalPocketBaseProvider } from '../services/yjsPocketBase';
@@ -42,10 +44,10 @@ describe('GlobalPocketBaseProvider Sync Logic', () => {
       return Promise.resolve(() => {}); // Return unsubscribe function
     });
 
-    // Setup IndexedDB mock
+    // Setup IndexedDB mock with immediate sync
     const mockPersistence = {
       on: vi.fn((event, cb) => {
-        if (event === 'synced') setTimeout(cb, 0);
+        if (event === 'synced') cb(); // Immediate sync
       }),
       destroy: vi.fn(),
     };
@@ -77,7 +79,7 @@ describe('GlobalPocketBaseProvider Sync Logic', () => {
     provider = GlobalPocketBaseProvider.getInstance();
     const docProvider = provider.getDocumentProvider(listId);
 
-    // 3. Verify initial state is applied after connection and sync
+    // 3. Verify initial state is applied
     await waitFor(() => {
       expect(mockPbInstance.getOne).toHaveBeenCalledWith(listId, { requestKey: null });
       expect(docProvider.doc.getText('name').toString()).toBe('Initial Name');
@@ -122,9 +124,7 @@ describe('GlobalPocketBaseProvider Sync Logic', () => {
       });
     });
 
-    await waitFor(() => {
-      expect(docProvider.doc.getText('name').toString()).toBe('Remote Update');
-    });
+    expect(docProvider.doc.getText('name').toString()).toBe('Remote Update');
   });
 
   it('should queue changes when offline and sync upon reconnection', async () => {
@@ -169,27 +169,3 @@ describe('GlobalPocketBaseProvider Sync Logic', () => {
     expect(finalDoc.getArray('todos').toJSON()).toEqual([{ text: 'remote todo' }]);
   });
 });
-
-// Helper to wait for async operations in tests
-const waitFor = (condition: () => void, options = { timeout: 1000 }) => {
-  return new Promise((resolve, reject) => {
-    const startTime = Date.now();
-    const interval = setInterval(() => {
-      try {
-        condition();
-        clearInterval(interval);
-        resolve(undefined);
-      } catch (e) {
-        if (Date.now() - startTime > options.timeout) {
-          clearInterval(interval);
-          reject(e);
-        }
-      }
-    }, 50);
-  });
-};
-
-// Helper to wrap state-changing code in tests
-const act = (callback: () => void) => {
-  callback();
-};
