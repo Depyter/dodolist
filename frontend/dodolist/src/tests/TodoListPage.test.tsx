@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
 import DodoListApp from '../pages/TodoListPage';
 import { useTodoLists } from '../hooks/useTodoLists';
 import { useYjsTodoList } from '../hooks/useYjsTodoList';
@@ -18,8 +18,8 @@ vi.mock('@/services/authService', () => ({
   })),
 }));
 
-const mockUseTodoLists = useTodoLists as vi.Mock;
-const mockUseYjsTodoList = useYjsTodoList as vi.Mock;
+const mockUseTodoLists = useTodoLists as Mock;
+const mockUseYjsTodoList = useYjsTodoList as Mock;
 
 describe('TodoListPage Component', () => {
   const mockAddTodo = vi.fn();
