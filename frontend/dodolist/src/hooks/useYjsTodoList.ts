@@ -343,32 +343,46 @@ export function useYjsTodoList(listId: string | null) {
         const ylist = providerRef.current.doc.getMap('list');
 
         providerRef.current.doc.transact(() => {
-            // Initialize name
-            if (metadata.name && !ylist.has('name')) {
-                const nameText = new Y.Text();
+            // Always set name
+            if (metadata.name) {
+                let nameText = ylist.get('name') as Y.Text;
+                if (!nameText) {
+                    nameText = new Y.Text();
+                    ylist.set('name', nameText);
+                }
+                nameText.delete(0, nameText.length);
                 nameText.insert(0, metadata.name);
-                ylist.set('name', nameText);
             }
 
-            // Initialize color
-            if (metadata.color && !ylist.has('color')) {
-                const colorText = new Y.Text();
+            // Always set color
+            if (metadata.color) {
+                let colorText = ylist.get('color') as Y.Text;
+                if (!colorText) {
+                    colorText = new Y.Text();
+                    ylist.set('color', colorText);
+                }
+                colorText.delete(0, colorText.length);
                 colorText.insert(0, metadata.color);
-                ylist.set('color', colorText);
             }
 
-            // Initialize pinned
-            if (metadata.pinned !== undefined && !ylist.has('pinned')) {
-                const pinnedMap = new Y.Map();
+            // Always set pinned
+            if (metadata.pinned !== undefined) {
+                let pinnedMap = ylist.get('pinned') as Y.Map<boolean>;
+                if (!pinnedMap) {
+                    pinnedMap = new Y.Map();
+                    ylist.set('pinned', pinnedMap);
+                }
                 pinnedMap.set('value', metadata.pinned);
-                ylist.set('pinned', pinnedMap);
             }
 
-            // Initialize archived
-            if (metadata.archived !== undefined && !ylist.has('archived')) {
-                const archivedMap = new Y.Map();
+            // Always set archived
+            if (metadata.archived !== undefined) {
+                let archivedMap = ylist.get('archived') as Y.Map<boolean>;
+                if (!archivedMap) {
+                    archivedMap = new Y.Map();
+                    ylist.set('archived', archivedMap);
+                }
                 archivedMap.set('value', metadata.archived);
-                ylist.set('archived', archivedMap);
             }
         });
     }, []);

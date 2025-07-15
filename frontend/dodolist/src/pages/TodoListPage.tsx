@@ -955,6 +955,7 @@ export default function DodoListApp() {
         <div className="flex items-start gap-3">
           <button
             onClick={() => handleToggleTodo(todo.id)}
+            aria-label={todo.completed ? `Mark "${todo.text}" as incomplete` : `Mark "${todo.text}" as complete`}
             className="mt-0.5 text-slate-400 hover:text-slate-600 transition-colors min-w-[20px]"
           >
             {todo.completed ? (
@@ -1020,6 +1021,7 @@ export default function DodoListApp() {
               variant="ghost"
               size="sm"
               onClick={() => handleDeleteTodo(todo.id)}
+              aria-label={`Delete task "${todo.text}"`}
               className="text-slate-400 hover:text-red-500 hover:bg-red-50 h-7 w-7 p-0"
             >
               <Trash2 className="w-3.5 h-3.5" />
@@ -1454,6 +1456,7 @@ export default function DodoListApp() {
                         loading={isAddingTodo}
                         tabIndex={-1}
                         type="button"
+                        aria-label="Add task"
                         style={{ boxShadow: 'none' }}
                       >
                         <Send className="w-5 h-5" />

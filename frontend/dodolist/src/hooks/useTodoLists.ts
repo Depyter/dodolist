@@ -433,7 +433,7 @@ export function useTodoLists() {
     // The initialization will happen automatically when the Yjs document is first accessed
 
     return newId;
-  }, [authService, pb.authStore.token, pb.authStore.model, queuePocketBaseOperation]);
+  }, [authService, pb, queuePocketBaseOperation]);
 
   const deleteList = useCallback(async (listId: string) => {
     const remainingLists = todoLists.filter(list => list.id !== listId);
@@ -455,7 +455,7 @@ export function useTodoLists() {
       await freshPb.collection('task_lists').delete(listId, { requestKey: null });
       console.log(`Successfully synced list deletion ${listId} to PocketBase`);
     });
-  }, [todoLists, activeListId, createNewList, queuePocketBaseOperation, pb.authStore.token, pb.authStore.model]);
+  }, [todoLists, activeListId, createNewList, queuePocketBaseOperation, pb.authStore]);
 
   // Legacy function removed - metadata updates now handled by Yjs
   // All list metadata operations (name, color, pinned, archived) should use useYjsTodoList hook functions
@@ -501,7 +501,7 @@ export function useTodoLists() {
     }
 
     return newId;
-  }, [todoLists, createNewList, queuePocketBaseOperation, pb.authStore.token, pb.authStore.model, getTodosFromYjsUpdate, getMetadataFromYjsUpdate]);
+  }, [todoLists, createNewList, queuePocketBaseOperation, pb.authStore, getTodosFromYjsUpdate, getMetadataFromYjsUpdate]);
 
   // Function to update metadata for a specific list in local state
   // This is used to sync Yjs metadata changes to the local todoLists state

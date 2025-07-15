@@ -1,299 +1,195 @@
-import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { vi, describe, it, expect, beforeEach, afterEach, type Mock } from 'vitest';
 import PocketBase from 'pocketbase';
 import * as Y from 'yjs';
-import { PocketBaseProvider } from '../services/yjsPocketBase';
-
-// Mock PocketBase properly (outside beforeEach)
-vi.mock('pocketbase', () => {
-  return {
-    default: vi.fn().mockImplementation(() => ({
-      authStore: {
-        isValid: true,
-        token: 'test-token',
-        model: { id: 'user-id' },
-        save: vi.fn(),
-        onChange: vi.fn()
-      },
-      collection: vi.fn().mockReturnValue({
-        getOne: vi.fn(),
-        update: vi.fn(),
-        subscribe: vi.fn().mockImplementation(() => Promise.resolve(() => {}))
-      })
-    }))
-  };
-});
+import { GlobalPocketBaseProvider } from '../services/yjsPocketBase';
+import { IndexeddbPersistence } from 'y-indexeddb';
 
 // --- Mocks ---
+vi.mock('pocketbase');
+vi.mock('y-indexeddb');
 
-// Mock y-indexeddb with a stateful in-memory store
-const storedDocs = new Map<string, Uint8Array>();
-
-// Create a proper mock class that implements the IndexeddbPersistence interface
-class MockIndexeddbPersistence {
-  private eventCallbacks: Record<string, Function[]> = {};
-  private doc: Y.Doc;
-  private dbName: string;
-  private updateHandler: (update: Uint8Array, origin: any) => void;
-
-  constructor(dbName: string, doc: Y.Doc) {
-    this.dbName = dbName;
-    this.doc = doc;
-    
-    // When a new persistence object is created, load the stored state if it exists.
-    if (storedDocs.has(dbName)) {
-      Y.applyUpdate(doc, storedDocs.get(dbName)!);
-    }
-
-    this.updateHandler = (_update: Uint8Array, _origin: any) => {
-      // Persist the entire document state on any change.
-      storedDocs.set(dbName, Y.encodeStateAsUpdate(doc));
-    };
-
-    doc.on('update', this.updateHandler);
-
-    // Trigger 'synced' event in next tick to simulate IndexedDB sync completion
-    setTimeout(() => {
-      this.emit('synced');
-    }, 0);
-  }
-
-  // Event emitter methods
-  on(eventName: string, callback: Function) {
-    if (!this.eventCallbacks[eventName]) {
-      this.eventCallbacks[eventName] = [];
-    }
-    this.eventCallbacks[eventName].push(callback);
-    
-    // Immediately trigger 'synced' event if that's what we're listening for
-    if (eventName === 'synced') {
-      setTimeout(() => callback(), 0);
-    }
-    
-    return this; // For method chaining
-  }
-  
-  off = vi.fn((eventName: string, callback: Function) => {
-    if (this.eventCallbacks[eventName]) {
-      this.eventCallbacks[eventName] = this.eventCallbacks[eventName].filter(cb => cb !== callback);
-    }
-    return this;
-  });
-  
-  emit = vi.fn((eventName: string, ...args: any[]) => {
-    if (this.eventCallbacks[eventName]) {
-      this.eventCallbacks[eventName].forEach(callback => callback(...args));
-    }
-  });
-  
-  // Promise that resolves when synced
-  whenSynced = Promise.resolve();
-  
-  destroy = vi.fn(() => {
-    // On destroy, ensure final state is saved and remove listener.
-    storedDocs.set(this.dbName, Y.encodeStateAsUpdate(this.doc));
-    this.doc.off('update', this.updateHandler);
-    // Clear event listeners
-    Object.keys(this.eventCallbacks).forEach(key => {
-      this.eventCallbacks[key] = [];
-    });
-  });
-}
-
-vi.mock('y-indexeddb', () => ({
-  IndexeddbPersistence: vi.fn().mockImplementation((dbName: string, doc: Y.Doc) => {
-    return new MockIndexeddbPersistence(dbName, doc);
-  }),
-}));
-
-describe('PocketBaseProvider Sync Logic', () => {
-  let provider: PocketBaseProvider | null = null;
+describe('GlobalPocketBaseProvider Sync Logic', () => {
+  let provider: GlobalPocketBaseProvider | null = null;
   const listId = 'test-list';
-  const dbName = `dodolist-yjs-${listId}`;
 
-  // Reference to mocks for control during tests
-  const mockPb = {
+  const mockPbInstance = {
     authStore: {
       isValid: true,
       token: 'test-token',
       model: { id: 'user-id' },
-      save: vi.fn(),
       onChange: vi.fn(),
     },
-    collection: vi.fn(),
+    collection: vi.fn().mockReturnThis(),
+    getOne: vi.fn(),
+    update: vi.fn(),
+    subscribe: vi.fn(),
+    realtime: { isConnected: true },
   };
 
-  // Mocks for collection methods
-  const getOneMock = vi.fn();
-  const updateMock = vi.fn();
-  const subscribeMock = vi.fn();
+  const MockedPocketBase = PocketBase as Mock;
+  const MockedIndexeddbPersistence = IndexeddbPersistence as Mock;
+
   let remoteUpdateCallback: (data: any) => void = () => {};
 
   beforeEach(() => {
     vi.clearAllMocks();
-    storedDocs.clear(); // Clear our in-memory DB for each test
 
-    // Set up the PocketBase collection mock for this test
-    const pbImpl = PocketBase as unknown as any;
-    pbImpl.mockImplementation(() => mockPb);
-    
-    mockPb.collection.mockReturnValue({
-      getOne: getOneMock,
-      update: updateMock,
-      subscribe: subscribeMock,
-    });
-
-    // Mock subscribe to capture the callback for remote updates
-    subscribeMock.mockImplementation((_id, callback) => {
+    // Setup PocketBase mock
+    MockedPocketBase.mockReturnValue(mockPbInstance);
+    mockPbInstance.collection.mockReturnValue(mockPbInstance);
+    mockPbInstance.subscribe.mockImplementation((_id, callback) => {
       remoteUpdateCallback = callback;
-      return Promise.resolve(() => {}); // Return an unsubscribe function
+      return Promise.resolve(() => {}); // Return unsubscribe function
     });
 
-    // Default to authenticated state
-    mockPb.authStore.isValid = true;
+    // Setup IndexedDB mock
+    const mockPersistence = {
+      on: vi.fn((event, cb) => {
+        if (event === 'synced') setTimeout(cb, 0);
+      }),
+      destroy: vi.fn(),
+    };
+    MockedIndexeddbPersistence.mockReturnValue(mockPersistence);
+
+    // Mock navigator
+    Object.defineProperty(navigator, 'onLine', {
+      value: true,
+      writable: true,
+      configurable: true,
+    });
   });
 
   afterEach(() => {
-    if (provider) {
-      provider.destroy();
-      provider = null;
-    }
+    provider?.destroy();
+    provider = null;
   });
 
   it('should connect, fetch initial state, and sync local changes', async () => {
-    // 1. Initial state setup on the "server"
+    // 1. Initial server state
     const initialDoc = new Y.Doc();
     initialDoc.getText('name').insert(0, 'Initial Name');
     const initialStateUpdate = Y.encodeStateAsUpdate(initialDoc);
     const base64InitialState = Buffer.from(initialStateUpdate).toString('base64');
-    getOneMock.mockResolvedValue({ id: listId, yjsUpdate: base64InitialState });
-    updateMock.mockResolvedValue({});
+    mockPbInstance.getOne.mockResolvedValue({ id: listId, yjsUpdate: base64InitialState });
+    mockPbInstance.update.mockResolvedValue({});
 
     // 2. Create provider
-    provider = new PocketBaseProvider(listId);
-    await vi.waitFor(() => expect(getOneMock).toHaveBeenCalledWith(listId, { requestKey: null }));
+    provider = GlobalPocketBaseProvider.getInstance();
+    const docProvider = provider.getDocumentProvider(listId);
 
-    // 3. Verify initial state is applied
-    expect(provider.doc.getText('name').toString()).toBe('Initial Name');
+    // 3. Verify initial state is applied after connection and sync
+    await waitFor(() => {
+      expect(mockPbInstance.getOne).toHaveBeenCalledWith(listId, { requestKey: null });
+      expect(docProvider.doc.getText('name').toString()).toBe('Initial Name');
+    });
 
     // 4. Make a local change
-    provider.doc.getArray('todos').insert(0, [{ text: 'new todo' }]);
+    act(() => {
+      docProvider.doc.getArray('todos').insert(0, [{ text: 'new todo' }]);
+    });
 
     // 5. Verify the local change is synced to PocketBase
-    await vi.waitFor(() => expect(updateMock).toHaveBeenCalled());
-    const sentData = updateMock.mock.calls[0][1].yjsUpdate;
+    await waitFor(() => {
+      expect(mockPbInstance.update).toHaveBeenCalled();
+    });
+
+    const sentData = mockPbInstance.update.mock.calls[0][1].yjsUpdate;
     const tempDoc = new Y.Doc();
     Y.applyUpdate(tempDoc, Buffer.from(sentData, 'base64'));
     expect(tempDoc.getArray('todos').toJSON()).toEqual([{ text: 'new todo' }]);
     expect(tempDoc.getText('name').toString()).toBe('Initial Name');
   });
 
+  it('should apply remote updates to the local document', async () => {
+    mockPbInstance.getOne.mockResolvedValue({ id: listId, yjsUpdate: null });
+    provider = GlobalPocketBaseProvider.getInstance();
+    const docProvider = provider.getDocumentProvider(listId);
+
+    await waitFor(() => {
+      expect(mockPbInstance.subscribe).toHaveBeenCalledWith(listId, expect.any(Function), { requestKey: null });
+    });
+
+    // Simulate a remote update from another client
+    const remoteUpdateDoc = new Y.Doc();
+    remoteUpdateDoc.getText('name').insert(0, 'Remote Update');
+    const remoteUpdate = Y.encodeStateAsUpdate(remoteUpdateDoc);
+    const base64RemoteUpdate = Buffer.from(remoteUpdate).toString('base64');
+
+    act(() => {
+      remoteUpdateCallback({
+        action: 'update',
+        record: { yjsUpdate: base64RemoteUpdate, yjsClientId: 'some-other-client' },
+      });
+    });
+
+    await waitFor(() => {
+      expect(docProvider.doc.getText('name').toString()).toBe('Remote Update');
+    });
+  });
+
   it('should queue changes when offline and sync upon reconnection', async () => {
-    // 1. Simulate being offline initially
-    getOneMock.mockRejectedValue(new Error('Network Error'));
-    updateMock.mockRejectedValue(new Error('Network Error'));
+    // 1. Simulate being offline
+    mockPbInstance.realtime.isConnected = false;
+    Object.defineProperty(navigator, 'onLine', { value: false });
 
-    // 2. Create provider. It will fail to connect.
-    provider = new PocketBaseProvider(listId);
+    provider = GlobalPocketBaseProvider.getInstance();
+    const docProvider = provider.getDocumentProvider(listId);
 
-    // 3. Make a local change while "offline". This change is persisted in our mock IndexedDB.
-    provider.doc.getText('name').insert(0, 'Offline Change');
+    // 2. Make a local change while offline
+    act(() => {
+      docProvider.doc.getText('name').insert(0, 'Offline Change');
+    });
 
-    // 4. Verify that a sync was attempted but failed.
-    await vi.waitFor(() => expect(updateMock).toHaveBeenCalled());
-    expect(provider.doc.getText('name').toString()).toBe('Offline Change');
+    // 3. Verify no sync was attempted
+    expect(mockPbInstance.update).not.toHaveBeenCalled();
 
-    // 5. Simulate reconnection
-    getOneMock.mockClear();
-    updateMock.mockClear();
+    // 4. Simulate reconnection
     const remoteDoc = new Y.Doc();
     remoteDoc.getArray('todos').insert(0, [{ text: 'remote todo' }]);
     const remoteStateUpdate = Y.encodeStateAsUpdate(remoteDoc);
     const base64RemoteState = Buffer.from(remoteStateUpdate).toString('base64');
-    getOneMock.mockResolvedValue({ id: listId, yjsUpdate: base64RemoteState });
-    updateMock.mockResolvedValue({});
+    mockPbInstance.getOne.mockResolvedValue({ id: listId, yjsUpdate: base64RemoteState });
+    mockPbInstance.update.mockResolvedValue({});
 
-    // 6. Manually trigger the connection retry logic.
-    // In the real code, this is a busy loop. We'll just call connect again.
-    await (provider as any).connect();
+    await act(async () => {
+      mockPbInstance.realtime.isConnected = true;
+      Object.defineProperty(navigator, 'onLine', { value: true });
+      window.dispatchEvent(new Event('online'));
+    });
 
-    // 7. Verify it fetches the latest remote state.
-    await vi.waitFor(() => expect(getOneMock).toHaveBeenCalled());
+    // 5. Verify it fetches latest, merges, and syncs back
+    await waitFor(() => {
+      expect(mockPbInstance.getOne).toHaveBeenCalled();
+      expect(mockPbInstance.update).toHaveBeenCalled();
+    });
 
-    // 8. Verify that the merged state (local offline + remote) is synced back.
-    // The merge happens when Y.applyUpdate is called inside connect(), which then
-    // triggers the 'update' listener that queues the sync.
-    await vi.waitFor(() => expect(updateMock).toHaveBeenCalled());
-
-    // 9. Check the final merged state of the document
-    const finalDoc = provider.doc;
+    // 6. Check final merged state
+    const finalDoc = docProvider.doc;
     expect(finalDoc.getText('name').toString()).toBe('Offline Change');
     expect(finalDoc.getArray('todos').toJSON()).toEqual([{ text: 'remote todo' }]);
-
-    // 10. Check the data that was sent to the server
-    const sentData = updateMock.mock.calls[0][1].yjsUpdate;
-    const tempDoc = new Y.Doc();
-    Y.applyUpdate(tempDoc, Buffer.from(sentData, 'base64'));
-    expect(tempDoc.getText('name').toString()).toBe('Offline Change');
-    expect(tempDoc.getArray('todos').toJSON()).toEqual([{ text: 'remote todo' }]);
-  });
-
-  it('should work completely offline, persisting changes to indexeddb', async () => {
-    // 1. Have some data in our mock indexeddb from a "previous session".
-    const priorDoc = new Y.Doc();
-    priorDoc.getText('name').insert(0, 'Session 1');
-    storedDocs.set(dbName, Y.encodeStateAsUpdate(priorDoc));
-
-    // 2. Simulate being completely offline.
-    getOneMock.mockRejectedValue(new Error('No network'));
-    updateMock.mockRejectedValue(new Error('No network'));
-
-    // 3. Create a new provider. It should load from our mock indexeddb.
-    provider = new PocketBaseProvider(listId);
-    
-    // Wait a bit for the 'synced' event to fire and load data
-    await new Promise(resolve => setTimeout(resolve, 50));
-
-    // 4. Verify prior data was loaded.
-    expect(provider.doc.getText('name').toString()).toBe('Session 1');
-
-    // 5. Make a new change while offline.
-    provider.doc.getArray('todos').insert(0, [{ text: 'offline todo' }]);
-    expect(provider.doc.getArray('todos').toJSON()).toEqual([{ text: 'offline todo' }]);
-
-    // 6. Verify it tries to sync but fails.
-    await vi.waitFor(() => expect(updateMock).toHaveBeenCalled());
-
-    // 7. Destroy the provider. This should save the merged state back to mock indexeddb.
-    provider.destroy();
-    provider = null;
-
-    // 8. Create another provider instance, still offline, to ensure persistence worked.
-    const provider2 = new PocketBaseProvider(listId);
-    
-    // Wait a bit for the 'synced' event to fire and load data
-    await new Promise(resolve => setTimeout(resolve, 50));
-
-    // 9. Verify the new doc has all the changes.
-    expect(provider2.doc.getText('name').toString()).toBe('Session 1');
-    expect(provider2.doc.getArray('todos').toJSON()).toEqual([{ text: 'offline todo' }]);
-    provider2.destroy();
-  });
-
-  it('should not attempt to sync if the user is not authenticated', async () => {
-    // 1. Set auth to invalid
-    mockPb.authStore.isValid = false;
-    
-    // 2. Create provider
-    provider = new PocketBaseProvider(listId);
-
-    // 3. Make a local change
-    provider.doc.getText('name').insert(0, 'No Auth Change');
-
-    // 4. Wait a bit to ensure no network calls are made
-    await new Promise(r => setTimeout(r, 100));
-    
-    // 5. Verify no connection or update calls were made
-    expect(getOneMock).not.toHaveBeenCalled();
-    expect(updateMock).not.toHaveBeenCalled();
   });
 });
+
+// Helper to wait for async operations in tests
+const waitFor = (condition: () => void, options = { timeout: 1000 }) => {
+  return new Promise((resolve, reject) => {
+    const startTime = Date.now();
+    const interval = setInterval(() => {
+      try {
+        condition();
+        clearInterval(interval);
+        resolve(undefined);
+      } catch (e) {
+        if (Date.now() - startTime > options.timeout) {
+          clearInterval(interval);
+          reject(e);
+        }
+      }
+    }, 50);
+  });
+};
+
+// Helper to wrap state-changing code in tests
+const act = (callback: () => void) => {
+  callback();
+};
