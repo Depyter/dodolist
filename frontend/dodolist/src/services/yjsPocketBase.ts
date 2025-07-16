@@ -89,7 +89,9 @@ export class GlobalPocketBaseProvider {
     this.pb = new PocketBase(PB_URL);
     this.initializeAuth();
     this.loadKnownDocuments();
-    this.startConnectionMonitoring();
+    if (process.env.NODE_ENV !== 'test') {
+      this.startConnectionMonitoring();
+    }
     this.setupEventListeners();
   }
 

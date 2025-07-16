@@ -1,69 +1,42 @@
-// Use the proper waitFor from testing library instead of custom implementation
-import { vi, describe, it, expect, beforeEach, afterEach, type Mock } from 'vitest';
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { waitFor, act } from '@testing-library/react';
-import PocketBase from 'pocketbase';
 import * as Y from 'yjs';
 import { GlobalPocketBaseProvider } from '../services/yjsPocketBase';
-import { IndexeddbPersistence } from 'y-indexeddb';
-
-// --- Mocks ---
-vi.mock('pocketbase');
-vi.mock('y-indexeddb');
+import { pb, mockCollectionGetOne, mockCollectionUpdate, mockCollectionSubscribe } from './setup';
+import './setup'; // Ensure global mocks are loaded
 
 describe('GlobalPocketBaseProvider Sync Logic', () => {
   let provider: GlobalPocketBaseProvider | null = null;
   const listId = 'test-list';
-
-  const mockPbInstance = {
-    authStore: {
-      isValid: true,
-      token: 'test-token',
-      model: { id: 'user-id' },
-      onChange: vi.fn(),
-    },
-    collection: vi.fn().mockReturnThis(),
-    getOne: vi.fn(),
-    update: vi.fn(),
-    subscribe: vi.fn(),
-    realtime: { isConnected: true },
-  };
-
-  const MockedPocketBase = PocketBase as Mock;
-  const MockedIndexeddbPersistence = IndexeddbPersistence as Mock;
 
   let remoteUpdateCallback: (data: any) => void = () => {};
 
   beforeEach(() => {
     vi.clearAllMocks();
 
-    // Setup PocketBase mock
-    MockedPocketBase.mockReturnValue(mockPbInstance);
-    mockPbInstance.collection.mockReturnValue(mockPbInstance);
-    mockPbInstance.subscribe.mockImplementation((_id, callback) => {
-      remoteUpdateCallback = callback;
-      return Promise.resolve(() => {}); // Return unsubscribe function
-    });
-
-    // Setup IndexedDB mock with immediate sync
-    const mockPersistence = {
-      on: vi.fn((event, cb) => {
-        if (event === 'synced') cb(); // Immediate sync
-      }),
-      destroy: vi.fn(),
-    };
-    MockedIndexeddbPersistence.mockReturnValue(mockPersistence);
+    // Setup auth state
+    pb.authStore.isValid = true;
+    pb.authStore.token = 'test-token';
+    pb.authStore.model = { id: 'user-id', email: 'test@test.com', username: 'test', verified: true, avatar: '' };
+    pb.realtime.isConnected = true;
 
     // Mock navigator
-    Object.defineProperty(navigator, 'onLine', {
-      value: true,
-      writable: true,
-      configurable: true,
+    Object.defineProperty(navigator, 'onLine', { value: true, writable: true, configurable: true });
+
+    // Setup collection mock with subscribe that captures the callback
+    mockCollectionSubscribe.mockImplementation((_id: string, callback: any) => {
+      remoteUpdateCallback = callback;
+      return 'subscription-id';
     });
+
+    provider = GlobalPocketBaseProvider.getInstance();
   });
 
   afterEach(() => {
     provider?.destroy();
     provider = null;
+    // Clear the singleton instance for the next test
+    (GlobalPocketBaseProvider as any).instance = null;
   });
 
   it('should connect, fetch initial state, and sync local changes', async () => {
@@ -72,8 +45,8 @@ describe('GlobalPocketBaseProvider Sync Logic', () => {
     initialDoc.getText('name').insert(0, 'Initial Name');
     const initialStateUpdate = Y.encodeStateAsUpdate(initialDoc);
     const base64InitialState = Buffer.from(initialStateUpdate).toString('base64');
-    mockPbInstance.getOne.mockResolvedValue({ id: listId, yjsUpdate: base64InitialState });
-    mockPbInstance.update.mockResolvedValue({});
+    mockCollectionGetOne.mockResolvedValue({ id: listId, yjsUpdate: base64InitialState });
+    mockCollectionUpdate.mockResolvedValue({});
 
     // 2. Create provider
     provider = GlobalPocketBaseProvider.getInstance();
@@ -81,7 +54,7 @@ describe('GlobalPocketBaseProvider Sync Logic', () => {
 
     // 3. Verify initial state is applied
     await waitFor(() => {
-      expect(mockPbInstance.getOne).toHaveBeenCalledWith(listId, { requestKey: null });
+      expect(mockCollectionGetOne).toHaveBeenCalledWith(listId, { requestKey: null });
       expect(docProvider.doc.getText('name').toString()).toBe('Initial Name');
     });
 
@@ -92,10 +65,10 @@ describe('GlobalPocketBaseProvider Sync Logic', () => {
 
     // 5. Verify the local change is synced to PocketBase
     await waitFor(() => {
-      expect(mockPbInstance.update).toHaveBeenCalled();
+      expect(mockCollectionUpdate).toHaveBeenCalled();
     });
 
-    const sentData = mockPbInstance.update.mock.calls[0][1].yjsUpdate;
+    const sentData = mockCollectionUpdate.mock.calls[0][1].yjsUpdate;
     const tempDoc = new Y.Doc();
     Y.applyUpdate(tempDoc, Buffer.from(sentData, 'base64'));
     expect(tempDoc.getArray('todos').toJSON()).toEqual([{ text: 'new todo' }]);
@@ -103,12 +76,12 @@ describe('GlobalPocketBaseProvider Sync Logic', () => {
   });
 
   it('should apply remote updates to the local document', async () => {
-    mockPbInstance.getOne.mockResolvedValue({ id: listId, yjsUpdate: null });
+    mockCollectionGetOne.mockResolvedValue({ id: listId, yjsUpdate: '' });
     provider = GlobalPocketBaseProvider.getInstance();
     const docProvider = provider.getDocumentProvider(listId);
 
     await waitFor(() => {
-      expect(mockPbInstance.subscribe).toHaveBeenCalledWith(listId, expect.any(Function), { requestKey: null });
+      expect(mockCollectionSubscribe).toHaveBeenCalledWith(listId, expect.any(Function), { requestKey: null });
     });
 
     // Simulate a remote update from another client
@@ -129,7 +102,7 @@ describe('GlobalPocketBaseProvider Sync Logic', () => {
 
   it('should queue changes when offline and sync upon reconnection', async () => {
     // 1. Simulate being offline
-    mockPbInstance.realtime.isConnected = false;
+    pb.realtime.isConnected = false;
     Object.defineProperty(navigator, 'onLine', { value: false });
 
     provider = GlobalPocketBaseProvider.getInstance();
@@ -140,27 +113,27 @@ describe('GlobalPocketBaseProvider Sync Logic', () => {
       docProvider.doc.getText('name').insert(0, 'Offline Change');
     });
 
-    // 3. Verify no sync was attempted
-    expect(mockPbInstance.update).not.toHaveBeenCalled();
+    // 3. Verify no sync was attempted yet
+    expect(mockCollectionUpdate).not.toHaveBeenCalled();
 
     // 4. Simulate reconnection
     const remoteDoc = new Y.Doc();
     remoteDoc.getArray('todos').insert(0, [{ text: 'remote todo' }]);
     const remoteStateUpdate = Y.encodeStateAsUpdate(remoteDoc);
     const base64RemoteState = Buffer.from(remoteStateUpdate).toString('base64');
-    mockPbInstance.getOne.mockResolvedValue({ id: listId, yjsUpdate: base64RemoteState });
-    mockPbInstance.update.mockResolvedValue({});
+    mockCollectionGetOne.mockResolvedValue({ id: listId, yjsUpdate: base64RemoteState });
+    mockCollectionUpdate.mockResolvedValue({});
 
     await act(async () => {
-      mockPbInstance.realtime.isConnected = true;
+      pb.realtime.isConnected = true;
       Object.defineProperty(navigator, 'onLine', { value: true });
       window.dispatchEvent(new Event('online'));
     });
 
     // 5. Verify it fetches latest, merges, and syncs back
     await waitFor(() => {
-      expect(mockPbInstance.getOne).toHaveBeenCalled();
-      expect(mockPbInstance.update).toHaveBeenCalled();
+      expect(mockCollectionGetOne).toHaveBeenCalled();
+      expect(mockCollectionUpdate).toHaveBeenCalled();
     });
 
     // 6. Check final merged state

@@ -1,7 +1,7 @@
 import type { Todo } from '@/lib/types';
 import * as Y from 'yjs';
 import PocketBase from 'pocketbase';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { PB_URL } from '@/config';
 import AuthService from '@/services/authService';
 
@@ -110,236 +110,11 @@ export function useTodoLists() {
   const [error, setError] = useState<Error | null>(null);
   const [activeListId, setActiveListId] = useState<string | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
+  const subscribedRef = useRef(false);
 
-  // Queue for PocketBase operations with retry tracking
-  const [pocketBaseQueue, setPocketBaseQueue] = useState<Array<{operation: () => Promise<void>, retryCount: number}>>([]);
-  const [isProcessingQueue, setIsProcessingQueue] = useState(false);
-
-  // Queue PocketBase operations for background processing
-  const queuePocketBaseOperation = useCallback((operation: () => Promise<void>) => {
-    // Only queue if we're online or if it's a critical operation
-    if (!navigator.onLine) {
-      console.warn('[useTodoLists] Offline - operation will be queued for when back online');
-    }
-    setPocketBaseQueue(prev => [...prev, { operation, retryCount: 0 }]);
-  }, []);
-
-  // Check if we're online and can reach PocketBase
-  const isOnlineAndConnected = useCallback(() => {
-    return navigator.onLine && authService.isAuthenticated();
-  }, [authService]);
-
-  // Check if an error is due to being offline or network issues
-  const isNetworkError = useCallback((error: any): boolean => {
-    // Check various indicators of network/offline errors
-    if (!navigator.onLine) return true;
-    if (error.status === 0) return true;
-    if (error.code === 'NETWORK_ERROR') return true;
-    if (error.name === 'TypeError' && error.message?.includes('fetch')) return true;
-    if (error.message?.toLowerCase().includes('network')) return true;
-    if (error.message?.toLowerCase().includes('failed to fetch')) return true;
-    if (error.message?.toLowerCase().includes('connection')) return true;
-    
-    // PocketBase specific offline errors
-    if (error.status === 500 && error.message?.includes('Something went wrong')) return true;
-    
-    return false;
-  }, []);
-
-  // Process PocketBase operations queue
-  const processPocketBaseQueue = useCallback(async () => {
-    if (isProcessingQueue || pocketBaseQueue.length === 0 || !isOnlineAndConnected()) {
-      return;
-    }
-
-    setIsProcessingQueue(true);
-    
-    const currentQueue = [...pocketBaseQueue];
-    setPocketBaseQueue([]);
-    const failedOperations: Array<{operation: () => Promise<void>, retryCount: number}> = [];
-
-    for (const queueItem of currentQueue) {
-      try {
-        await queueItem.operation();
-        console.log('[useTodoLists] PocketBase operation completed successfully');
-      } catch (error: any) {
-        console.error('[useTodoLists] PocketBase operation failed:', error);
-        
-        const isNetworkIssue = isNetworkError(error);
-        const maxRetries = 3;
-        
-        if (isNetworkIssue && queueItem.retryCount < maxRetries) {
-          // Re-queue network errors up to max retries
-          console.warn(`[useTodoLists] Network error detected, will retry (attempt ${queueItem.retryCount + 1}/${maxRetries})`);
-          failedOperations.push({ 
-            operation: queueItem.operation, 
-            retryCount: queueItem.retryCount + 1 
-          });
-        } else if (!isNetworkIssue && queueItem.retryCount < maxRetries) {
-          // Re-queue other errors up to max retries (but fewer retries)
-          console.warn(`[useTodoLists] Operation error, will retry (attempt ${queueItem.retryCount + 1}/${maxRetries})`);
-          failedOperations.push({ 
-            operation: queueItem.operation, 
-            retryCount: queueItem.retryCount + 1 
-          });
-        } else {
-          // Max retries reached or unrecoverable error
-          console.error(`[useTodoLists] Operation failed permanently after ${queueItem.retryCount} retries:`, error);
-        }
-      }
-    }
-
-    // Re-queue failed operations that should be retried
-    if (failedOperations.length > 0) {
-      setPocketBaseQueue(prev => [...prev, ...failedOperations]);
-    }
-
-    setIsProcessingQueue(false);
-  }, [isProcessingQueue, pocketBaseQueue, isOnlineAndConnected, isNetworkError]);
-
-  // Process queue periodically and when conditions change
-  useEffect(() => {
-    if (pocketBaseQueue.length > 0 && !isProcessingQueue && authService.isAuthenticated()) {
-      if (process.env.NODE_ENV === 'test') {
-        // Immediate processing in tests
-        processPocketBaseQueue();
-        return;
-      }
-      // Add a small delay to prevent excessive processing (prod only)
-      const timeoutId = setTimeout(() => {
-        processPocketBaseQueue();
-      }, 1000);
-      return () => clearTimeout(timeoutId);
-    }
-  }, [pocketBaseQueue.length, isProcessingQueue, authService, processPocketBaseQueue]);
-
-  // Listen for online/offline events to process queue when connection is restored
-  useEffect(() => {
-    const handleOnline = () => {
-      console.log('[useTodoLists] Back online, processing queued operations');
-      // Clear the offline queue timeout if it exists
-      const offlineTimeout = (window as any).__offlineQueueTimeout;
-      if (offlineTimeout) {
-        clearTimeout(offlineTimeout);
-        delete (window as any).__offlineQueueTimeout;
-      }
-      if (pocketBaseQueue.length > 0 && !isProcessingQueue && authService.isAuthenticated()) {
-        if (process.env.NODE_ENV === 'test') {
-          // Immediate processing in tests
-          processPocketBaseQueue();
-        } else {
-          // Add a delay before processing to allow connection to stabilize (prod only)
-          setTimeout(() => {
-            processPocketBaseQueue();
-          }, 2000);
-        }
-      }
-    };
-
-    const handleOffline = () => {
-      console.log('[useTodoLists] Gone offline, operations will be queued');
-      
-      // Clear the queue if we've been offline for too long to prevent memory issues
-      // This timeout will be cleared when we come back online
-      const clearQueueTimeout = setTimeout(() => {
-        console.warn('[useTodoLists] Clearing queue due to extended offline period');
-        setPocketBaseQueue([]);
-      }, 5 * 60 * 1000); // 5 minutes
-      
-      // Store timeout ID to clear it when online
-      (window as any).__offlineQueueTimeout = clearQueueTimeout;
-    };
-
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
-
-    return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
-      
-      // Clean up any pending offline timeout
-      const offlineTimeout = (window as any).__offlineQueueTimeout;
-      if (offlineTimeout) {
-        clearTimeout(offlineTimeout);
-        delete (window as any).__offlineQueueTimeout;
-      }
-    };
-  }, [pocketBaseQueue.length, isProcessingQueue, authService, processPocketBaseQueue]);
-
-  // Subscribe to real-time updates
-  useEffect(() => {
-    if (!pb || !authService.isAuthenticated()) return;
-
-    const handleCreate = (record: TodoList) => {
-      const todos = getTodosFromYjsUpdate(record.yjsUpdate || '');
-      const metadata = getMetadataFromYjsUpdate(record.yjsUpdate || '');
-      const newList: TodoListWithTodos = { 
-        ...record, 
-        todos, 
-        ...metadata 
-      };
-      setTodoLists(prevLists => {
-        // Avoid adding a duplicate if the list already exists
-        if (prevLists.some(list => list.id === record.id)) {
-          return prevLists;
-        }
-        return [newList, ...prevLists];
-      });
-    };
-
-    const handleUpdate = (record: TodoList) => {
-      setTodoLists(prevLists => prevLists.map(list => {
-        if (list.id === record.id) {
-          const todos = getTodosFromYjsUpdate(record.yjsUpdate || '');
-          const metadata = getMetadataFromYjsUpdate(record.yjsUpdate || '');
-          return { 
-            ...list, 
-            ...record, 
-            todos, 
-            ...metadata 
-          };
-        }
-        return list;
-      }));
-    };
-
-    const handleDelete = (record: { id: string }) => {
-      setTodoLists(prevLists => prevLists.filter(list => list.id !== record.id));
-      setActiveListId(prevActiveId => prevActiveId === record.id ? null : prevActiveId);
-    };
-
-    const subscribe = async () => {
-      try {
-        await pb.collection('task_lists').subscribe('*', (e) => {
-          const record = e.record as unknown as TodoList;
-          if (e.action === 'create') {
-            handleCreate(record);
-          } else if (e.action === 'update') {
-            handleUpdate(record);
-          } else if (e.action === 'delete') {
-            handleDelete(e.record as { id: string });
-          }
-        });
-      } catch (error) {
-        console.error("Failed to subscribe to real-time updates:", error);
-      }
-    };
-
-    subscribe();
-
-    return () => {
-      pb.collection('task_lists').unsubscribe('*');
-    };
-  }, [pb, authService]);
-
-  // Fetch all lists for the user on initial load
   const fetchLists = useCallback(async () => {
     if (!authService.isAuthenticated() || !authService.getCurrentUser()) {
       setLoading(false);
-      return;
-    }
-    
-    if (loading && isInitialized) {
       return;
     }
     
@@ -352,10 +127,7 @@ export function useTodoLists() {
         throw new Error("No user ID available");
       }
       
-      const freshPb = new PocketBase(PB_URL);
-      freshPb.authStore.save(pb.authStore.token, pb.authStore.model);
-      
-      const records = await freshPb.collection('task_lists').getFullList<TodoList>({filter: `user_id = "${userId}"`,sort: 'createdAt',requestKey: null});
+      const records = await pb.collection('task_lists').getFullList<TodoList>({filter: `user_id = "${userId}"`,sort: 'createdAt',requestKey: null});
       
       const listsWithTodos: TodoListWithTodos[] = records.map(list => {
         const todos = getTodosFromYjsUpdate(list.yjsUpdate || '');
@@ -369,9 +141,12 @@ export function useTodoLists() {
 
       setTodoLists(listsWithTodos);
       
-      if (listsWithTodos.length > 0 && !activeListId) {
-        setActiveListId(listsWithTodos[0].id);
-      }
+      setActiveListId(prevActiveListId => {
+        if (listsWithTodos.length > 0 && !prevActiveListId) {
+          return listsWithTodos[0].id;
+        }
+        return prevActiveListId;
+      });
       
       console.log(`Successfully fetched ${listsWithTodos.length} lists from PocketBase`);
       
@@ -384,8 +159,9 @@ export function useTodoLists() {
     } finally {
       setLoading(false);
     }
-  }, [pb, authService, activeListId, loading, isInitialized]);
+  }, [pb, authService]);
 
+  // Subscribe to real-time updates
   useEffect(() => {
     if (!isInitialized) {
       fetchLists();
@@ -401,14 +177,12 @@ export function useTodoLists() {
     const newId = crypto.randomUUID();
     const now = new Date().toISOString();
 
-    // Create the initial list with metadata from Yjs default values
     const newList: TodoListWithTodos = {
       id: newId,
       user_id: userId,
       createdAt: now,
       deleted: false,
       todos: [],
-      // Computed metadata (these will be stored in Yjs, not PocketBase)
       name: name,
       color: color,
       pinned: false,
@@ -418,42 +192,39 @@ export function useTodoLists() {
     setTodoLists(prev => [newList, ...prev]);
     setActiveListId(newId);
 
-    queuePocketBaseOperation(async () => {
+    try {
       const freshPb = new PocketBase(PB_URL);
       freshPb.authStore.save(pb.authStore.token, pb.authStore.model);
-      
-      // Only create with essential fields - metadata will be in Yjs
       const data = { 
         id: newId, 
         user_id: userId, 
         createdAt: now, 
         deleted: false 
       };
-      
       await freshPb.collection('task_lists').create<TodoList>(data, { requestKey: null });
-      
       console.log(`Successfully synced new list ${newId} to PocketBase`);
-    });
-
-    // Initialize Yjs document with the provided metadata
-    // This should be done by accessing the useYjsTodoList hook for this list
-    // The initialization will happen automatically when the Yjs document is first accessed
+    } catch (error) {
+      console.error("Failed to create new list:", error);
+      // Optionally handle the error, e.g., by removing the optimistic update
+    }
 
     return newId;
-  }, [authService, pb, queuePocketBaseOperation]);
+  }, [authService, pb.authStore.token, pb.authStore.model]);
 
   const deleteList = useCallback(async (listId: string) => {
     const remainingLists = todoLists.filter(list => list.id !== listId);
     setTodoLists(remainingLists);
-    
-    // Always queue the delete operation first
-    queuePocketBaseOperation(async () => {
+
+    try {
       const freshPb = new PocketBase(PB_URL);
       freshPb.authStore.save(pb.authStore.token, pb.authStore.model);
       await freshPb.collection('task_lists').delete(listId, { requestKey: null });
       console.log(`Successfully synced list deletion ${listId} to PocketBase`);
-    });
-    
+    } catch (error) {
+      console.error("Failed to delete list:", error);
+      // Optionally handle the error, e.g., by restoring the deleted list
+    }
+
     if (activeListId === listId) {
       if (remainingLists.length > 0) {
         setActiveListId(remainingLists[0].id);
@@ -462,10 +233,7 @@ export function useTodoLists() {
         setActiveListId(newId);
       }
     }
-  }, [todoLists, activeListId, createNewList, queuePocketBaseOperation, pb.authStore]);
-
-  // Legacy function removed - metadata updates now handled by Yjs
-  // All list metadata operations (name, color, pinned, archived) should use useYjsTodoList hook functions
+  }, [todoLists, activeListId, createNewList, pb.authStore.token, pb.authStore.model]);
 
   const cloneList = useCallback(async (listId: string) => {
     const listToClone = todoLists.find(list => list.id === listId);
@@ -476,19 +244,18 @@ export function useTodoLists() {
     const newName = `${listToClone.name} (Copy)`;
     const newId = await createNewList(newName, listToClone.color);
 
-    // The yjsUpdate is a base64 string. We can just copy it.
     const yjsUpdate = listToClone.yjsUpdate;
 
     if (yjsUpdate) {
-      // Update the newly created list with the cloned yjsUpdate
-      queuePocketBaseOperation(async () => {
+      try {
         const freshPb = new PocketBase(PB_URL);
         freshPb.authStore.save(pb.authStore.token, pb.authStore.model);
         await freshPb.collection('task_lists').update(newId, { yjsUpdate });
         console.log(`Successfully synced cloned list data ${newId} to PocketBase`);
-      });
+      } catch (error) {
+        console.error("Failed to clone list:", error);
+      }
 
-      // Also update the local state immediately for better UX
       const todos = getTodosFromYjsUpdate(yjsUpdate);
       const clonedMetadata = getMetadataFromYjsUpdate(yjsUpdate);
       
@@ -508,21 +275,7 @@ export function useTodoLists() {
     }
 
     return newId;
-  }, [todoLists, createNewList, queuePocketBaseOperation, pb.authStore, getTodosFromYjsUpdate, getMetadataFromYjsUpdate]);
-
-  // Function to update metadata for a specific list in local state
-  // This is used to sync Yjs metadata changes to the local todoLists state
-  const updateListMetadata = useCallback((listId: string, metadata: Partial<{
-    name: string;
-    color: string;
-    pinned: boolean;
-    archived: boolean;
-    deleted: boolean;
-  }>) => {
-    setTodoLists(prevLists => prevLists.map(list => 
-      list.id === listId ? { ...list, ...metadata } : list
-    ));
-  }, []);
+  }, [todoLists, createNewList, pb.authStore.token, pb.authStore.model]);
 
   return {
     todoLists,
@@ -533,6 +286,5 @@ export function useTodoLists() {
     createNewList,
     deleteList,
     cloneList,
-    updateListMetadata,
   };
 }

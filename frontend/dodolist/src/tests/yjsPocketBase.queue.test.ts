@@ -2,58 +2,7 @@ import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { act } from '@testing-library/react';
 import { GlobalPocketBaseProvider } from '../services/yjsPocketBase';
 import * as Y from 'yjs';
-
-// Mock PocketBase with synchronous responses
-vi.mock('pocketbase', () => {
-  return {
-    default: vi.fn().mockImplementation(() => ({
-      authStore: {
-        isValid: true,
-        token: 'mock-token',
-        model: { id: 'user1' },
-        save: vi.fn(),
-        onChange: vi.fn(),
-      },
-      collection: vi.fn().mockReturnValue({
-        getOne: vi.fn().mockResolvedValue({ yjsUpdate: '' }),
-        subscribe: vi.fn().mockResolvedValue(() => {}),
-        unsubscribe: vi.fn(),
-        update: vi.fn().mockResolvedValue({}),
-      }),
-      realtime: {
-        isConnected: true,
-      },
-    })),
-  };
-});
-
-// Mock y-indexeddb with immediate sync
-vi.mock('y-indexeddb', () => ({
-  IndexeddbPersistence: vi.fn().mockImplementation((_name, doc) => {
-    // Trigger sync immediately
-    if (doc && typeof doc.emit === 'function') {
-      doc.emit('synced', []);
-    }
-    return {
-      on: vi.fn((event, callback) => {
-        if (event === 'synced') {
-          callback();
-        }
-      }),
-      whenSynced: Promise.resolve(),
-      destroy: vi.fn(),
-    };
-  }),
-}));
-
-// Mock global window
-Object.defineProperty(window, 'navigator', {
-  value: { onLine: true },
-  writable: true,
-});
-
-global.addEventListener = vi.fn();
-global.removeEventListener = vi.fn();
+import './setup'; // Ensure global mocks are loaded
 
 describe('PocketBaseProvider Sync Queue Logic', () => {
   let globalProvider: GlobalPocketBaseProvider;
@@ -74,6 +23,8 @@ describe('PocketBaseProvider Sync Queue Logic', () => {
   afterEach(() => {
     globalProvider.destroy();
     vi.useRealTimers();
+    // Clear the singleton instance for the next test
+    (GlobalPocketBaseProvider as any).instance = null;
   });
 
   it('should queue sync operations when document is updated', () => {

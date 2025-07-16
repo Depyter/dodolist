@@ -1,25 +1,30 @@
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
+import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import DodoListApp from '../pages/TodoListPage';
-import { useTodoLists } from '../hooks/useTodoLists';
-import { useYjsTodoList } from '../hooks/useYjsTodoList';
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import './setup'; // Ensure global mocks are loaded
 
-// Mock the hooks
-vi.mock('../hooks/useTodoLists');
-vi.mock('../hooks/useYjsTodoList');
+// Mock hooks
+const mockUseTodoLists = vi.fn();
+const mockUseYjsTodoList = vi.fn();
 
-// Mock AuthService
-vi.mock('@/services/authService', () => ({
-  default: vi.fn(() => ({
-    logout: vi.fn(),
-    isAuthenticated: () => true,
-    getCurrentUser: () => ({ id: 'user-123', name: 'Test User' }),
-  })),
+// Mock react-router-dom hooks
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual('react-router-dom');
+  return {
+    ...actual,
+    useParams: () => ({ listId: 'list-1' }),
+    useNavigate: () => vi.fn(),
+  };
+});
+
+// Mock hooks used in DodoListApp
+vi.mock('../hooks/useTodoLists', () => ({
+  useTodoLists: () => mockUseTodoLists(),
 }));
-
-const mockUseTodoLists = useTodoLists as Mock;
-const mockUseYjsTodoList = useYjsTodoList as Mock;
+vi.mock('../hooks/useYjsTodoList', () => ({
+  useYjsTodoList: () => mockUseYjsTodoList(),
+}));
 
 describe('TodoListPage Component', () => {
   const mockAddTodo = vi.fn();

@@ -111,7 +111,7 @@ class AuthService {
   // Request password reset
   async requestPasswordReset(email: string): Promise<void> {
     try {
-      await this.pb.collection('users').requestPasswordReset(email)
+      await this.pb.users.requestPasswordReset(email)
     } catch (error) {
       console.error('Password reset request error:', error)
       throw new Error('Password reset request failed')
@@ -125,7 +125,7 @@ class AuthService {
     passwordConfirm: string
   ): Promise<void> {
     try {
-      await this.pb.collection('users').confirmPasswordReset(
+      await this.pb.users.confirmPasswordReset(
         token,
         password,
         passwordConfirm
@@ -139,7 +139,7 @@ class AuthService {
   // Send email verification
   async requestVerification(email: string): Promise<void> {
     try {
-      await this.pb.collection('users').requestVerification(email)
+      await this.pb.users.requestVerification(email)
     } catch (error) {
       console.error('Verification request error:', error)
       throw new Error('Verification request failed')
@@ -149,7 +149,7 @@ class AuthService {
   // Confirm email verification
   async confirmVerification(token: string): Promise<void> {
     try {
-      await this.pb.collection('users').confirmVerification(token)
+      await this.pb.users.confirmVerification(token)
     } catch (error) {
       console.error('Email verification error:', error)
       throw new Error('Email verification failed')

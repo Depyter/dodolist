@@ -1,21 +1,24 @@
+import './setup'; // Ensure global mocks are loaded
 import { renderHook, act } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import * as Y from 'yjs';
 import { useYjsTodoList } from '../hooks/useYjsTodoList';
+import { getDocumentProvider } from '../services/yjsPocketBase';
 
-// Mock the PocketBaseProvider
-vi.mock('../services/yjsPocketBase', async (importOriginal) => {
-  const original = await importOriginal<typeof import('../services/yjsPocketBase')>();
+// Mock the getDocumentProvider function
+vi.mock('../services/yjsPocketBase', async () => {
+  const originalModule = await vi.importActual('../services/yjsPocketBase');
   const mockProvider = {
     doc: new Y.Doc(),
+    getSyncStatus: vi.fn(() => ({ status: 'synced' })),
     onStatusChange: vi.fn(() => () => {}),
+    reconnect: vi.fn(),
     destroy: vi.fn(),
   };
-
   return {
-    ...original,
-    PocketBaseProvider: vi.fn(() => mockProvider),
-    __mockProvider: mockProvider,
+    ...originalModule,
+    getDocumentProvider: vi.fn(() => mockProvider),
+    __mockProvider: mockProvider, // Export for test access
   };
 });
 
