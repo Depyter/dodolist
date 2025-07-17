@@ -39,23 +39,23 @@ export const mockAuthStore = {
 };
 
 // Mocks for collection methods
-export const mockCollectionCreate = vi.fn().mockResolvedValue({});
+export const mockCollectionCreate = vi.fn();
 export const mockCollectionAuthWithPassword = vi.fn();
-export const mockCollectionUpdate = vi.fn().mockResolvedValue({});
-export const mockCollectionGetOne = vi.fn((id: string) => Promise.resolve({ id, yjsUpdate: '' }));
-export const mockCollectionGetFullList = vi.fn().mockResolvedValue([]);
-export const mockCollectionDelete = vi.fn().mockResolvedValue({});
-export const mockCollectionSubscribe = vi.fn().mockResolvedValue(vi.fn());
-export const mockCollectionUnsubscribe = vi.fn().mockResolvedValue(undefined);
+export const mockCollectionUpdate = vi.fn();
+export const mockCollectionGetOne = vi.fn().mockResolvedValue({ yjsUpdate: '' });
+export const mockCollectionGetFullList = vi.fn();
+export const mockCollectionDelete = vi.fn();
+export const mockCollectionSubscribe = vi.fn().mockReturnValue('subscription-id');
+export const mockCollectionUnsubscribe = vi.fn();
 
 
 // Mocks for users methods
-export const mockUsersRequestPasswordReset = vi.fn();
-export const mockUsersConfirmPasswordReset = vi.fn();
-export const mockUsersRequestVerification = vi.fn();
-export const mockUsersConfirmVerification = vi.fn();
+export const mockUsersRequestPasswordReset = vi.fn().mockResolvedValue(undefined);
+export const mockUsersConfirmPasswordReset = vi.fn().mockResolvedValue(undefined);
+export const mockUsersRequestVerification = vi.fn().mockResolvedValue(undefined);
+export const mockUsersConfirmVerification = vi.fn().mockResolvedValue(undefined);
 
-export const pb = new Proxy({
+export const pb = {
   authStore: mockAuthStore,
   collection: vi.fn((_collectionName: string) => ({
     create: mockCollectionCreate,
@@ -67,27 +67,18 @@ export const pb = new Proxy({
     subscribe: mockCollectionSubscribe,
     unsubscribe: mockCollectionUnsubscribe,
   })),
-  users: new Proxy({}, {
-    get: (target, prop) => {
-        if (prop === 'requestPasswordReset') return mockUsersRequestPasswordReset;
-        if (prop === 'confirmPasswordReset') return mockUsersConfirmPasswordReset;
-        if (prop === 'requestVerification') return mockUsersRequestVerification;
-        if (prop === 'confirmVerification') return mockUsersConfirmVerification;
-        return vi.fn();
-    }
-  }),
+  users: {
+    requestPasswordReset: mockUsersRequestPasswordReset,
+    confirmPasswordReset: mockUsersConfirmPasswordReset,
+    requestVerification: mockUsersRequestVerification,
+    confirmVerification: mockUsersConfirmVerification,
+  },
   realtime: {
     subscribe: vi.fn().mockReturnValue('realtime-subscription-id'),
     unsubscribe: vi.fn(),
     isConnected: true,
   },
-}, {
-  get(target, prop) {
-    if (prop in target) return target[prop as keyof typeof target];
-    // Return a no-op function for any unknown property
-    return vi.fn();
-  }
-});
+};
 
 vi.mock('pocketbase', () => ({
   default: vi.fn(() => pb),

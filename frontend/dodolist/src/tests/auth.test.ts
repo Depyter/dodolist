@@ -108,14 +108,8 @@ describe('PocketBase Authentication', () => {
 
   describe('Password Reset', () => {
     it('should request password reset', async () => {
-      const mockRequestPasswordReset = vi.fn().mockResolvedValue(true)
-      pb.collection = vi.fn().mockReturnValue({
-        requestPasswordReset: mockRequestPasswordReset
-      })
-
-      // TypeScript fix: assert the method exists (mock always provides it)
-      await (pb.collection('users').requestPasswordReset! as Function)('test@example.com')
-      expect(mockRequestPasswordReset).toHaveBeenCalledWith('test@example.com')
+      await pb.users.requestPasswordReset('test@example.com')
+      expect(pb.users.requestPasswordReset).toHaveBeenCalledWith('test@example.com')
     })
   })
 })

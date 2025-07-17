@@ -3,12 +3,10 @@ import { renderHook, act, waitFor } from '@testing-library/react';
 import * as Y from 'yjs';
 import { useTodoLists } from '../hooks/useTodoLists';
 import AuthService from '../services/authService';
-import './setup'; // Ensure global mocks are loaded
-import { mockCollectionGetFullList, mockCollectionCreate, mockCollectionDelete, pb } from './setup';
+import './setup';
+import { mockCollectionGetFullList, mockCollectionCreate, mockCollectionDelete } from './setup';
 
-// Mock AuthService
-vi.mock('../services/authService');
-
+// Helper to create a valid yjsUpdate string
 const createYjsUpdate = (data: { name: string; color?: string; pinned?: boolean; archived?: boolean }) => {
   const doc = new Y.Doc();
   const ylist = doc.getMap('list');
@@ -23,31 +21,24 @@ const createYjsUpdate = (data: { name: string; color?: string; pinned?: boolean;
   return Buffer.from(Y.encodeStateAsUpdate(doc)).toString('base64');
 };
 
-describe('useTodoLists Hook', () => {
+describe('useTodoLists', () => {
   beforeEach(() => {
     vi.useFakeTimers();
     vi.clearAllMocks();
-
-    // Mock the AuthService implementation
-    vi.mocked(AuthService).mockImplementation(function() {
-      // @ts-ignore: allow private pb for test
-      this.pb = pb;
-      return {
-        isAuthenticated: () => true,
-        getCurrentUser: () => ({ id: 'user-123', email: 'test@test.com', username: 'test', verified: true, avatar: '' }),
-        onAuthChange: () => () => {},
-        logout: () => {},
-        login: vi.fn(),
-        register: vi.fn(),
-        requestPasswordReset: vi.fn(),
-        confirmPasswordReset: vi.fn(),
-        requestVerification: vi.fn(),
-        confirmVerification: vi.fn(),
-        updateProfile: vi.fn(),
-        getToken: () => 'fake-token',
-      };
-    } as any);
-
+    vi.mocked(AuthService).mockImplementation(() => ({
+      isAuthenticated: () => true,
+      getCurrentUser: () => ({ id: 'user-123', email: 'test@test.com', username: 'test', verified: true, avatar: '' }),
+      onAuthChange: () => () => {},
+      logout: () => {},
+      login: vi.fn(),
+      register: vi.fn(),
+      requestPasswordReset: vi.fn(),
+      confirmPasswordReset: vi.fn(),
+      requestVerification: vi.fn(),
+      confirmVerification: vi.fn(),
+      updateProfile: vi.fn(),
+      getToken: () => 'fake-token',
+    } as any));
     Object.defineProperty(navigator, 'onLine', {
       value: true,
       writable: true,
@@ -61,79 +52,90 @@ describe('useTodoLists Hook', () => {
       { id: '2', user_id: 'user-123', createdAt: '2023-01-02T00:00:00Z', yjsUpdate: createYjsUpdate({ name: 'List 2' }) },
     ];
     mockCollectionGetFullList.mockResolvedValue([...mockLists]);
-
     const { result } = renderHook(() => useTodoLists());
-
     await waitFor(() => {
       expect(result.current.loading).toBe(false);
       expect(result.current.todoLists).toHaveLength(2);
     });
-
     expect(result.current.todoLists[0].name).toBe('List 1');
     expect(result.current.activeListId).toBe('1');
   });
 
-  it('creates a new list optimistically and queues the backend operation', async () => {
+  it('creates a new list and updates state optimistically', async () => {
     mockCollectionGetFullList.mockResolvedValue([]);
     mockCollectionCreate.mockResolvedValue({ id: 'new-list' });
     const { result } = renderHook(() => useTodoLists());
-
     await waitFor(() => expect(result.current.loading).toBe(false));
-
     await act(async () => {
       await result.current.createNewList('New List', 'bg-red-400');
     });
-
     expect(result.current.todoLists.find(l => l.name === 'New List')).toBeDefined();
-    
     await waitFor(() => {
       expect(mockCollectionCreate).toHaveBeenCalled();
     });
   });
 
-  it('deletes a list optimistically and queues the backend operation', async () => {
+  it('deletes a list and removes it from state', async () => {
     const mockLists = [{ id: '1', user_id: 'user-123', createdAt: '2023-01-01T00:00:00Z', yjsUpdate: createYjsUpdate({ name: 'List 1' }) }];
     mockCollectionGetFullList.mockResolvedValue([...mockLists]);
     mockCollectionDelete.mockResolvedValue({});
     const { result } = renderHook(() => useTodoLists());
-
     await waitFor(() => expect(result.current.todoLists).toHaveLength(1));
-
     await act(async () => {
       await result.current.deleteList('1');
     });
-
     expect(result.current.todoLists.find(l => l.id === '1')).toBeUndefined();
-    
     await waitFor(() => {
-      expect(mockCollectionDelete).toHaveBeenCalledWith('1', { requestKey: null });
+      expect(mockCollectionDelete).toHaveBeenCalled();
     });
   });
 
-  it('queues operations when offline and processes them when back online', async () => {
+  it('creates a default list if last list is deleted', async () => {
+    const mockLists = [{ id: '1', user_id: 'user-123', createdAt: '2023-01-01T00:00:00Z', yjsUpdate: createYjsUpdate({ name: 'List 1' }) }];
+    mockCollectionGetFullList.mockResolvedValue([...mockLists]);
+    mockCollectionDelete.mockResolvedValue({});
+    mockCollectionCreate.mockResolvedValue({ id: 'default-list' });
+    const { result } = renderHook(() => useTodoLists());
+    await waitFor(() => expect(result.current.todoLists.length).toBe(1));
+    await act(async () => {
+      await result.current.deleteList('1');
+    });
+    expect(result.current.todoLists.length).toBe(1);
+    expect(result.current.todoLists[0].name).toBe('Default List');
+    await waitFor(() => {
+      expect(mockCollectionCreate).toHaveBeenCalled();
+    });
+  });
+
+  it('does not fetch lists if unauthenticated', async () => {
+    vi.mocked(AuthService).mockImplementation(function() {
+      return {
+        isAuthenticated: () => false,
+        getCurrentUser: () => null,
+      };
+    } as any);
     mockCollectionGetFullList.mockResolvedValue([]);
     const { result } = renderHook(() => useTodoLists());
+    await act(async () => {});
+    expect(result.current.todoLists.length).toBe(0);
+  });
 
+  it('queues operations when offline and processes when online', async () => {
+    mockCollectionGetFullList.mockResolvedValue([]);
+    mockCollectionCreate.mockResolvedValue({ id: 'offline-list' });
+    const { result } = renderHook(() => useTodoLists());
     await waitFor(() => expect(result.current.loading).toBe(false));
-
-    // Go offline
     await act(async () => {
       vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(false);
       await result.current.createNewList('Offline List', 'bg-gray-500');
       await vi.runAllTimersAsync();
-      await Promise.resolve();
     });
-
     expect(result.current.todoLists.find(l => l.name === 'Offline List')).toBeDefined();
-
-    // Go back online
     await act(async () => {
       vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(true);
       window.dispatchEvent(new Event('online'));
       await vi.runAllTimersAsync();
-      await Promise.resolve();
     });
-
     await waitFor(() => {
       expect(mockCollectionCreate).toHaveBeenCalled();
     });

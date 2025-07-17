@@ -52,17 +52,15 @@ class AuthService {
     }
   }
 
-  // Login user
+  // Login user (password)
   async login(data: LoginData): Promise<AuthData> {
     try {
       const authData = await this.pb.collection('users').authWithPassword(
         data.identity,
         data.password
       )
-      
       // Update the global auth store
       ;(window as any).__pb_auth_store = this.pb.authStore
-      
       return {
         token: authData.token,
         record: {
@@ -79,7 +77,7 @@ class AuthService {
     }
   }
 
-  // Logout user
+  // Logout user (clear token)
   logout(): void {
     this.pb.authStore.clear()
   }
@@ -93,7 +91,6 @@ class AuthService {
   getCurrentUser(): User | null {
     const model = this.pb.authStore.model
     if (!model) return null
-    
     return {
       id: model.id,
       email: model.email,
@@ -111,7 +108,7 @@ class AuthService {
   // Request password reset
   async requestPasswordReset(email: string): Promise<void> {
     try {
-      await this.pb.users.requestPasswordReset(email)
+      await this.pb.collection('users').requestPasswordReset(email)
     } catch (error) {
       console.error('Password reset request error:', error)
       throw new Error('Password reset request failed')
@@ -125,7 +122,7 @@ class AuthService {
     passwordConfirm: string
   ): Promise<void> {
     try {
-      await this.pb.users.confirmPasswordReset(
+      await this.pb.collection('users').confirmPasswordReset(
         token,
         password,
         passwordConfirm
@@ -139,7 +136,7 @@ class AuthService {
   // Send email verification
   async requestVerification(email: string): Promise<void> {
     try {
-      await this.pb.users.requestVerification(email)
+      await this.pb.collection('users').requestVerification(email)
     } catch (error) {
       console.error('Verification request error:', error)
       throw new Error('Verification request failed')
@@ -149,7 +146,7 @@ class AuthService {
   // Confirm email verification
   async confirmVerification(token: string): Promise<void> {
     try {
-      await this.pb.users.confirmVerification(token)
+      await this.pb.collection('users').confirmVerification(token)
     } catch (error) {
       console.error('Email verification error:', error)
       throw new Error('Email verification failed')

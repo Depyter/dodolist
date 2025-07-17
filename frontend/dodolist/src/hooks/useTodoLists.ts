@@ -1,7 +1,7 @@
 import type { Todo } from '@/lib/types';
 import * as Y from 'yjs';
 import PocketBase from 'pocketbase';
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { PB_URL } from '@/config';
 import AuthService from '@/services/authService';
 
@@ -110,7 +110,6 @@ export function useTodoLists() {
   const [error, setError] = useState<Error | null>(null);
   const [activeListId, setActiveListId] = useState<string | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
-  const subscribedRef = useRef(false);
 
   const fetchLists = useCallback(async () => {
     if (!authService.isAuthenticated() || !authService.getCurrentUser()) {
@@ -168,8 +167,12 @@ export function useTodoLists() {
     }
   }, [fetchLists, isInitialized]);
 
+  // Filter out deleted lists from UI
+  const visibleLists = todoLists.filter(list => !list.deleted);
+
   // --- List Management (via PocketBase REST API) ---
 
+  // Create a new list with proper initial metadata and Yjs setup
   const createNewList = useCallback(async (name: string, color: string) => {
     const userId = authService.getCurrentUser()?.id;
     if (!userId) throw new Error("User not authenticated");
@@ -177,16 +180,34 @@ export function useTodoLists() {
     const newId = crypto.randomUUID();
     const now = new Date().toISOString();
 
+    // Create initial Yjs document and encode as base64
+    const doc = new Y.Doc();
+    const ylist = doc.getMap('list');
+    ylist.set('name', new Y.Text());
+    (ylist.get('name') as Y.Text).insert(0, name);
+    ylist.set('color', new Y.Text());
+    (ylist.get('color') as Y.Text).insert(0, color);
+    ylist.set('pinned', new Y.Map([["value", false]]));
+    ylist.set('archived', new Y.Map([["value", false]]));
+    ylist.set('deleted', new Y.Map([["value", false]]));
+    ylist.set('todos', new Y.Array());
+    ylist.set('createdAt', new Y.Text());
+    (ylist.get('createdAt') as Y.Text).insert(0, now);
+    ylist.set('metadataVersion', new Y.Map([["value", 1]]));
+    const update = Y.encodeStateAsUpdate(doc);
+    const yjsUpdate = btoa(String.fromCharCode(...update));
+
     const newList: TodoListWithTodos = {
       id: newId,
       user_id: userId,
       createdAt: now,
       deleted: false,
       todos: [],
-      name: name,
-      color: color,
+      name,
+      color,
       pinned: false,
       archived: false,
+      yjsUpdate,
     };
 
     setTodoLists(prev => [newList, ...prev]);
@@ -195,37 +216,56 @@ export function useTodoLists() {
     try {
       const freshPb = new PocketBase(PB_URL);
       freshPb.authStore.save(pb.authStore.token, pb.authStore.model);
-      const data = { 
-        id: newId, 
-        user_id: userId, 
-        createdAt: now, 
-        deleted: false 
+      const data = {
+        id: newId,
+        user_id: userId,
+        name,
+        color,
+        createdAt: now,
+        pinned: false,
+        archived: false,
+        yjsUpdate,
+        deleted: false,
       };
       await freshPb.collection('task_lists').create<TodoList>(data, { requestKey: null });
       console.log(`Successfully synced new list ${newId} to PocketBase`);
     } catch (error) {
       console.error("Failed to create new list:", error);
-      // Optionally handle the error, e.g., by removing the optimistic update
     }
 
     return newId;
   }, [authService, pb.authStore.token, pb.authStore.model]);
 
+  // Soft delete a list (set deleted: true)
   const deleteList = useCallback(async (listId: string) => {
-    const remainingLists = todoLists.filter(list => list.id !== listId);
-    setTodoLists(remainingLists);
+    setTodoLists(prev => prev.map(list =>
+      list.id === listId ? { ...list, deleted: true } : list
+    ));
 
     try {
       const freshPb = new PocketBase(PB_URL);
       freshPb.authStore.save(pb.authStore.token, pb.authStore.model);
-      await freshPb.collection('task_lists').delete(listId, { requestKey: null });
-      console.log(`Successfully synced list deletion ${listId} to PocketBase`);
+      const list = todoLists.find(l => l.id === listId);
+      if (!list) return;
+      const data = {
+        user_id: list.user_id,
+        name: list.name,
+        color: list.color,
+        createdAt: list.createdAt,
+        pinned: list.pinned,
+        archived: list.archived,
+        yjsUpdate: list.yjsUpdate,
+        deleted: true,
+      };
+      await freshPb.collection('task_lists').update(listId, data);
+      console.log(`Soft deleted list ${listId} in PocketBase`);
     } catch (error) {
-      console.error("Failed to delete list:", error);
-      // Optionally handle the error, e.g., by restoring the deleted list
+      console.error("Failed to soft delete list:", error);
     }
 
+    // Switch to another visible list if needed
     if (activeListId === listId) {
+      const remainingLists = todoLists.filter(list => list.id !== listId && !list.deleted);
       if (remainingLists.length > 0) {
         setActiveListId(remainingLists[0].id);
       } else {
@@ -277,8 +317,25 @@ export function useTodoLists() {
     return newId;
   }, [todoLists, createNewList, pb.authStore.token, pb.authStore.model]);
 
+  // Update list metadata in local state
+  const updateListMetadata = useCallback(
+    async (
+      listId: string,
+      metadata: Partial<Pick<TodoListWithTodos, 'name' | 'color' | 'pinned' | 'archived'>>
+    ) => {
+      setTodoLists(prev =>
+        prev.map(list =>
+          list.id === listId
+            ? { ...list, ...metadata }
+            : list
+        )
+      );
+    },
+    [pb.authStore.token, pb.authStore.model, todoLists]
+  );
+
   return {
-    todoLists,
+    todoLists: visibleLists,
     loading,
     error,
     activeListId,
@@ -286,5 +343,6 @@ export function useTodoLists() {
     createNewList,
     deleteList,
     cloneList,
+    updateListMetadata,
   };
 }
