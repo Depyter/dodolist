@@ -14,7 +14,6 @@ export interface YListDoc {
     deleted: Y.Map<boolean>; // Soft delete flag
     createdAt: Y.Text;
     todos: Y.Array<YTodo>;
-    // Metadata versioning for migration tracking
     metadataVersion: Y.Map<number>;
 }
 

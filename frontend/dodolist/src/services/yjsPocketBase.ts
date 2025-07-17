@@ -812,6 +812,10 @@ export class GlobalPocketBaseProvider {
     // Reset singleton instance
     GlobalPocketBaseProvider.instance = null;
   }
+
+  public setConnectionStatus(status: boolean) {
+    this.isConnected = status;
+  }
 }
 
 // Export a convenience function to get document providers

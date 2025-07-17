@@ -165,8 +165,47 @@ export function useTodoLists() {
     if (!isInitialized) {
       fetchLists();
     }
-  }, [fetchLists, isInitialized]);
 
+    pb.collection('task_lists').subscribe('*', (e) => {
+      if (e.action === 'update' || e.action === 'create') {
+        setTodoLists(prev => {
+          const idx = prev.findIndex(list => list.id === e.record.id);
+          const todos = getTodosFromYjsUpdate(e.record.yjsUpdate || '');
+          const metadata = getMetadataFromYjsUpdate(e.record.yjsUpdate || '');
+          const prevList: Partial<TodoListWithTodos> = idx > -1 ? prev[idx] : {
+            user_id: e.record.user_id || '',
+            createdAt: e.record.createdAt || '',
+          };
+          const updatedList: TodoListWithTodos = {
+            id: e.record.id,
+            user_id: e.record.user_id || prevList.user_id || '',
+            createdAt: e.record.createdAt || prevList.createdAt || '',
+            yjsUpdate: e.record.yjsUpdate,
+            deleted: metadata.deleted,
+            todos,
+            name: metadata.name,
+            color: metadata.color,
+            pinned: metadata.pinned,
+            archived: metadata.archived,
+          };
+          if (idx > -1) {
+            const newLists = [...prev];
+            newLists[idx] = updatedList;
+            return newLists;
+          } else {
+            return [updatedList, ...prev];
+          }
+        });
+      } else if (e.action === 'delete') {
+        setTodoLists(prev => prev.filter(list => list.id !== e.record.id));
+      }
+    });
+
+    return () => {
+      pb.collection('task_lists').unsubscribe('*');
+    };
+  }, [pb, isInitialized, fetchLists]);
+ 
   // Filter out deleted lists from UI
   const visibleLists = todoLists.filter(list => !list.deleted);
 

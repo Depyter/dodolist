@@ -1,1057 +1,1188 @@
-[GlobalPocketBaseProvider] Lost PocketBase connection yjsPocketBase.ts:189:16
-Active List ID: 3f168b1f-5e2d-43bc-9636-7d03bd95077f TodoListPage.tsx:203:12
+Active List ID: 3ff4d349-ecd2-4bb0-9945-0ee22bd3362c TodoListPage.tsx:215:13
 Active List: 
-Object { archived: false, collectionId: "pbc_825406485", collectionName: "task_lists", color: "bg-blue-400", createdAt: "2025-07-09 15:31:27.273Z", deleted: false, id: "3f168b1f-5e2d-43bc-9636-7d03bd95077f", name: "no", pinned: false, user_id: "51612qsjktu0i93", … }
-TodoListPage.tsx:204:12
+Object { id: "3ff4d349-ecd2-4bb0-9945-0ee22bd3362c", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 06:36:20.995Z", yjsUpdate: "Cw/2p9TWDgAnAQRsaXN0BG5hbWUCAQD2p9TWDgAEJwEEbGlzdAVjb2xvcgIBAPan1NYOBQwnAQRsaXN0BnBpbm5lZAEhAPan1NYOEgV2YWx1ZQEnAQRsaXN0CGFyY2hpdmVkASEA9qfU1g4UBXZhbHVlAScBBGxpc3QHZGVsZXRlZAEoAPan1NYOFgV2YWx1ZQF5JwEEbGlzdAV0b2RvcwAnAQRsaXN0CWNyZWF0ZWRBdAIEAPan1NYOGRgyMDI1LTA3LTE3VDA2OjM2OjIwLjk5NVonAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEoAPan1NYOMgV2YWx1ZQF9AQ3/hazYDQAhAQRsaXN0BG5hbWUBIQEEbGlzdAVjb2xvcgEhAQRsaXN0BXRvZG9zASEBBGxpc3QGcGlubmVkAQABIQEEbGlzdAhhcmNoaXZlZAEAASEBBGxpc3QHZGVsZXRlZAEAASEBBGxpc3QJY3JlYXRlZEF0AQAYIQEEbGlzdA9tZXRhZGF0YVZlcnNpb24BAAERrqCU9wkAIQEEbGlzdARuYW1lASEBBGxpc3QFY29sb3IBIQEEbGlzdAV0b2RvcwEhAQRsaXN0BnBpbm5lZAEAASEBBGxpc3QIYXJjaGl2ZWQBAAEhAQRsaXN0B2RlbGV0ZWQBAAEhAQRsaXN0CWNyZWF0ZWRBdAEAGCEBBGxpc3QPbWV0YWRhdGFWZXJzaW9uAQABgY3G/qcIOASBjcb+pwhEDKGNxv6nCEUBobWu7fUCJAERjcb+pwgAIQEEbGlzdARuYW1lASEBBGxpc3QFY29sb3IBIQEEbGlzdAV0b2RvcwEhAQRsaXN0BnBpbm5lZAEAASEBBGxpc3QIYXJjaGl2ZWQBAAEhAQRsaXN0B2RlbGV0ZWQBAAEhAQRsaXN0CWNyZWF0ZWRBdAEAGCEBBGxpc3QPbWV0YWRhdGFWZXJzaW9uAQASgfan1NYOBASB9qfU1g4RDKH2p9TWDhMBofan1NYOFQEN9dij1gcAIQEEbGlzdARuYW1lASEBBGxpc3QFY29sb3IBIQEEbGlzdAV0b2RvcwEhAQRsaXN0BnBpbm5lZAEAASEBBGxpc3QIYXJjaGl2ZWQBAAEhAQRsaXN0B2RlbGV0ZWQBAAEhAQRsaXN0CWNyZWF0ZWRBdAEAGCEBBGxpc3QPbWV0YWRhdGFWZXJzaW9uAQABAYrIjNQGAKGNxv6nCEYBDZaN6aYDACEBBGxpc3QEbmFtZQEhAQRsaXN0BWNvbG9yASEBBGxpc3QFdG9kb3MBIQEEbGlzdAZwaW5uZWQBAAEhAQRsaXN0CGFyY2hpdmVkAQABIQEEbGlzdAdkZWxldGVkAQABIQEEbGlzdAljcmVhdGVkQXQBABghAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEAAQ61ru31AgAhAQRsaXN0BG5hbWUBIQEEbGlzdAVjb2xvcgEhAQRsaXN0BXRvZG9zASEBBGxpc3QGcGlubmVkAQABIQEEbGlzdAhhcmNoaXZlZAEAASEBBGxpc3QHZGVsZXRlZAEAASEBBGxpc3QJY3JlYXRlZEF0AQAYIQEEbGlzdA9tZXRhZGF0YVZlcnNpb24BAAGhisiM1AYAAQ3KyZyYAQAhAQRsaXN0BG5hbWUBIQEEbGlzdAVjb2xvcgEhAQRsaXN0BXRvZG9zASEBBGxpc3QGcGlubmVkAQABIQEEbGlzdAhhcmNoaXZlZAEAASEBBGxpc3QHZGVsZXRlZAEAASEBBGxpc3QJY3JlYXRlZEF0AQAYIQEEbGlzdA9tZXRhZGF0YVZlcnNpb24BAAEEsZ7jUwCErqCU9wknBGZ1Y2uErqCU9wkzDGJnLXN0b25lLTQwMKiuoJT3CTQBeaiuoJT3CTUBeQ2SuuYyACEBBGxpc3QEbmFtZQEhAQRsaXN0BWNvbG9yASEBBGxpc3QFdG9kb3MBIQEEbGlzdAZwaW5uZWQBAAEhAQRsaXN0CGFyY2hpdmVkAQABIQEEbGlzdAdkZWxldGVkAQABIQEEbGlzdAljcmVhdGVkQXQBABghAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEAAQr2p9TWDgQBBAYMEwEVAf+FrNgNAQAkrqCU9wkBADaNxv6nCAEAR/XYo9YHAQAkisiM1AYBAAGWjemmAwEAJLWu7fUCAQAlysmcmAEBACSSuuYyAQAk", deleted: false, todos: [], name: "fuck", color: "bg-stone-400", pinned: false, archived: false }
+TodoListPage.tsx:216:13
 Active List Todos: 
-Array(7) [ {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
-TodoListPage.tsx:205:12
+Array []
+TodoListPage.tsx:217:13
 Todos to use: 
-Array(7) [ {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
-TodoListPage.tsx:206:12
+Array []
+TodoListPage.tsx:218:13
 Active todos: 
 Array []
-TodoListPage.tsx:207:12
+TodoListPage.tsx:219:13
 Sorted active todos: 
 Array []
-TodoListPage.tsx:208:12
-[GlobalPocketBaseProvider] Local document updated for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f, origin: null yjsPocketBase.ts:296:14
-[GlobalPocketBaseProvider] Queued sync operation for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f, queue length: 1 yjsPocketBase.ts:461:12
-[GlobalPocketBaseProvider] Processing sync queue for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f, 1 operations pending yjsPocketBase.ts:477:12
-Active List ID: 3f168b1f-5e2d-43bc-9636-7d03bd95077f TodoListPage.tsx:203:12
+TodoListPage.tsx:220:13
+Active List ID: 3ff4d349-ecd2-4bb0-9945-0ee22bd3362c TodoListPage.tsx:215:13
 Active List: 
-Object { archived: false, collectionId: "pbc_825406485", collectionName: "task_lists", color: "bg-blue-400", createdAt: "2025-07-09 15:31:27.273Z", deleted: false, id: "3f168b1f-5e2d-43bc-9636-7d03bd95077f", name: "no", pinned: false, user_id: "51612qsjktu0i93", … }
-TodoListPage.tsx:204:12
+Object { id: "3ff4d349-ecd2-4bb0-9945-0ee22bd3362c", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 06:36:20.995Z", yjsUpdate: "Cw/2p9TWDgAnAQRsaXN0BG5hbWUCAQD2p9TWDgAEJwEEbGlzdAVjb2xvcgIBAPan1NYOBQwnAQRsaXN0BnBpbm5lZAEhAPan1NYOEgV2YWx1ZQEnAQRsaXN0CGFyY2hpdmVkASEA9qfU1g4UBXZhbHVlAScBBGxpc3QHZGVsZXRlZAEoAPan1NYOFgV2YWx1ZQF5JwEEbGlzdAV0b2RvcwAnAQRsaXN0CWNyZWF0ZWRBdAIEAPan1NYOGRgyMDI1LTA3LTE3VDA2OjM2OjIwLjk5NVonAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEoAPan1NYOMgV2YWx1ZQF9AQ3/hazYDQAhAQRsaXN0BG5hbWUBIQEEbGlzdAVjb2xvcgEhAQRsaXN0BXRvZG9zASEBBGxpc3QGcGlubmVkAQABIQEEbGlzdAhhcmNoaXZlZAEAASEBBGxpc3QHZGVsZXRlZAEAASEBBGxpc3QJY3JlYXRlZEF0AQAYIQEEbGlzdA9tZXRhZGF0YVZlcnNpb24BAAERrqCU9wkAIQEEbGlzdARuYW1lASEBBGxpc3QFY29sb3IBIQEEbGlzdAV0b2RvcwEhAQRsaXN0BnBpbm5lZAEAASEBBGxpc3QIYXJjaGl2ZWQBAAEhAQRsaXN0B2RlbGV0ZWQBAAEhAQRsaXN0CWNyZWF0ZWRBdAEAGCEBBGxpc3QPbWV0YWRhdGFWZXJzaW9uAQABgY3G/qcIOASBjcb+pwhEDKGNxv6nCEUBobWu7fUCJAERjcb+pwgAIQEEbGlzdARuYW1lASEBBGxpc3QFY29sb3IBIQEEbGlzdAV0b2RvcwEhAQRsaXN0BnBpbm5lZAEAASEBBGxpc3QIYXJjaGl2ZWQBAAEhAQRsaXN0B2RlbGV0ZWQBAAEhAQRsaXN0CWNyZWF0ZWRBdAEAGCEBBGxpc3QPbWV0YWRhdGFWZXJzaW9uAQASgfan1NYOBASB9qfU1g4RDKH2p9TWDhMBofan1NYOFQEN9dij1gcAIQEEbGlzdARuYW1lASEBBGxpc3QFY29sb3IBIQEEbGlzdAV0b2RvcwEhAQRsaXN0BnBpbm5lZAEAASEBBGxpc3QIYXJjaGl2ZWQBAAEhAQRsaXN0B2RlbGV0ZWQBAAEhAQRsaXN0CWNyZWF0ZWRBdAEAGCEBBGxpc3QPbWV0YWRhdGFWZXJzaW9uAQABAYrIjNQGAKGNxv6nCEYBDZaN6aYDACEBBGxpc3QEbmFtZQEhAQRsaXN0BWNvbG9yASEBBGxpc3QFdG9kb3MBIQEEbGlzdAZwaW5uZWQBAAEhAQRsaXN0CGFyY2hpdmVkAQABIQEEbGlzdAdkZWxldGVkAQABIQEEbGlzdAljcmVhdGVkQXQBABghAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEAAQ61ru31AgAhAQRsaXN0BG5hbWUBIQEEbGlzdAVjb2xvcgEhAQRsaXN0BXRvZG9zASEBBGxpc3QGcGlubmVkAQABIQEEbGlzdAhhcmNoaXZlZAEAASEBBGxpc3QHZGVsZXRlZAEAASEBBGxpc3QJY3JlYXRlZEF0AQAYIQEEbGlzdA9tZXRhZGF0YVZlcnNpb24BAAGhisiM1AYAAQ3KyZyYAQAhAQRsaXN0BG5hbWUBIQEEbGlzdAVjb2xvcgEhAQRsaXN0BXRvZG9zASEBBGxpc3QGcGlubmVkAQABIQEEbGlzdAhhcmNoaXZlZAEAASEBBGxpc3QHZGVsZXRlZAEAASEBBGxpc3QJY3JlYXRlZEF0AQAYIQEEbGlzdA9tZXRhZGF0YVZlcnNpb24BAAEEsZ7jUwCErqCU9wknBGZ1Y2uErqCU9wkzDGJnLXN0b25lLTQwMKiuoJT3CTQBeaiuoJT3CTUBeQ2SuuYyACEBBGxpc3QEbmFtZQEhAQRsaXN0BWNvbG9yASEBBGxpc3QFdG9kb3MBIQEEbGlzdAZwaW5uZWQBAAEhAQRsaXN0CGFyY2hpdmVkAQABIQEEbGlzdAdkZWxldGVkAQABIQEEbGlzdAljcmVhdGVkQXQBABghAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEAAQr2p9TWDgQBBAYMEwEVAf+FrNgNAQAkrqCU9wkBADaNxv6nCAEAR/XYo9YHAQAkisiM1AYBAAGWjemmAwEAJLWu7fUCAQAlysmcmAEBACSSuuYyAQAk", deleted: false, todos: [], name: "fuck", color: "bg-stone-400", pinned: false, archived: false }
+TodoListPage.tsx:216:13
 Active List Todos: 
-Array(7) [ {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
-TodoListPage.tsx:205:12
+Array []
+TodoListPage.tsx:217:13
 Todos to use: 
-Array(7) [ {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
-TodoListPage.tsx:206:12
-Active todos: 
-Array [ {…} ]
-TodoListPage.tsx:207:12
-Sorted active todos: 
-Array [ {…} ]
-TodoListPage.tsx:208:12
-[GlobalPocketBaseProvider] Failed to sync document for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f: ClientResponseError 0: Something went wrong while processing your request.
-    _ClientResponseError ClientResponseError.ts:13
-    send Client.ts:376
-    promise callback*send Client.ts:374
-    getOne CrudService.ts:165
-    getOne RecordService.ts:213
-    syncDocumentToServer yjsPocketBase.ts:542
-    handleDocUpdate yjsPocketBase.ts:303
-    processSyncQueue yjsPocketBase.ts:489
-    queueSync yjsPocketBase.ts:464
-    handleDocUpdate yjsPocketBase.ts:302
-    emit observable.js:82
-    emit observable.js:82
-    cleanupTransactions Transaction.js:363
-    transact Transaction.js:439
-    transact Doc.js:185
-    toggleTodo useYjsTodoList.ts:144
-    handleToggleTodo TodoListPage.tsx:252
-    onClick TodoListPage.tsx:893
-    React 13
-    <anonymous> main.tsx:21
-yjsPocketBase.ts:563:14
-[GlobalPocketBaseProvider] Sync operation failed for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f: ClientResponseError 0: Something went wrong while processing your request.
-    _ClientResponseError ClientResponseError.ts:13
-    send Client.ts:376
-    promise callback*send Client.ts:374
-    getOne CrudService.ts:165
-    getOne RecordService.ts:213
-    syncDocumentToServer yjsPocketBase.ts:542
-    handleDocUpdate yjsPocketBase.ts:303
-    processSyncQueue yjsPocketBase.ts:489
-    queueSync yjsPocketBase.ts:464
-    handleDocUpdate yjsPocketBase.ts:302
-    emit observable.js:82
-    emit observable.js:82
-    cleanupTransactions Transaction.js:363
-    transact Transaction.js:439
-    transact Doc.js:185
-    toggleTodo useYjsTodoList.ts:144
-    handleToggleTodo TodoListPage.tsx:252
-    onClick TodoListPage.tsx:893
-    React 13
-    <anonymous> main.tsx:21
-yjsPocketBase.ts:494:18
-[GlobalPocketBaseProvider] Finished processing sync queue for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f. Processed: 0, Failed: 1, Remaining: 0 yjsPocketBase.ts:518:12
-Active List ID: 3f168b1f-5e2d-43bc-9636-7d03bd95077f TodoListPage.tsx:203:12
-Active List: 
-Object { archived: false, collectionId: "pbc_825406485", collectionName: "task_lists", color: "bg-blue-400", createdAt: "2025-07-09 15:31:27.273Z", deleted: false, id: "3f168b1f-5e2d-43bc-9636-7d03bd95077f", name: "no", pinned: false, user_id: "51612qsjktu0i93", … }
-TodoListPage.tsx:204:12
-Active List Todos: 
-Array(7) [ {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
-TodoListPage.tsx:205:12
-Todos to use: 
-Array(7) [ {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
-TodoListPage.tsx:206:12
-Active todos: 
-Array [ {…} ]
-TodoListPage.tsx:207:12
-Sorted active todos: 
-Array [ {…} ]
-TodoListPage.tsx:208:12
-[GlobalPocketBaseProvider] Local document updated for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f, origin: null yjsPocketBase.ts:296:14
-[GlobalPocketBaseProvider] Queued sync operation for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f, queue length: 1 yjsPocketBase.ts:461:12
-[GlobalPocketBaseProvider] Processing sync queue for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f, 1 operations pending yjsPocketBase.ts:477:12
-Active List ID: 3f168b1f-5e2d-43bc-9636-7d03bd95077f TodoListPage.tsx:203:12
-Active List: 
-Object { archived: false, collectionId: "pbc_825406485", collectionName: "task_lists", color: "bg-blue-400", createdAt: "2025-07-09 15:31:27.273Z", deleted: false, id: "3f168b1f-5e2d-43bc-9636-7d03bd95077f", name: "no", pinned: false, user_id: "51612qsjktu0i93", … }
-TodoListPage.tsx:204:12
-Active List Todos: 
-Array(7) [ {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
-TodoListPage.tsx:205:12
-Todos to use: 
-Array(7) [ {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
-TodoListPage.tsx:206:12
-Active todos: 
-Array [ {…}, {…} ]
-TodoListPage.tsx:207:12
-Sorted active todos: 
-Array [ {…}, {…} ]
-TodoListPage.tsx:208:12
-[GlobalPocketBaseProvider] Failed to sync document for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f: ClientResponseError 0: Something went wrong while processing your request.
-    _ClientResponseError ClientResponseError.ts:13
-    send Client.ts:376
-    promise callback*send Client.ts:374
-    getOne CrudService.ts:165
-    getOne RecordService.ts:213
-    syncDocumentToServer yjsPocketBase.ts:542
-    handleDocUpdate yjsPocketBase.ts:303
-    processSyncQueue yjsPocketBase.ts:489
-    queueSync yjsPocketBase.ts:464
-    handleDocUpdate yjsPocketBase.ts:302
-    emit observable.js:82
-    emit observable.js:82
-    cleanupTransactions Transaction.js:363
-    transact Transaction.js:439
-    transact Doc.js:185
-    toggleTodo useYjsTodoList.ts:144
-    handleToggleTodo TodoListPage.tsx:252
-    onClick TodoListPage.tsx:893
-    React 13
-    <anonymous> main.tsx:21
-yjsPocketBase.ts:563:14
-[GlobalPocketBaseProvider] Sync operation failed for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f: ClientResponseError 0: Something went wrong while processing your request.
-    _ClientResponseError ClientResponseError.ts:13
-    send Client.ts:376
-    promise callback*send Client.ts:374
-    getOne CrudService.ts:165
-    getOne RecordService.ts:213
-    syncDocumentToServer yjsPocketBase.ts:542
-    handleDocUpdate yjsPocketBase.ts:303
-    processSyncQueue yjsPocketBase.ts:489
-    queueSync yjsPocketBase.ts:464
-    handleDocUpdate yjsPocketBase.ts:302
-    emit observable.js:82
-    emit observable.js:82
-    cleanupTransactions Transaction.js:363
-    transact Transaction.js:439
-    transact Doc.js:185
-    toggleTodo useYjsTodoList.ts:144
-    handleToggleTodo TodoListPage.tsx:252
-    onClick TodoListPage.tsx:893
-    React 13
-    <anonymous> main.tsx:21
-yjsPocketBase.ts:494:18
-[GlobalPocketBaseProvider] Finished processing sync queue for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f. Processed: 0, Failed: 1, Remaining: 0 yjsPocketBase.ts:518:12
-Active List ID: 3f168b1f-5e2d-43bc-9636-7d03bd95077f TodoListPage.tsx:203:12
-Active List: 
-Object { archived: false, collectionId: "pbc_825406485", collectionName: "task_lists", color: "bg-blue-400", createdAt: "2025-07-09 15:31:27.273Z", deleted: false, id: "3f168b1f-5e2d-43bc-9636-7d03bd95077f", name: "no", pinned: false, user_id: "51612qsjktu0i93", … }
-TodoListPage.tsx:204:12
-Active List Todos: 
-Array(7) [ {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
-TodoListPage.tsx:205:12
-Todos to use: 
-Array(7) [ {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
-TodoListPage.tsx:206:12
-Active todos: 
-Array [ {…}, {…} ]
-TodoListPage.tsx:207:12
-Sorted active todos: 
-Array [ {…}, {…} ]
-TodoListPage.tsx:208:12
-[useYjsTodoList] Cleanup for listId: 3f168b1f-5e2d-43bc-9636-7d03bd95077f useYjsTodoList.ts:38:20
-[GlobalPocketBaseProvider] Destroying document for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f yjsPocketBase.ts:689:12
-[GlobalPocketBaseProvider] Disconnected from PocketBase for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f yjsPocketBase.ts:437:16
-[useYjsTodoList] Effect triggered for listId: f82cb78a-b308-48d2-b669-c2e5599eb508 useYjsTodoList.ts:30:16
-[GlobalPocketBaseProvider] Creating document for list f82cb78a-b308-48d2-b669-c2e5599eb508 yjsPocketBase.ts:251:12
-[GlobalPocketBaseProvider] Local document updated for list f82cb78a-b308-48d2-b669-c2e5599eb508, origin: null yjsPocketBase.ts:296:14
-[GlobalPocketBaseProvider] Queued sync operation for list f82cb78a-b308-48d2-b669-c2e5599eb508, queue length: 1 yjsPocketBase.ts:461:12
-[GlobalPocketBaseProvider] Processing sync queue for list f82cb78a-b308-48d2-b669-c2e5599eb508, 1 operations pending yjsPocketBase.ts:477:12
-[GlobalPocketBaseProvider] Local document updated for list f82cb78a-b308-48d2-b669-c2e5599eb508, origin: null yjsPocketBase.ts:296:14
-[GlobalPocketBaseProvider] Queued sync operation for list f82cb78a-b308-48d2-b669-c2e5599eb508, queue length: 2 yjsPocketBase.ts:461:12
-[GlobalPocketBaseProvider] Local document updated for list f82cb78a-b308-48d2-b669-c2e5599eb508, origin: null yjsPocketBase.ts:296:14
-[GlobalPocketBaseProvider] Queued sync operation for list f82cb78a-b308-48d2-b669-c2e5599eb508, queue length: 3 yjsPocketBase.ts:461:12
-Active List ID: f82cb78a-b308-48d2-b669-c2e5599eb508 TodoListPage.tsx:203:12
-Active List: 
-Object { archived: false, collectionId: "pbc_825406485", collectionName: "task_lists", color: "bg-amber-300", createdAt: "2025-07-10 14:41:35.916Z", deleted: false, id: "f82cb78a-b308-48d2-b669-c2e5599eb508", name: "test", pinned: true, user_id: "51612qsjktu0i93", … }
-TodoListPage.tsx:204:12
-Active List Todos: 
-Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
-TodoListPage.tsx:205:12
-Todos to use: 
-Array(7) [ {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
-TodoListPage.tsx:206:12
-Active todos: 
-Array [ {…}, {…} ]
-TodoListPage.tsx:207:12
-Sorted active todos: 
-Array [ {…}, {…} ]
-TodoListPage.tsx:208:12
-[useYjsTodoList] Cleanup for listId: f82cb78a-b308-48d2-b669-c2e5599eb508 useYjsTodoList.ts:38:20
-[GlobalPocketBaseProvider] Destroying document for list f82cb78a-b308-48d2-b669-c2e5599eb508 yjsPocketBase.ts:689:12
-[GlobalPocketBaseProvider] Disconnected from PocketBase for list f82cb78a-b308-48d2-b669-c2e5599eb508 yjsPocketBase.ts:437:16
-[useYjsTodoList] Effect triggered for listId: 3f168b1f-5e2d-43bc-9636-7d03bd95077f useYjsTodoList.ts:30:16
-[GlobalPocketBaseProvider] Creating document for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f yjsPocketBase.ts:251:12
-[GlobalPocketBaseProvider] Local document updated for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f, origin: null yjsPocketBase.ts:296:14
-[GlobalPocketBaseProvider] Queued sync operation for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f, queue length: 1 yjsPocketBase.ts:461:12
-[GlobalPocketBaseProvider] Processing sync queue for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f, 1 operations pending yjsPocketBase.ts:477:12
-[GlobalPocketBaseProvider] Local document updated for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f, origin: null yjsPocketBase.ts:296:14
-[GlobalPocketBaseProvider] Queued sync operation for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f, queue length: 2 yjsPocketBase.ts:461:12
-[GlobalPocketBaseProvider] Local document updated for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f, origin: null yjsPocketBase.ts:296:14
-[GlobalPocketBaseProvider] Queued sync operation for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f, queue length: 3 yjsPocketBase.ts:461:12
-Active List ID: 3f168b1f-5e2d-43bc-9636-7d03bd95077f TodoListPage.tsx:203:12
-Active List: 
-Object { archived: false, collectionId: "pbc_825406485", collectionName: "task_lists", color: "bg-blue-400", createdAt: "2025-07-09 15:31:27.273Z", deleted: false, id: "3f168b1f-5e2d-43bc-9636-7d03bd95077f", name: "no", pinned: false, user_id: "51612qsjktu0i93", … }
-TodoListPage.tsx:204:12
-Active List Todos: 
-Array(7) [ {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
-TodoListPage.tsx:205:12
-Todos to use: 
-Array(7) [ {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
-TodoListPage.tsx:206:12
+Array []
+TodoListPage.tsx:218:13
 Active todos: 
 Array []
-TodoListPage.tsx:207:12
+TodoListPage.tsx:219:13
 Sorted active todos: 
 Array []
-TodoListPage.tsx:208:12
-Active List ID: 3f168b1f-5e2d-43bc-9636-7d03bd95077f TodoListPage.tsx:203:12
+TodoListPage.tsx:220:13
+[useYjsTodoList] Cleanup for listId: 3ff4d349-ecd2-4bb0-9945-0ee22bd3362c useYjsTodoList.ts:31:15
+[useYjsTodoList] Effect triggered for listId: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 useYjsTodoList.ts:25:13
+[GlobalPocketBaseProvider] Creating document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:200:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 1 yjsPocketBase.ts:410:13
+[GlobalPocketBaseProvider] Processing sync queue for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, 1 operations pending yjsPocketBase.ts:423:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 2 yjsPocketBase.ts:410:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 3 yjsPocketBase.ts:410:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 4 yjsPocketBase.ts:410:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 5 yjsPocketBase.ts:410:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 6 yjsPocketBase.ts:410:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 7 yjsPocketBase.ts:410:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 8 yjsPocketBase.ts:410:13
+[TodoListPage] Syncing Yjs metadata changes to todoLists state for list: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:179:19
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
 Active List: 
-Object { archived: false, collectionId: "pbc_825406485", collectionName: "task_lists", color: "bg-blue-400", createdAt: "2025-07-09 15:31:27.273Z", deleted: false, id: "3f168b1f-5e2d-43bc-9636-7d03bd95077f", name: "no", pinned: false, user_id: "51612qsjktu0i93", … }
-TodoListPage.tsx:204:12
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "AQ+r3OkCACcBBGxpc3QEbmFtZQIEAKvc6QIABWNyYXNoJwEEbGlzdAVjb2xvcgIEAKvc6QIGDGJnLXN0b25lLTQwMCcBBGxpc3QGcGlubmVkASgAq9zpAhMFdmFsdWUBeScBBGxpc3QIYXJjaGl2ZWQBKACr3OkCFQV2YWx1ZQF5JwEEbGlzdAdkZWxldGVkASgAq9zpAhcFdmFsdWUBeScBBGxpc3QFdG9kb3MAJwEEbGlzdAljcmVhdGVkQXQCBACr3OkCGhgyMDI1LTA3LTE3VDEwOjIwOjQ3Ljg3MlonAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEoAKvc6QIzBXZhbHVlAX0BAA==", deleted: false, todos: [], name: "crash", color: "bg-stone-400", pinned: false, archived: false }
+TodoListPage.tsx:216:13
 Active List Todos: 
-Array(7) [ {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
-TodoListPage.tsx:205:12
+Array []
+TodoListPage.tsx:217:13
 Todos to use: 
-Array(7) [ {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
-TodoListPage.tsx:206:12
+Array []
+TodoListPage.tsx:218:13
 Active todos: 
 Array []
-TodoListPage.tsx:207:12
+TodoListPage.tsx:219:13
 Sorted active todos: 
 Array []
-TodoListPage.tsx:208:12
-[GlobalPocketBaseProvider] Failed to sync document for list f82cb78a-b308-48d2-b669-c2e5599eb508: ClientResponseError 0: Something went wrong while processing your request.
-    _ClientResponseError ClientResponseError.ts:13
-    send Client.ts:376
-    promise callback*send Client.ts:374
-    getOne CrudService.ts:165
-    getOne RecordService.ts:213
-    syncDocumentToServer yjsPocketBase.ts:542
-    handleDocUpdate yjsPocketBase.ts:303
-    processSyncQueue yjsPocketBase.ts:489
-    queueSync yjsPocketBase.ts:464
-    handleDocUpdate yjsPocketBase.ts:302
-yjsPocketBase.ts:563:14
-[GlobalPocketBaseProvider] Sync operation failed for list f82cb78a-b308-48d2-b669-c2e5599eb508: ClientResponseError 0: Something went wrong while processing your request.
-    _ClientResponseError ClientResponseError.ts:13
-    send Client.ts:376
-    promise callback*send Client.ts:374
-    getOne CrudService.ts:165
-    getOne RecordService.ts:213
-    syncDocumentToServer yjsPocketBase.ts:542
-    handleDocUpdate yjsPocketBase.ts:303
-    processSyncQueue yjsPocketBase.ts:489
-    queueSync yjsPocketBase.ts:464
-    handleDocUpdate yjsPocketBase.ts:302
-yjsPocketBase.ts:494:18
-[GlobalPocketBaseProvider] Finished processing sync queue for list f82cb78a-b308-48d2-b669-c2e5599eb508. Processed: 0, Failed: 1, Remaining: 0 yjsPocketBase.ts:518:12
-[GlobalPocketBaseProvider] Failed to sync document for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f: ClientResponseError 0: Something went wrong while processing your request.
-    _ClientResponseError ClientResponseError.ts:13
-    send Client.ts:376
-    promise callback*send Client.ts:374
-    getOne CrudService.ts:165
-    getOne RecordService.ts:213
-    syncDocumentToServer yjsPocketBase.ts:542
-    handleDocUpdate yjsPocketBase.ts:303
-    processSyncQueue yjsPocketBase.ts:489
-    queueSync yjsPocketBase.ts:464
-    handleDocUpdate yjsPocketBase.ts:302
-yjsPocketBase.ts:563:14
-[GlobalPocketBaseProvider] Sync operation failed for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f: ClientResponseError 0: Something went wrong while processing your request.
-    _ClientResponseError ClientResponseError.ts:13
-    send Client.ts:376
-    promise callback*send Client.ts:374
-    getOne CrudService.ts:165
-    getOne RecordService.ts:213
-    syncDocumentToServer yjsPocketBase.ts:542
-    handleDocUpdate yjsPocketBase.ts:303
-    processSyncQueue yjsPocketBase.ts:489
-    queueSync yjsPocketBase.ts:464
-    handleDocUpdate yjsPocketBase.ts:302
-yjsPocketBase.ts:494:18
-[GlobalPocketBaseProvider] Local document updated for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f, origin: [object Object] yjsPocketBase.ts:296:14
-[GlobalPocketBaseProvider] Queued sync operation for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f, queue length: 3 yjsPocketBase.ts:461:12
-[GlobalPocketBaseProvider] Local persistence for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f is ready yjsPocketBase.ts:275:14
-[GlobalPocketBaseProvider] Connecting to PocketBase for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f yjsPocketBase.ts:321:14
-Uncaught (in promise) ClientResponseError 0: Something went wrong while processing your request.
-    _ClientResponseError ClientResponseError.ts:13
-    send Client.ts:376
-    promise callback*send Client.ts:374
-    submitSubscriptions RealtimeService.ts:269
-    unsubscribe pocketbase.js:421
-    unsubscribe pocketbase.js:546
-    disconnectDocument yjsPocketBase.ts:340
-    destroyDocument yjsPocketBase.ts:555
-    destroy yjsPocketBase.ts:183
-    destroy yjsPocketBase.ts:619
-    cleanup useYjsTodoList.ts:30
-ClientResponseError.ts:13:8
-Active List ID: 3f168b1f-5e2d-43bc-9636-7d03bd95077f TodoListPage.tsx:203:12
+TodoListPage.tsx:220:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 9 yjsPocketBase.ts:410:13
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
 Active List: 
-Object { archived: false, collectionId: "pbc_825406485", collectionName: "task_lists", color: "bg-blue-400", createdAt: "2025-07-09 15:31:27.273Z", deleted: false, id: "3f168b1f-5e2d-43bc-9636-7d03bd95077f", name: "no", pinned: false, user_id: "51612qsjktu0i93", … }
-TodoListPage.tsx:204:12
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "AQ+r3OkCACcBBGxpc3QEbmFtZQIEAKvc6QIABWNyYXNoJwEEbGlzdAVjb2xvcgIEAKvc6QIGDGJnLXN0b25lLTQwMCcBBGxpc3QGcGlubmVkASgAq9zpAhMFdmFsdWUBeScBBGxpc3QIYXJjaGl2ZWQBKACr3OkCFQV2YWx1ZQF5JwEEbGlzdAdkZWxldGVkASgAq9zpAhcFdmFsdWUBeScBBGxpc3QFdG9kb3MAJwEEbGlzdAljcmVhdGVkQXQCBACr3OkCGhgyMDI1LTA3LTE3VDEwOjIwOjQ3Ljg3MlonAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEoAKvc6QIzBXZhbHVlAX0BAA==", deleted: false, todos: [], name: "fuck", color: "bg-stone-400", pinned: false, archived: false }
+TodoListPage.tsx:216:13
 Active List Todos: 
-Array(7) [ {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
-TodoListPage.tsx:205:12
+Array []
+TodoListPage.tsx:217:13
 Todos to use: 
-Array(7) [ {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
-TodoListPage.tsx:206:12
+Array []
+TodoListPage.tsx:218:13
 Active todos: 
 Array []
-TodoListPage.tsx:207:12
+TodoListPage.tsx:219:13
 Sorted active todos: 
 Array []
-TodoListPage.tsx:208:12
-[useYjsTodoList] Cleanup for listId: 3f168b1f-5e2d-43bc-9636-7d03bd95077f useYjsTodoList.ts:38:20
-[GlobalPocketBaseProvider] Destroying document for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f yjsPocketBase.ts:689:12
-[useYjsTodoList] Effect triggered for listId: f82cb78a-b308-48d2-b669-c2e5599eb508 useYjsTodoList.ts:30:16
-[GlobalPocketBaseProvider] Creating document for list f82cb78a-b308-48d2-b669-c2e5599eb508 yjsPocketBase.ts:251:12
-[GlobalPocketBaseProvider] Local document updated for list f82cb78a-b308-48d2-b669-c2e5599eb508, origin: null yjsPocketBase.ts:296:14
-[GlobalPocketBaseProvider] Queued sync operation for list f82cb78a-b308-48d2-b669-c2e5599eb508, queue length: 1 yjsPocketBase.ts:461:12
-[GlobalPocketBaseProvider] Processing sync queue for list f82cb78a-b308-48d2-b669-c2e5599eb508, 1 operations pending yjsPocketBase.ts:477:12
-[GlobalPocketBaseProvider] Local document updated for list f82cb78a-b308-48d2-b669-c2e5599eb508, origin: null yjsPocketBase.ts:296:14
-[GlobalPocketBaseProvider] Queued sync operation for list f82cb78a-b308-48d2-b669-c2e5599eb508, queue length: 2 yjsPocketBase.ts:461:12
-[GlobalPocketBaseProvider] Local document updated for list f82cb78a-b308-48d2-b669-c2e5599eb508, origin: null yjsPocketBase.ts:296:14
-[GlobalPocketBaseProvider] Queued sync operation for list f82cb78a-b308-48d2-b669-c2e5599eb508, queue length: 3 yjsPocketBase.ts:461:12
-Active List ID: f82cb78a-b308-48d2-b669-c2e5599eb508 TodoListPage.tsx:203:12
+TodoListPage.tsx:220:13
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
 Active List: 
-Object { archived: false, collectionId: "pbc_825406485", collectionName: "task_lists", color: "bg-amber-300", createdAt: "2025-07-10 14:41:35.916Z", deleted: false, id: "f82cb78a-b308-48d2-b669-c2e5599eb508", name: "test", pinned: true, user_id: "51612qsjktu0i93", … }
-TodoListPage.tsx:204:12
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "AQ+r3OkCACcBBGxpc3QEbmFtZQIEAKvc6QIABWNyYXNoJwEEbGlzdAVjb2xvcgIEAKvc6QIGDGJnLXN0b25lLTQwMCcBBGxpc3QGcGlubmVkASgAq9zpAhMFdmFsdWUBeScBBGxpc3QIYXJjaGl2ZWQBKACr3OkCFQV2YWx1ZQF5JwEEbGlzdAdkZWxldGVkASgAq9zpAhcFdmFsdWUBeScBBGxpc3QFdG9kb3MAJwEEbGlzdAljcmVhdGVkQXQCBACr3OkCGhgyMDI1LTA3LTE3VDEwOjIwOjQ3Ljg3MlonAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEoAKvc6QIzBXZhbHVlAX0BAA==", deleted: false, todos: [], name: "fuck", color: "bg-stone-400", pinned: false, archived: false }
+TodoListPage.tsx:216:13
 Active List Todos: 
-Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
-TodoListPage.tsx:205:12
+Array []
+TodoListPage.tsx:217:13
 Todos to use: 
-Array(7) [ {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
-TodoListPage.tsx:206:12
+Array []
+TodoListPage.tsx:218:13
 Active todos: 
-Array [ {…}, {…} ]
-TodoListPage.tsx:207:12
+Array []
+TodoListPage.tsx:219:13
 Sorted active todos: 
-Array [ {…}, {…} ]
-TodoListPage.tsx:208:12
-Active List ID: f82cb78a-b308-48d2-b669-c2e5599eb508 TodoListPage.tsx:203:12
+Array []
+TodoListPage.tsx:220:13
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
 Active List: 
-Object { archived: false, collectionId: "pbc_825406485", collectionName: "task_lists", color: "bg-amber-300", createdAt: "2025-07-10 14:41:35.916Z", deleted: false, id: "f82cb78a-b308-48d2-b669-c2e5599eb508", name: "test", pinned: true, user_id: "51612qsjktu0i93", … }
-TodoListPage.tsx:204:12
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "AQ+r3OkCACcBBGxpc3QEbmFtZQIEAKvc6QIABWNyYXNoJwEEbGlzdAVjb2xvcgIEAKvc6QIGDGJnLXN0b25lLTQwMCcBBGxpc3QGcGlubmVkASgAq9zpAhMFdmFsdWUBeScBBGxpc3QIYXJjaGl2ZWQBKACr3OkCFQV2YWx1ZQF5JwEEbGlzdAdkZWxldGVkASgAq9zpAhcFdmFsdWUBeScBBGxpc3QFdG9kb3MAJwEEbGlzdAljcmVhdGVkQXQCBACr3OkCGhgyMDI1LTA3LTE3VDEwOjIwOjQ3Ljg3MlonAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEoAKvc6QIzBXZhbHVlAX0BAA==", deleted: false, todos: [], name: "fuck", color: "bg-stone-400", pinned: false, archived: false }
+TodoListPage.tsx:216:13
 Active List Todos: 
-Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
-TodoListPage.tsx:205:12
+Array []
+TodoListPage.tsx:217:13
 Todos to use: 
-Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
-TodoListPage.tsx:206:12
+Array []
+TodoListPage.tsx:218:13
 Active todos: 
-Array [ {…} ]
-TodoListPage.tsx:207:12
+Array []
+TodoListPage.tsx:219:13
 Sorted active todos: 
-Array [ {…} ]
-TodoListPage.tsx:208:12
-[GlobalPocketBaseProvider] Failed to sync document for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f: ClientResponseError 0: Something went wrong while processing your request.
-    _ClientResponseError ClientResponseError.ts:13
-    send Client.ts:376
-    promise callback*send Client.ts:374
-    getOne CrudService.ts:165
-    getOne RecordService.ts:213
-    syncDocumentToServer yjsPocketBase.ts:542
-    handleDocUpdate yjsPocketBase.ts:303
-    processSyncQueue yjsPocketBase.ts:489
-    queueSync yjsPocketBase.ts:464
-    handleDocUpdate yjsPocketBase.ts:302
-    emit observable.js:82
-    emit observable.js:82
-    cleanupTransactions Transaction.js:363
-    transact Transaction.js:439
-    set chunk-NIR4DFCD.js:5348
-    updateState useYjsTodoList.ts:57
-    useYjsTodoList useYjsTodoList.ts:71
-    React 20
-yjsPocketBase.ts:563:14
-[GlobalPocketBaseProvider] Sync operation failed for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f: ClientResponseError 0: Something went wrong while processing your request.
-    _ClientResponseError ClientResponseError.ts:13
-    send Client.ts:376
-    promise callback*send Client.ts:374
-    getOne CrudService.ts:165
-    getOne RecordService.ts:213
-    syncDocumentToServer yjsPocketBase.ts:542
-    handleDocUpdate yjsPocketBase.ts:303
-    processSyncQueue yjsPocketBase.ts:489
-    queueSync yjsPocketBase.ts:464
-    handleDocUpdate yjsPocketBase.ts:302
-    emit observable.js:82
-    emit observable.js:82
-    cleanupTransactions Transaction.js:363
-    transact Transaction.js:439
-    set chunk-NIR4DFCD.js:5348
-    updateState useYjsTodoList.ts:57
-    useYjsTodoList useYjsTodoList.ts:71
-    React 20
-yjsPocketBase.ts:494:18
-[GlobalPocketBaseProvider] Finished processing sync queue for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f. Processed: 0, Failed: 2, Remaining: 0 yjsPocketBase.ts:518:12
-[GlobalPocketBaseProvider] Failed to connect for list 3f168b1f-5e2d-43bc-9636-7d03bd95077f: ClientResponseError 0: Something went wrong while processing your request.
-    _ClientResponseError ClientResponseError.ts:13
-    send Client.ts:376
-    promise callback*send Client.ts:374
-    submitSubscriptions RealtimeService.ts:269
-    subscribe RealtimeService.ts:90
-    subscribe RecordService.ts:130
-    connectDocument yjsPocketBase.ts:324
-    createDocument yjsPocketBase.ts:281
-    emit observable.js:154
-    emit observable.js:154
-    afterApplyUpdatesCallback y-indexeddb.js:91
-    fetchUpdates y-indexeddb.js:24
-    promise callback*fetchUpdates y-indexeddb.js:18
-    IndexeddbPersistence y-indexeddb.js:93
-    promise callback*IndexeddbPersistence y-indexeddb.js:82
-    createDocument yjsPocketBase.ts:255
-    getDocumentProvider yjsPocketBase.ts:232
-    PocketBaseProvider yjsPocketBase.ts:769
-    useYjsTodoList useYjsTodoList.ts:67
-    React 25
-yjsPocketBase.ts:341:14
-[GlobalPocketBaseProvider] Failed to sync document for list f82cb78a-b308-48d2-b669-c2e5599eb508: ClientResponseError 0: Something went wrong while processing your request.
-    _ClientResponseError ClientResponseError.ts:13
-    send Client.ts:376
-    promise callback*send Client.ts:374
-    getOne CrudService.ts:165
-    getOne RecordService.ts:213
-    syncDocumentToServer yjsPocketBase.ts:542
-    handleDocUpdate yjsPocketBase.ts:303
-    processSyncQueue yjsPocketBase.ts:489
-    queueSync yjsPocketBase.ts:464
-    handleDocUpdate yjsPocketBase.ts:302
-    emit observable.js:82
-    emit observable.js:82
-    cleanupTransactions Transaction.js:363
-    transact Transaction.js:439
-    set chunk-NIR4DFCD.js:5348
-    updateState useYjsTodoList.ts:57
-    useYjsTodoList useYjsTodoList.ts:71
-    React 40
-    performWorkUntilDeadline scheduler.development.js:45
-    js scheduler.development.js:223
-    js scheduler.development.js:364
-    __require chunk-G3PMV62Z.js:8
-    js index.js:6
-    __require chunk-G3PMV62Z.js:8
-    React 2
-    __require chunk-G3PMV62Z.js:8
-    js React
-    __require chunk-G3PMV62Z.js:8
-    <anonymous> react-dom_client.js:18075
-yjsPocketBase.ts:563:14
-[GlobalPocketBaseProvider] Sync operation failed for list f82cb78a-b308-48d2-b669-c2e5599eb508: ClientResponseError 0: Something went wrong while processing your request.
-    _ClientResponseError ClientResponseError.ts:13
-    send Client.ts:376
-    promise callback*send Client.ts:374
-    getOne CrudService.ts:165
-    getOne RecordService.ts:213
-    syncDocumentToServer yjsPocketBase.ts:542
-    handleDocUpdate yjsPocketBase.ts:303
-    processSyncQueue yjsPocketBase.ts:489
-    queueSync yjsPocketBase.ts:464
-    handleDocUpdate yjsPocketBase.ts:302
-    emit observable.js:82
-    emit observable.js:82
-    cleanupTransactions Transaction.js:363
-    transact Transaction.js:439
-    set chunk-NIR4DFCD.js:5348
-    updateState useYjsTodoList.ts:57
-    useYjsTodoList useYjsTodoList.ts:71
-    React 40
-    performWorkUntilDeadline scheduler.development.js:45
-    js scheduler.development.js:223
-    js scheduler.development.js:364
-    __require chunk-G3PMV62Z.js:8
-    js index.js:6
-    __require chunk-G3PMV62Z.js:8
-    React 2
-    __require chunk-G3PMV62Z.js:8
-    js React
-    __require chunk-G3PMV62Z.js:8
-    <anonymous> react-dom_client.js:18075
-yjsPocketBase.ts:494:18
-[GlobalPocketBaseProvider] Local document updated for list f82cb78a-b308-48d2-b669-c2e5599eb508, origin: [object Object] yjsPocketBase.ts:296:14
-[GlobalPocketBaseProvider] Queued sync operation for list f82cb78a-b308-48d2-b669-c2e5599eb508, queue length: 3 yjsPocketBase.ts:461:12
-[GlobalPocketBaseProvider] Local persistence for list f82cb78a-b308-48d2-b669-c2e5599eb508 is ready yjsPocketBase.ts:275:14
-[GlobalPocketBaseProvider] Connecting to PocketBase for list f82cb78a-b308-48d2-b669-c2e5599eb508 yjsPocketBase.ts:321:14
-Active List ID: f82cb78a-b308-48d2-b669-c2e5599eb508 TodoListPage.tsx:203:12
+Array []
+TodoListPage.tsx:220:13
+[GlobalPocketBaseProvider] Local persistence for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 is ready yjsPocketBase.ts:217:15
+[GlobalPocketBaseProvider] Merged remote state for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:296:17
+[GlobalPocketBaseProvider] Connecting to PocketBase for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:253:15
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
 Active List: 
-Object { archived: false, collectionId: "pbc_825406485", collectionName: "task_lists", color: "bg-amber-300", createdAt: "2025-07-10 14:41:35.916Z", deleted: false, id: "f82cb78a-b308-48d2-b669-c2e5599eb508", name: "test", pinned: true, user_id: "51612qsjktu0i93", … }
-TodoListPage.tsx:204:12
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "AhGt6oTzAgAnAQRsaXN0BG5hbWUCJwEEbGlzdAVjb2xvcgInAQRsaXN0BXRvZG9zACcBBGxpc3QGcGlubmVkASEAreqE8wIDBXZhbHVlAScBBGxpc3QIYXJjaGl2ZWQBIQCt6oTzAgUFdmFsdWUBJwEEbGlzdAdkZWxldGVkASgAreqE8wIHBXZhbHVlAXknAQRsaXN0CWNyZWF0ZWRBdAIEAK3qhPMCCRgyMDI1LTA3LTE3VDEwOjIwOjQ4LjA2OFonAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEoAK3qhPMCIgV2YWx1ZQF9AQQAreqE8wIABGZ1Y2sEAK3qhPMCAQxiZy1zdG9uZS00MDCoreqE8wIEAXmoreqE8wIGAXkPq9zpAgAhAQRsaXN0BG5hbWUBAAUhAQRsaXN0BWNvbG9yAQAMIQEEbGlzdAZwaW5uZWQBAAEhAQRsaXN0CGFyY2hpdmVkAQABIQEEbGlzdAdkZWxldGVkAQABIQEEbGlzdAV0b2RvcwEhAQRsaXN0CWNyZWF0ZWRBdAEAGCEBBGxpc3QPbWV0YWRhdGFWZXJzaW9uAQABAq3qhPMCAgQBBgGr3OkCAQA1", deleted: false, todos: [], name: "fuck", color: "bg-stone-400", pinned: false, archived: false }
+TodoListPage.tsx:216:13
 Active List Todos: 
-Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
-TodoListPage.tsx:205:12
+Array []
+TodoListPage.tsx:217:13
 Todos to use: 
-Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
-TodoListPage.tsx:206:12
+Array []
+TodoListPage.tsx:218:13
 Active todos: 
-Array [ {…} ]
-TodoListPage.tsx:207:12
+Array []
+TodoListPage.tsx:219:13
 Sorted active todos: 
-Array [ {…} ]
-TodoListPage.tsx:208:12
-[GlobalPocketBaseProvider] Failed to sync document for list f82cb78a-b308-48d2-b669-c2e5599eb508: ClientResponseError 0: Something went wrong while processing your request.
-    _ClientResponseError ClientResponseError.ts:13
-    send Client.ts:376
-    promise callback*send Client.ts:374
-    getOne CrudService.ts:165
-    getOne RecordService.ts:213
-    syncDocumentToServer yjsPocketBase.ts:542
-    handleDocUpdate yjsPocketBase.ts:303
-    processSyncQueue yjsPocketBase.ts:489
-    queueSync yjsPocketBase.ts:464
-    handleDocUpdate yjsPocketBase.ts:302
-    emit observable.js:82
-    emit observable.js:82
-    cleanupTransactions Transaction.js:363
-    transact Transaction.js:439
-    set chunk-NIR4DFCD.js:5348
-    updateState useYjsTodoList.ts:57
-    useYjsTodoList useYjsTodoList.ts:71
-    React 20
-yjsPocketBase.ts:563:14
-[GlobalPocketBaseProvider] Sync operation failed for list f82cb78a-b308-48d2-b669-c2e5599eb508: ClientResponseError 0: Something went wrong while processing your request.
-    _ClientResponseError ClientResponseError.ts:13
-    send Client.ts:376
-    promise callback*send Client.ts:374
-    getOne CrudService.ts:165
-    getOne RecordService.ts:213
-    syncDocumentToServer yjsPocketBase.ts:542
-    handleDocUpdate yjsPocketBase.ts:303
-    processSyncQueue yjsPocketBase.ts:489
-    queueSync yjsPocketBase.ts:464
-    handleDocUpdate yjsPocketBase.ts:302
-    emit observable.js:82
-    emit observable.js:82
-    cleanupTransactions Transaction.js:363
-    transact Transaction.js:439
-    set chunk-NIR4DFCD.js:5348
-    updateState useYjsTodoList.ts:57
-    useYjsTodoList useYjsTodoList.ts:71
-    React 20
-yjsPocketBase.ts:494:18
-[GlobalPocketBaseProvider] Failed to connect for list f82cb78a-b308-48d2-b669-c2e5599eb508: ClientResponseError 0: Something went wrong while processing your request.
-    _ClientResponseError ClientResponseError.ts:13
-    send Client.ts:376
-    promise callback*send Client.ts:374
-    submitSubscriptions RealtimeService.ts:269
-    subscribe RealtimeService.ts:90
-    subscribe RecordService.ts:130
-    connectDocument yjsPocketBase.ts:324
-    createDocument yjsPocketBase.ts:281
-    emit observable.js:154
-    emit observable.js:154
-    afterApplyUpdatesCallback y-indexeddb.js:91
-    fetchUpdates y-indexeddb.js:24
-    promise callback*fetchUpdates y-indexeddb.js:18
-    IndexeddbPersistence y-indexeddb.js:93
-    promise callback*IndexeddbPersistence y-indexeddb.js:82
-    createDocument yjsPocketBase.ts:255
-    getDocumentProvider yjsPocketBase.ts:232
-    PocketBaseProvider yjsPocketBase.ts:769
-    useYjsTodoList useYjsTodoList.ts:67
-    React 40
-    performWorkUntilDeadline scheduler.development.js:45
-    js scheduler.development.js:223
-    js scheduler.development.js:364
-    __require chunk-G3PMV62Z.js:8
-    js index.js:6
-    __require chunk-G3PMV62Z.js:8
-    React 2
-    __require chunk-G3PMV62Z.js:8
-    js React
-    __require chunk-G3PMV62Z.js:8
-    <anonymous> react-dom_client.js:18075
-yjsPocketBase.ts:341:14
-Active List ID: f82cb78a-b308-48d2-b669-c2e5599eb508 TodoListPage.tsx:203:12
+Array []
+TodoListPage.tsx:220:13
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Successfully connected to PocketBase for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:271:15
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
 Active List: 
-Object { archived: false, collectionId: "pbc_825406485", collectionName: "task_lists", color: "bg-amber-300", createdAt: "2025-07-10 14:41:35.916Z", deleted: false, id: "f82cb78a-b308-48d2-b669-c2e5599eb508", name: "test", pinned: true, user_id: "51612qsjktu0i93", … }
-TodoListPage.tsx:204:12
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "AhGt6oTzAgAnAQRsaXN0BG5hbWUCJwEEbGlzdAVjb2xvcgInAQRsaXN0BXRvZG9zACcBBGxpc3QGcGlubmVkASEAreqE8wIDBXZhbHVlAScBBGxpc3QIYXJjaGl2ZWQBIQCt6oTzAgUFdmFsdWUBJwEEbGlzdAdkZWxldGVkASgAreqE8wIHBXZhbHVlAXknAQRsaXN0CWNyZWF0ZWRBdAIEAK3qhPMCCRgyMDI1LTA3LTE3VDEwOjIwOjQ4LjA2OFonAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEoAK3qhPMCIgV2YWx1ZQF9AQQAreqE8wIABGZ1Y2sEAK3qhPMCAQxiZy1zdG9uZS00MDCoreqE8wIEAXmoreqE8wIGAXkPq9zpAgAhAQRsaXN0BG5hbWUBAAUhAQRsaXN0BWNvbG9yAQAMIQEEbGlzdAZwaW5uZWQBAAEhAQRsaXN0CGFyY2hpdmVkAQABIQEEbGlzdAdkZWxldGVkAQABIQEEbGlzdAV0b2RvcwEhAQRsaXN0CWNyZWF0ZWRBdAEAGCEBBGxpc3QPbWV0YWRhdGFWZXJzaW9uAQABAq3qhPMCAgQBBgGr3OkCAQA1", deleted: false, todos: [], name: "fuck", color: "bg-stone-400", pinned: false, archived: false }
+TodoListPage.tsx:216:13
 Active List Todos: 
-Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
-TodoListPage.tsx:205:12
+Array []
+TodoListPage.tsx:217:13
 Todos to use: 
-Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
-TodoListPage.tsx:206:12
+Array []
+TodoListPage.tsx:218:13
 Active todos: 
-Array [ {…} ]
-TodoListPage.tsx:207:12
+Array []
+TodoListPage.tsx:219:13
 Sorted active todos: 
-Array [ {…} ]
-TodoListPage.tsx:208:12
-[GlobalPocketBaseProvider] Failed to sync document for list f82cb78a-b308-48d2-b669-c2e5599eb508: ClientResponseError 0: Something went wrong while processing your request.
-    _ClientResponseError ClientResponseError.ts:13
-    send Client.ts:376
-    promise callback*send Client.ts:374
-    getOne CrudService.ts:165
-    getOne RecordService.ts:213
-    syncDocumentToServer yjsPocketBase.ts:542
-    handleDocUpdate yjsPocketBase.ts:303
-    processSyncQueue yjsPocketBase.ts:489
-    queueSync yjsPocketBase.ts:464
-    handleDocUpdate yjsPocketBase.ts:302
-    emit observable.js:82
-    emit observable.js:82
-    cleanupTransactions Transaction.js:363
-    transact Transaction.js:439
-    set chunk-NIR4DFCD.js:5348
-    updateState useYjsTodoList.ts:57
-    useYjsTodoList useYjsTodoList.ts:71
-    React 20
-yjsPocketBase.ts:563:14
-[GlobalPocketBaseProvider] Sync operation failed for list f82cb78a-b308-48d2-b669-c2e5599eb508: ClientResponseError 0: Something went wrong while processing your request.
-    _ClientResponseError ClientResponseError.ts:13
-    send Client.ts:376
-    promise callback*send Client.ts:374
-    getOne CrudService.ts:165
-    getOne RecordService.ts:213
-    syncDocumentToServer yjsPocketBase.ts:542
-    handleDocUpdate yjsPocketBase.ts:303
-    processSyncQueue yjsPocketBase.ts:489
-    queueSync yjsPocketBase.ts:464
-    handleDocUpdate yjsPocketBase.ts:302
-    emit observable.js:82
-    emit observable.js:82
-    cleanupTransactions Transaction.js:363
-    transact Transaction.js:439
-    set chunk-NIR4DFCD.js:5348
-    updateState useYjsTodoList.ts:57
-    useYjsTodoList useYjsTodoList.ts:71
-    React 20
-yjsPocketBase.ts:494:18
-[GlobalPocketBaseProvider] Too many consecutive failures for list f82cb78a-b308-48d2-b669-c2e5599eb508, stopping queue processing yjsPocketBase.ts:395:21
-[GlobalPocketBaseProvider] Finished processing sync queue for list f82cb78a-b308-48d2-b669-c2e5599eb508. Processed: 0, Failed: 3, Remaining: 2 yjsPocketBase.ts:518:12
-Active List ID: f82cb78a-b308-48d2-b669-c2e5599eb508 TodoListPage.tsx:203:12
+Array []
+TodoListPage.tsx:220:13
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
 Active List: 
-Object { archived: false, collectionId: "pbc_825406485", collectionName: "task_lists", color: "bg-amber-300", createdAt: "2025-07-10 14:41:35.916Z", deleted: false, id: "f82cb78a-b308-48d2-b669-c2e5599eb508", name: "test", pinned: true, user_id: "51612qsjktu0i93", … }
-TodoListPage.tsx:204:12
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "AhGt6oTzAgAnAQRsaXN0BG5hbWUCJwEEbGlzdAVjb2xvcgInAQRsaXN0BXRvZG9zACcBBGxpc3QGcGlubmVkASEAreqE8wIDBXZhbHVlAScBBGxpc3QIYXJjaGl2ZWQBIQCt6oTzAgUFdmFsdWUBJwEEbGlzdAdkZWxldGVkASgAreqE8wIHBXZhbHVlAXknAQRsaXN0CWNyZWF0ZWRBdAIEAK3qhPMCCRgyMDI1LTA3LTE3VDEwOjIwOjQ4LjA2OFonAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEoAK3qhPMCIgV2YWx1ZQF9AQQAreqE8wIABGZ1Y2sEAK3qhPMCAQxiZy1zdG9uZS00MDCoreqE8wIEAXmoreqE8wIGAXkPq9zpAgAhAQRsaXN0BG5hbWUBAAUhAQRsaXN0BWNvbG9yAQAMIQEEbGlzdAZwaW5uZWQBAAEhAQRsaXN0CGFyY2hpdmVkAQABIQEEbGlzdAdkZWxldGVkAQABIQEEbGlzdAV0b2RvcwEhAQRsaXN0CWNyZWF0ZWRBdAEAGCEBBGxpc3QPbWV0YWRhdGFWZXJzaW9uAQABAq3qhPMCAgQBBgGr3OkCAQA1", deleted: false, todos: [], name: "fuck", color: "bg-stone-400", pinned: false, archived: false }
+TodoListPage.tsx:216:13
 Active List Todos: 
-Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
-TodoListPage.tsx:205:12
+Array []
+TodoListPage.tsx:217:13
 Todos to use: 
-Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
-TodoListPage.tsx:206:12
+Array []
+TodoListPage.tsx:218:13
 Active todos: 
-Array [ {…} ]
-TodoListPage.tsx:207:12
+Array []
+TodoListPage.tsx:219:13
 Sorted active todos: 
-Array [ {…} ]
-TodoListPage.tsx:208:12
-[GlobalPocketBaseProvider] Retrying connection for list f82cb78a-b308-48d2-b669-c2e5599eb508 (attempt 1) yjsPocketBase.ts:585:14
-[GlobalPocketBaseProvider] Connecting to PocketBase for list f82cb78a-b308-48d2-b669-c2e5599eb508 yjsPocketBase.ts:321:14
-[GlobalPocketBaseProvider] Successfully connected to PocketBase for list f82cb78a-b308-48d2-b669-c2e5599eb508 yjsPocketBase.ts:338:14
-[GlobalPocketBaseProvider] Local document updated for list f82cb78a-b308-48d2-b669-c2e5599eb508, origin: null yjsPocketBase.ts:296:14
-[GlobalPocketBaseProvider] Queued sync operation for list f82cb78a-b308-48d2-b669-c2e5599eb508, queue length: 3 yjsPocketBase.ts:461:12
-[GlobalPocketBaseProvider] Processing sync queue for list f82cb78a-b308-48d2-b669-c2e5599eb508, 3 operations pending yjsPocketBase.ts:477:12
-Active List ID: f82cb78a-b308-48d2-b669-c2e5599eb508 TodoListPage.tsx:203:12
+Array []
+TodoListPage.tsx:220:13
+[GlobalPocketBaseProvider] Applied real-time update for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:264:21
+[GlobalPocketBaseProvider] Applied real-time update for list 3ff4d349-ecd2-4bb0-9945-0ee22bd3362c yjsPocketBase.ts:264:21
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 7 yjsPocketBase.ts:410:13
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
 Active List: 
-Object { archived: false, collectionId: "pbc_825406485", collectionName: "task_lists", color: "bg-amber-300", createdAt: "2025-07-10 14:41:35.916Z", deleted: false, id: "f82cb78a-b308-48d2-b669-c2e5599eb508", name: "test", pinned: true, user_id: "51612qsjktu0i93", … }
-TodoListPage.tsx:204:12
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "Ag2S0v7MBQAnAQRsaXN0BG5hbWUCJwEEbGlzdAVjb2xvcgInAQRsaXN0BXRvZG9zACcBBGxpc3QGcGlubmVkASgAktL+zAUDBXZhbHVlAXknAQRsaXN0CGFyY2hpdmVkASgAktL+zAUFBXZhbHVlAXknAQRsaXN0B2RlbGV0ZWQBKACS0v7MBQcFdmFsdWUBeScBBGxpc3QJY3JlYXRlZEF0AgQAktL+zAUJGDIwMjUtMDctMTdUMTA6MjA6NDcuOTUzWicBBGxpc3QPbWV0YWRhdGFWZXJzaW9uASgAktL+zAUiBXZhbHVlAX0BD6vc6QIAIQEEbGlzdARuYW1lAQAFIQEEbGlzdAVjb2xvcgEADCEBBGxpc3QGcGlubmVkAQABIQEEbGlzdAhhcmNoaXZlZAEAASEBBGxpc3QHZGVsZXRlZAEAASEBBGxpc3QFdG9kb3MBIQEEbGlzdAljcmVhdGVkQXQBABghAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEAAQGr3OkCAQA1", deleted: false, todos: [], name: "", color: "", pinned: false, archived: false }
+TodoListPage.tsx:216:13
 Active List Todos: 
-Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
-TodoListPage.tsx:205:12
+Array []
+TodoListPage.tsx:217:13
 Todos to use: 
-Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
-TodoListPage.tsx:206:12
+Array []
+TodoListPage.tsx:218:13
 Active todos: 
-Array [ {…}, {…} ]
-TodoListPage.tsx:207:12
+Array []
+TodoListPage.tsx:219:13
 Sorted active todos: 
-Array [ {…}, {…} ]
-TodoListPage.tsx:208:12
-[GlobalPocketBaseProvider] Failed to sync document for list f82cb78a-b308-48d2-b669-c2e5599eb508: ClientResponseError 0: Something went wrong while processing your request.
-    _ClientResponseError ClientResponseError.ts:13
-    send Client.ts:376
-    promise callback*send Client.ts:374
-    getOne CrudService.ts:165
-    getOne RecordService.ts:213
-    syncDocumentToServer yjsPocketBase.ts:542
-    handleDocUpdate yjsPocketBase.ts:303
-    processSyncQueue yjsPocketBase.ts:489
-    queueSync yjsPocketBase.ts:464
-    handleDocUpdate yjsPocketBase.ts:302
-    emit observable.js:82
-    emit observable.js:82
-    cleanupTransactions Transaction.js:363
-    transact Transaction.js:439
-    transact Doc.js:185
-    toggleTodo useYjsTodoList.ts:144
-    handleToggleTodo TodoListPage.tsx:252
-    onClick TodoListPage.tsx:893
-    React 13
-    <anonymous> main.tsx:21
-yjsPocketBase.ts:563:14
-[GlobalPocketBaseProvider] Sync operation failed for list f82cb78a-b308-48d2-b669-c2e5599eb508: ClientResponseError 0: Something went wrong while processing your request.
-    _ClientResponseError ClientResponseError.ts:13
-    send Client.ts:376
-    promise callback*send Client.ts:374
-    getOne CrudService.ts:165
-    getOne RecordService.ts:213
-    syncDocumentToServer yjsPocketBase.ts:542
-    handleDocUpdate yjsPocketBase.ts:303
-    processSyncQueue yjsPocketBase.ts:489
-    queueSync yjsPocketBase.ts:464
-    handleDocUpdate yjsPocketBase.ts:302
-    emit observable.js:82
-    emit observable.js:82
-    cleanupTransactions Transaction.js:363
-    transact Transaction.js:439
-    transact Doc.js:185
-    toggleTodo useYjsTodoList.ts:144
-    handleToggleTodo TodoListPage.tsx:252
-    onClick TodoListPage.tsx:893
-    React 13
-    <anonymous> main.tsx:21
-yjsPocketBase.ts:494:18
-[GlobalPocketBaseProvider] Failed to sync document for list f82cb78a-b308-48d2-b669-c2e5599eb508: ClientResponseError 0: Something went wrong while processing your request.
-    _ClientResponseError ClientResponseError.ts:13
-    send Client.ts:376
-    promise callback*send Client.ts:374
-    getOne CrudService.ts:165
-    getOne RecordService.ts:213
-    syncDocumentToServer yjsPocketBase.ts:542
-    handleDocUpdate yjsPocketBase.ts:303
-    processSyncQueue yjsPocketBase.ts:489
-    queueSync yjsPocketBase.ts:464
-    handleDocUpdate yjsPocketBase.ts:302
-    emit observable.js:82
-    emit observable.js:82
-    cleanupTransactions Transaction.js:363
-    transact Transaction.js:439
-    transact Doc.js:185
-    toggleTodo useYjsTodoList.ts:144
-    handleToggleTodo TodoListPage.tsx:252
-    onClick TodoListPage.tsx:893
-    React 13
-    <anonymous> main.tsx:21
-yjsPocketBase.ts:563:14
-[GlobalPocketBaseProvider] Sync operation failed for list f82cb78a-b308-48d2-b669-c2e5599eb508: ClientResponseError 0: Something went wrong while processing your request.
-    _ClientResponseError ClientResponseError.ts:13
-    send Client.ts:376
-    promise callback*send Client.ts:374
-    getOne CrudService.ts:165
-    getOne RecordService.ts:213
-    syncDocumentToServer yjsPocketBase.ts:542
-    handleDocUpdate yjsPocketBase.ts:303
-    processSyncQueue yjsPocketBase.ts:489
-    queueSync yjsPocketBase.ts:464
-    handleDocUpdate yjsPocketBase.ts:302
-    emit observable.js:82
-    emit observable.js:82
-    cleanupTransactions Transaction.js:363
-    transact Transaction.js:439
-    transact Doc.js:185
-    toggleTodo useYjsTodoList.ts:144
-    handleToggleTodo TodoListPage.tsx:252
-    onClick TodoListPage.tsx:893
-    React 13
-    <anonymous> main.tsx:21
-yjsPocketBase.ts:494:18
-[GlobalPocketBaseProvider] Failed to sync document for list f82cb78a-b308-48d2-b669-c2e5599eb508: ClientResponseError 0: Something went wrong while processing your request.
-    _ClientResponseError ClientResponseError.ts:13
-    send Client.ts:376
-    promise callback*send Client.ts:374
-    getOne CrudService.ts:165
-    getOne RecordService.ts:213
-    syncDocumentToServer yjsPocketBase.ts:542
-    handleDocUpdate yjsPocketBase.ts:303
-    processSyncQueue yjsPocketBase.ts:489
-    queueSync yjsPocketBase.ts:464
-    handleDocUpdate yjsPocketBase.ts:302
-    emit observable.js:82
-    emit observable.js:82
-    cleanupTransactions Transaction.js:363
-    transact Transaction.js:439
-    transact Doc.js:185
-    toggleTodo useYjsTodoList.ts:144
-    handleToggleTodo TodoListPage.tsx:252
-    onClick TodoListPage.tsx:893
-    React 13
-    <anonymous> main.tsx:21
-yjsPocketBase.ts:563:14
-[GlobalPocketBaseProvider] Sync operation failed for list f82cb78a-b308-48d2-b669-c2e5599eb508: ClientResponseError 0: Something went wrong while processing your request.
-    _ClientResponseError ClientResponseError.ts:13
-    send Client.ts:376
-    promise callback*send Client.ts:374
-    getOne CrudService.ts:165
-    getOne RecordService.ts:213
-    syncDocumentToServer yjsPocketBase.ts:542
-    handleDocUpdate yjsPocketBase.ts:303
-    processSyncQueue yjsPocketBase.ts:489
-    queueSync yjsPocketBase.ts:464
-    handleDocUpdate yjsPocketBase.ts:302
-    emit observable.js:82
-    emit observable.js:82
-    cleanupTransactions Transaction.js:363
-    transact Transaction.js:439
-    transact Doc.js:185
-    toggleTodo useYjsTodoList.ts:144
-    handleToggleTodo TodoListPage.tsx:252
-    onClick TodoListPage.tsx:893
-    React 13
-    <anonymous> main.tsx:21
-yjsPocketBase.ts:494:18
-[GlobalPocketBaseProvider] Too many consecutive failures for list f82cb78a-b308-48d2-b669-c2e5599eb508, stopping queue processing yjsPocketBase.ts:395:21
-[GlobalPocketBaseProvider] Finished processing sync queue for list f82cb78a-b308-48d2-b669-c2e5599eb508. Processed: 0, Failed: 3, Remaining: 1 yjsPocketBase.ts:518:12
-Active List ID: f82cb78a-b308-48d2-b669-c2e5599eb508 TodoListPage.tsx:203:12
+Array []
+TodoListPage.tsx:220:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 8 yjsPocketBase.ts:410:13
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
 Active List: 
-Object { archived: false, collectionId: "pbc_825406485", collectionName: "task_lists", color: "bg-amber-300", createdAt: "2025-07-10 14:41:35.916Z", deleted: false, id: "f82cb78a-b308-48d2-b669-c2e5599eb508", name: "test", pinned: true, user_id: "51612qsjktu0i93", … }
-TodoListPage.tsx:204:12
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "Ag2S0v7MBQAnAQRsaXN0BG5hbWUCJwEEbGlzdAVjb2xvcgInAQRsaXN0BXRvZG9zACcBBGxpc3QGcGlubmVkASgAktL+zAUDBXZhbHVlAXknAQRsaXN0CGFyY2hpdmVkASgAktL+zAUFBXZhbHVlAXknAQRsaXN0B2RlbGV0ZWQBKACS0v7MBQcFdmFsdWUBeScBBGxpc3QJY3JlYXRlZEF0AgQAktL+zAUJGDIwMjUtMDctMTdUMTA6MjA6NDcuOTUzWicBBGxpc3QPbWV0YWRhdGFWZXJzaW9uASgAktL+zAUiBXZhbHVlAX0BD6vc6QIAIQEEbGlzdARuYW1lAQAFIQEEbGlzdAVjb2xvcgEADCEBBGxpc3QGcGlubmVkAQABIQEEbGlzdAhhcmNoaXZlZAEAASEBBGxpc3QHZGVsZXRlZAEAASEBBGxpc3QFdG9kb3MBIQEEbGlzdAljcmVhdGVkQXQBABghAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEAAQGr3OkCAQA1", deleted: false, todos: [], name: "", color: "", pinned: false, archived: false }
+TodoListPage.tsx:216:13
 Active List Todos: 
-Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
-TodoListPage.tsx:205:12
+Array []
+TodoListPage.tsx:217:13
 Todos to use: 
-Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
-TodoListPage.tsx:206:12
+Array []
+TodoListPage.tsx:218:13
 Active todos: 
-Array [ {…}, {…} ]
-TodoListPage.tsx:207:12
+Array []
+TodoListPage.tsx:219:13
 Sorted active todos: 
-Array [ {…}, {…} ]
-TodoListPage.tsx:208:12
-[GlobalPocketBaseProvider] Local document updated for list f82cb78a-b308-48d2-b669-c2e5599eb508, origin: null yjsPocketBase.ts:296:14
-[GlobalPocketBaseProvider] Queued sync operation for list f82cb78a-b308-48d2-b669-c2e5599eb508, queue length: 2 yjsPocketBase.ts:461:12
-[GlobalPocketBaseProvider] Processing sync queue for list f82cb78a-b308-48d2-b669-c2e5599eb508, 2 operations pending yjsPocketBase.ts:477:12
-Active List ID: f82cb78a-b308-48d2-b669-c2e5599eb508 TodoListPage.tsx:203:12
+Array []
+TodoListPage.tsx:220:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 9 yjsPocketBase.ts:410:13
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
 Active List: 
-Object { archived: false, collectionId: "pbc_825406485", collectionName: "task_lists", color: "bg-amber-300", createdAt: "2025-07-10 14:41:35.916Z", deleted: false, id: "f82cb78a-b308-48d2-b669-c2e5599eb508", name: "test", pinned: true, user_id: "51612qsjktu0i93", … }
-TodoListPage.tsx:204:12
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "Ag2S0v7MBQAnAQRsaXN0BG5hbWUCJwEEbGlzdAVjb2xvcgInAQRsaXN0BXRvZG9zACcBBGxpc3QGcGlubmVkASgAktL+zAUDBXZhbHVlAXknAQRsaXN0CGFyY2hpdmVkASgAktL+zAUFBXZhbHVlAXknAQRsaXN0B2RlbGV0ZWQBKACS0v7MBQcFdmFsdWUBeScBBGxpc3QJY3JlYXRlZEF0AgQAktL+zAUJGDIwMjUtMDctMTdUMTA6MjA6NDcuOTUzWicBBGxpc3QPbWV0YWRhdGFWZXJzaW9uASgAktL+zAUiBXZhbHVlAX0BD6vc6QIAIQEEbGlzdARuYW1lAQAFIQEEbGlzdAVjb2xvcgEADCEBBGxpc3QGcGlubmVkAQABIQEEbGlzdAhhcmNoaXZlZAEAASEBBGxpc3QHZGVsZXRlZAEAASEBBGxpc3QFdG9kb3MBIQEEbGlzdAljcmVhdGVkQXQBABghAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEAAQGr3OkCAQA1", deleted: false, todos: [], name: "", color: "", pinned: false, archived: false }
+TodoListPage.tsx:216:13
 Active List Todos: 
-Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
-TodoListPage.tsx:205:12
+Array []
+TodoListPage.tsx:217:13
 Todos to use: 
-Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
-TodoListPage.tsx:206:12
+Array []
+TodoListPage.tsx:218:13
 Active todos: 
-Array(3) [ {…}, {…}, {…} ]
-TodoListPage.tsx:207:12
+Array []
+TodoListPage.tsx:219:13
 Sorted active todos: 
-Array(3) [ {…}, {…}, {…} ]
-TodoListPage.tsx:208:12
-[GlobalPocketBaseProvider] Failed to sync document for list f82cb78a-b308-48d2-b669-c2e5599eb508: ClientResponseError 0: Something went wrong while processing your request.
-    _ClientResponseError ClientResponseError.ts:13
-    send Client.ts:376
-    promise callback*send Client.ts:374
-    getOne CrudService.ts:165
-    getOne RecordService.ts:213
-    syncDocumentToServer yjsPocketBase.ts:542
-    handleDocUpdate yjsPocketBase.ts:303
-    processSyncQueue yjsPocketBase.ts:489
-    queueSync yjsPocketBase.ts:464
-    handleDocUpdate yjsPocketBase.ts:302
-    emit observable.js:82
-    emit observable.js:82
-    cleanupTransactions Transaction.js:363
-    transact Transaction.js:439
-    transact Doc.js:185
-    toggleTodo useYjsTodoList.ts:144
-    handleToggleTodo TodoListPage.tsx:252
-    onClick TodoListPage.tsx:893
-    React 13
-    <anonymous> main.tsx:21
-yjsPocketBase.ts:563:14
-[GlobalPocketBaseProvider] Sync operation failed for list f82cb78a-b308-48d2-b669-c2e5599eb508: ClientResponseError 0: Something went wrong while processing your request.
-    _ClientResponseError ClientResponseError.ts:13
-    send Client.ts:376
-    promise callback*send Client.ts:374
-    getOne CrudService.ts:165
-    getOne RecordService.ts:213
-    syncDocumentToServer yjsPocketBase.ts:542
-    handleDocUpdate yjsPocketBase.ts:303
-    processSyncQueue yjsPocketBase.ts:489
-    queueSync yjsPocketBase.ts:464
-    handleDocUpdate yjsPocketBase.ts:302
-    emit observable.js:82
-    emit observable.js:82
-    cleanupTransactions Transaction.js:363
-    transact Transaction.js:439
-    transact Doc.js:185
-    toggleTodo useYjsTodoList.ts:144
-    handleToggleTodo TodoListPage.tsx:252
-    onClick TodoListPage.tsx:893
-    React 13
-    <anonymous> main.tsx:21
-yjsPocketBase.ts:494:18
-[GlobalPocketBaseProvider] Failed to sync document for list f82cb78a-b308-48d2-b669-c2e5599eb508: ClientResponseError 0: Something went wrong while processing your request.
-    _ClientResponseError ClientResponseError.ts:13
-    send Client.ts:376
-    promise callback*send Client.ts:374
-    getOne CrudService.ts:165
-    getOne RecordService.ts:213
-    syncDocumentToServer yjsPocketBase.ts:542
-    handleDocUpdate yjsPocketBase.ts:303
-    processSyncQueue yjsPocketBase.ts:489
-    queueSync yjsPocketBase.ts:464
-    handleDocUpdate yjsPocketBase.ts:302
-    emit observable.js:82
-    emit observable.js:82
-    cleanupTransactions Transaction.js:363
-    transact Transaction.js:439
-    transact Doc.js:185
-    toggleTodo useYjsTodoList.ts:144
-    handleToggleTodo TodoListPage.tsx:252
-    onClick TodoListPage.tsx:893
-    React 13
-    <anonymous> main.tsx:21
-yjsPocketBase.ts:563:14
-[GlobalPocketBaseProvider] Sync operation failed for list f82cb78a-b308-48d2-b669-c2e5599eb508: ClientResponseError 0: Something went wrong while processing your request.
-    _ClientResponseError ClientResponseError.ts:13
-    send Client.ts:376
-    promise callback*send Client.ts:374
-    getOne CrudService.ts:165
-    getOne RecordService.ts:213
-    syncDocumentToServer yjsPocketBase.ts:542
-    handleDocUpdate yjsPocketBase.ts:303
-    processSyncQueue yjsPocketBase.ts:489
-    queueSync yjsPocketBase.ts:464
-    handleDocUpdate yjsPocketBase.ts:302
-    emit observable.js:82
-    emit observable.js:82
-    cleanupTransactions Transaction.js:363
-    transact Transaction.js:439
-    transact Doc.js:185
-    toggleTodo useYjsTodoList.ts:144
-    handleToggleTodo TodoListPage.tsx:252
-    onClick TodoListPage.tsx:893
-    React 13
-    <anonymous> main.tsx:21
-yjsPocketBase.ts:494:18
-[GlobalPocketBaseProvider] Finished processing sync queue for list f82cb78a-b308-48d2-b669-c2e5599eb508. Processed: 0, Failed: 2, Remaining: 0 yjsPocketBase.ts:518:12
-Active List ID: f82cb78a-b308-48d2-b669-c2e5599eb508 TodoListPage.tsx:203:12
+Array []
+TodoListPage.tsx:220:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 10 yjsPocketBase.ts:410:13
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
 Active List: 
-Object { archived: false, collectionId: "pbc_825406485", collectionName: "task_lists", color: "bg-amber-300", createdAt: "2025-07-10 14:41:35.916Z", deleted: false, id: "f82cb78a-b308-48d2-b669-c2e5599eb508", name: "test", pinned: true, user_id: "51612qsjktu0i93", … }
-TodoListPage.tsx:204:12
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "Ag2S0v7MBQAnAQRsaXN0BG5hbWUCJwEEbGlzdAVjb2xvcgInAQRsaXN0BXRvZG9zACcBBGxpc3QGcGlubmVkASgAktL+zAUDBXZhbHVlAXknAQRsaXN0CGFyY2hpdmVkASgAktL+zAUFBXZhbHVlAXknAQRsaXN0B2RlbGV0ZWQBKACS0v7MBQcFdmFsdWUBeScBBGxpc3QJY3JlYXRlZEF0AgQAktL+zAUJGDIwMjUtMDctMTdUMTA6MjA6NDcuOTUzWicBBGxpc3QPbWV0YWRhdGFWZXJzaW9uASgAktL+zAUiBXZhbHVlAX0BD6vc6QIAIQEEbGlzdARuYW1lAQAFIQEEbGlzdAVjb2xvcgEADCEBBGxpc3QGcGlubmVkAQABIQEEbGlzdAhhcmNoaXZlZAEAASEBBGxpc3QHZGVsZXRlZAEAASEBBGxpc3QFdG9kb3MBIQEEbGlzdAljcmVhdGVkQXQBABghAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEAAQGr3OkCAQA1", deleted: false, todos: [], name: "", color: "", pinned: false, archived: false }
+TodoListPage.tsx:216:13
 Active List Todos: 
-Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
-TodoListPage.tsx:205:12
+Array []
+TodoListPage.tsx:217:13
 Todos to use: 
-Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
-TodoListPage.tsx:206:12
+Array []
+TodoListPage.tsx:218:13
 Active todos: 
-Array(3) [ {…}, {…}, {…} ]
-TodoListPage.tsx:207:12
+Array []
+TodoListPage.tsx:219:13
 Sorted active todos: 
-Array(3) [ {…}, {…}, {…} ]
-TodoListPage.tsx:208:12
-[GlobalPocketBaseProvider] PocketBase reconnected, forcing read-merge-write for all documents yjsPocketBase.ts:183:16
-[GlobalPocketBaseProvider] Forcing read-merge-write for list 6debfe6a-296b-450a-b258-39da2a16a868 yjsPocketBase.ts:384:14
-Active List ID: f82cb78a-b308-48d2-b669-c2e5599eb508 TodoListPage.tsx:203:12
+Array []
+TodoListPage.tsx:220:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 11 yjsPocketBase.ts:410:13
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
 Active List: 
-Object { archived: false, collectionId: "pbc_825406485", collectionName: "task_lists", color: "bg-amber-300", createdAt: "2025-07-10 14:41:35.916Z", deleted: false, id: "f82cb78a-b308-48d2-b669-c2e5599eb508", name: "test", pinned: true, user_id: "51612qsjktu0i93", … }
-TodoListPage.tsx:204:12
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "Ag2S0v7MBQAnAQRsaXN0BG5hbWUCJwEEbGlzdAVjb2xvcgInAQRsaXN0BXRvZG9zACcBBGxpc3QGcGlubmVkASgAktL+zAUDBXZhbHVlAXknAQRsaXN0CGFyY2hpdmVkASgAktL+zAUFBXZhbHVlAXknAQRsaXN0B2RlbGV0ZWQBKACS0v7MBQcFdmFsdWUBeScBBGxpc3QJY3JlYXRlZEF0AgQAktL+zAUJGDIwMjUtMDctMTdUMTA6MjA6NDcuOTUzWicBBGxpc3QPbWV0YWRhdGFWZXJzaW9uASgAktL+zAUiBXZhbHVlAX0BD6vc6QIAIQEEbGlzdARuYW1lAQAFIQEEbGlzdAVjb2xvcgEADCEBBGxpc3QGcGlubmVkAQABIQEEbGlzdAhhcmNoaXZlZAEAASEBBGxpc3QHZGVsZXRlZAEAASEBBGxpc3QFdG9kb3MBIQEEbGlzdAljcmVhdGVkQXQBABghAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEAAQGr3OkCAQA1", deleted: false, todos: [], name: "", color: "", pinned: false, archived: false }
+TodoListPage.tsx:216:13
 Active List Todos: 
-Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
-TodoListPage.tsx:205:12
+Array []
+TodoListPage.tsx:217:13
 Todos to use: 
-Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
-TodoListPage.tsx:206:12
+Array []
+TodoListPage.tsx:218:13
 Active todos: 
-Array(3) [ {…}, {…}, {…} ]
-TodoListPage.tsx:207:12
+Array []
+TodoListPage.tsx:219:13
 Sorted active todos: 
-Array(3) [ {…}, {…}, {…} ]
-TodoListPage.tsx:208:12
-[GlobalPocketBaseProvider] Merged remote state for list 6debfe6a-296b-450a-b258-39da2a16a868 yjsPocketBase.ts:396:16
-[GlobalPocketBaseProvider] Queuing sync-to-server after merge for list 6debfe6a-296b-450a-b258-39da2a16a868 yjsPocketBase.ts:400:14
-[GlobalPocketBaseProvider] Queued sync operation for list 6debfe6a-296b-450a-b258-39da2a16a868, queue length: 1 yjsPocketBase.ts:461:12
-[GlobalPocketBaseProvider] Processing sync queue for list 6debfe6a-296b-450a-b258-39da2a16a868, 1 operations pending yjsPocketBase.ts:477:12
-[GlobalPocketBaseProvider] Forcing read-merge-write for list f82cb78a-b308-48d2-b669-c2e5599eb508 yjsPocketBase.ts:384:14
-[GlobalPocketBaseProvider] Merged remote state for list f82cb78a-b308-48d2-b669-c2e5599eb508 yjsPocketBase.ts:396:16
-[GlobalPocketBaseProvider] Queuing sync-to-server after merge for list f82cb78a-b308-48d2-b669-c2e5599eb508 yjsPocketBase.ts:400:14
-[GlobalPocketBaseProvider] Queued sync operation for list f82cb78a-b308-48d2-b669-c2e5599eb508, queue length: 1 yjsPocketBase.ts:461:12
-[GlobalPocketBaseProvider] Processing sync queue for list f82cb78a-b308-48d2-b669-c2e5599eb508, 1 operations pending yjsPocketBase.ts:477:12
-Active List ID: f82cb78a-b308-48d2-b669-c2e5599eb508 TodoListPage.tsx:203:12
+Array []
+TodoListPage.tsx:220:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 12 yjsPocketBase.ts:410:13
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
 Active List: 
-Object { archived: false, collectionId: "pbc_825406485", collectionName: "task_lists", color: "bg-amber-300", createdAt: "2025-07-10 14:41:35.916Z", deleted: false, id: "f82cb78a-b308-48d2-b669-c2e5599eb508", name: "test", pinned: true, user_id: "51612qsjktu0i93", … }
-TodoListPage.tsx:204:12
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "Ag2S0v7MBQAnAQRsaXN0BG5hbWUCJwEEbGlzdAVjb2xvcgInAQRsaXN0BXRvZG9zACcBBGxpc3QGcGlubmVkASgAktL+zAUDBXZhbHVlAXknAQRsaXN0CGFyY2hpdmVkASgAktL+zAUFBXZhbHVlAXknAQRsaXN0B2RlbGV0ZWQBKACS0v7MBQcFdmFsdWUBeScBBGxpc3QJY3JlYXRlZEF0AgQAktL+zAUJGDIwMjUtMDctMTdUMTA6MjA6NDcuOTUzWicBBGxpc3QPbWV0YWRhdGFWZXJzaW9uASgAktL+zAUiBXZhbHVlAX0BD6vc6QIAIQEEbGlzdARuYW1lAQAFIQEEbGlzdAVjb2xvcgEADCEBBGxpc3QGcGlubmVkAQABIQEEbGlzdAhhcmNoaXZlZAEAASEBBGxpc3QHZGVsZXRlZAEAASEBBGxpc3QFdG9kb3MBIQEEbGlzdAljcmVhdGVkQXQBABghAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEAAQGr3OkCAQA1", deleted: false, todos: [], name: "", color: "", pinned: false, archived: false }
+TodoListPage.tsx:216:13
 Active List Todos: 
-Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
-TodoListPage.tsx:205:12
+Array []
+TodoListPage.tsx:217:13
 Todos to use: 
-Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
-TodoListPage.tsx:206:12
+Array []
+TodoListPage.tsx:218:13
 Active todos: 
-Array(3) [ {…}, {…}, {…} ]
-TodoListPage.tsx:207:12
+Array []
+TodoListPage.tsx:219:13
 Sorted active todos: 
-Array(3) [ {…}, {…}, {…} ]
-TodoListPage.tsx:208:12
-Active List ID: f82cb78a-b308-48d2-b669-c2e5599eb508 TodoListPage.tsx:203:12
+Array []
+TodoListPage.tsx:220:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 13 yjsPocketBase.ts:410:13
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
 Active List: 
-Object { archived: false, collectionId: "pbc_825406485", collectionName: "task_lists", color: "bg-amber-300", createdAt: "2025-07-10 14:41:35.916Z", deleted: false, id: "f82cb78a-b308-48d2-b669-c2e5599eb508", name: "test", pinned: true, user_id: "51612qsjktu0i93", … }
-TodoListPage.tsx:204:12
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "Ag2S0v7MBQAnAQRsaXN0BG5hbWUCJwEEbGlzdAVjb2xvcgInAQRsaXN0BXRvZG9zACcBBGxpc3QGcGlubmVkASgAktL+zAUDBXZhbHVlAXknAQRsaXN0CGFyY2hpdmVkASgAktL+zAUFBXZhbHVlAXknAQRsaXN0B2RlbGV0ZWQBKACS0v7MBQcFdmFsdWUBeScBBGxpc3QJY3JlYXRlZEF0AgQAktL+zAUJGDIwMjUtMDctMTdUMTA6MjA6NDcuOTUzWicBBGxpc3QPbWV0YWRhdGFWZXJzaW9uASgAktL+zAUiBXZhbHVlAX0BD6vc6QIAIQEEbGlzdARuYW1lAQAFIQEEbGlzdAVjb2xvcgEADCEBBGxpc3QGcGlubmVkAQABIQEEbGlzdAhhcmNoaXZlZAEAASEBBGxpc3QHZGVsZXRlZAEAASEBBGxpc3QFdG9kb3MBIQEEbGlzdAljcmVhdGVkQXQBABghAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEAAQGr3OkCAQA1", deleted: false, todos: [], name: "", color: "", pinned: false, archived: false }
+TodoListPage.tsx:216:13
 Active List Todos: 
-Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
-TodoListPage.tsx:205:12
+Array []
+TodoListPage.tsx:217:13
 Todos to use: 
-Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
-TodoListPage.tsx:206:12
+Array []
+TodoListPage.tsx:218:13
 Active todos: 
-Array(3) [ {…}, {…}, {…} ]
-TodoListPage.tsx:207:12
+Array []
+TodoListPage.tsx:219:13
 Sorted active todos: 
-Array(3) [ {…}, {…}, {…} ]
-TodoListPage.tsx:208:12
-[GlobalPocketBaseProvider] Successfully synced document for list 6debfe6a-296b-450a-b258-39da2a16a868 yjsPocketBase.ts:560:14
-[GlobalPocketBaseProvider] Finished processing sync queue for list 6debfe6a-296b-450a-b258-39da2a16a868. Processed: 1, Failed: 0, Remaining: 0 yjsPocketBase.ts:518:12
-Active List ID: f82cb78a-b308-48d2-b669-c2e5599eb508 TodoListPage.tsx:203:12
+Array []
+TodoListPage.tsx:220:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 14 yjsPocketBase.ts:410:13
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
 Active List: 
-Object { archived: false, collectionId: "pbc_825406485", collectionName: "task_lists", color: "bg-amber-300", createdAt: "2025-07-10 14:41:35.916Z", deleted: false, id: "f82cb78a-b308-48d2-b669-c2e5599eb508", name: "test", pinned: true, user_id: "51612qsjktu0i93", … }
-TodoListPage.tsx:204:12
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "Ag2S0v7MBQAnAQRsaXN0BG5hbWUCJwEEbGlzdAVjb2xvcgInAQRsaXN0BXRvZG9zACcBBGxpc3QGcGlubmVkASgAktL+zAUDBXZhbHVlAXknAQRsaXN0CGFyY2hpdmVkASgAktL+zAUFBXZhbHVlAXknAQRsaXN0B2RlbGV0ZWQBKACS0v7MBQcFdmFsdWUBeScBBGxpc3QJY3JlYXRlZEF0AgQAktL+zAUJGDIwMjUtMDctMTdUMTA6MjA6NDcuOTUzWicBBGxpc3QPbWV0YWRhdGFWZXJzaW9uASgAktL+zAUiBXZhbHVlAX0BD6vc6QIAIQEEbGlzdARuYW1lAQAFIQEEbGlzdAVjb2xvcgEADCEBBGxpc3QGcGlubmVkAQABIQEEbGlzdAhhcmNoaXZlZAEAASEBBGxpc3QHZGVsZXRlZAEAASEBBGxpc3QFdG9kb3MBIQEEbGlzdAljcmVhdGVkQXQBABghAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEAAQGr3OkCAQA1", deleted: false, todos: [], name: "", color: "", pinned: false, archived: false }
+TodoListPage.tsx:216:13
 Active List Todos: 
-Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
-TodoListPage.tsx:205:12
+Array []
+TodoListPage.tsx:217:13
 Todos to use: 
-Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
-TodoListPage.tsx:206:12
+Array []
+TodoListPage.tsx:218:13
 Active todos: 
-Array(3) [ {…}, {…}, {…} ]
-TodoListPage.tsx:207:12
+Array []
+TodoListPage.tsx:219:13
 Sorted active todos: 
-Array(3) [ {…}, {…}, {…} ]
-TodoListPage.tsx:208:12
-[GlobalPocketBaseProvider] Successfully synced document for list f82cb78a-b308-48d2-b669-c2e5599eb508 yjsPocketBase.ts:560:14
-[GlobalPocketBaseProvider] Finished processing sync queue for list f82cb78a-b308-48d2-b669-c2e5599eb508. Processed: 1, Failed: 0, Remaining: 0 yjsPocketBase.ts:518:12
-Active List ID: f82cb78a-b308-48d2-b669-c2e5599eb508 TodoListPage.tsx:203:12
+Array []
+TodoListPage.tsx:220:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 15 yjsPocketBase.ts:410:13
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
 Active List: 
-Object { archived: false, collectionId: "pbc_825406485", collectionName: "task_lists", color: "bg-amber-300", createdAt: "2025-07-10 14:41:35.916Z", deleted: false, id: "f82cb78a-b308-48d2-b669-c2e5599eb508", name: "test", pinned: true, user_id: "51612qsjktu0i93", … }
-TodoListPage.tsx:204:12
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "Ag2S0v7MBQAnAQRsaXN0BG5hbWUCJwEEbGlzdAVjb2xvcgInAQRsaXN0BXRvZG9zACcBBGxpc3QGcGlubmVkASgAktL+zAUDBXZhbHVlAXknAQRsaXN0CGFyY2hpdmVkASgAktL+zAUFBXZhbHVlAXknAQRsaXN0B2RlbGV0ZWQBKACS0v7MBQcFdmFsdWUBeScBBGxpc3QJY3JlYXRlZEF0AgQAktL+zAUJGDIwMjUtMDctMTdUMTA6MjA6NDcuOTUzWicBBGxpc3QPbWV0YWRhdGFWZXJzaW9uASgAktL+zAUiBXZhbHVlAX0BD6vc6QIAIQEEbGlzdARuYW1lAQAFIQEEbGlzdAVjb2xvcgEADCEBBGxpc3QGcGlubmVkAQABIQEEbGlzdAhhcmNoaXZlZAEAASEBBGxpc3QHZGVsZXRlZAEAASEBBGxpc3QFdG9kb3MBIQEEbGlzdAljcmVhdGVkQXQBABghAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEAAQGr3OkCAQA1", deleted: false, todos: [], name: "", color: "", pinned: false, archived: false }
+TodoListPage.tsx:216:13
 Active List Todos: 
-Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
-TodoListPage.tsx:205:12
+Array []
+TodoListPage.tsx:217:13
 Todos to use: 
-Array(9) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…} ]
-TodoListPage.tsx:206:12
+Array []
+TodoListPage.tsx:218:13
 Active todos: 
-Array(3) [ {…}, {…}, {…} ]
-TodoListPage.tsx:207:12
+Array []
+TodoListPage.tsx:219:13
 Sorted active todos: 
-Array(3) [ {…}, {…}, {…} ]
-TodoListPage.tsx:208:12
+Array []
+TodoListPage.tsx:220:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 16 yjsPocketBase.ts:410:13
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
+Active List: 
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "Ag2S0v7MBQAnAQRsaXN0BG5hbWUCJwEEbGlzdAVjb2xvcgInAQRsaXN0BXRvZG9zACcBBGxpc3QGcGlubmVkASgAktL+zAUDBXZhbHVlAXknAQRsaXN0CGFyY2hpdmVkASgAktL+zAUFBXZhbHVlAXknAQRsaXN0B2RlbGV0ZWQBKACS0v7MBQcFdmFsdWUBeScBBGxpc3QJY3JlYXRlZEF0AgQAktL+zAUJGDIwMjUtMDctMTdUMTA6MjA6NDcuOTUzWicBBGxpc3QPbWV0YWRhdGFWZXJzaW9uASgAktL+zAUiBXZhbHVlAX0BD6vc6QIAIQEEbGlzdARuYW1lAQAFIQEEbGlzdAVjb2xvcgEADCEBBGxpc3QGcGlubmVkAQABIQEEbGlzdAhhcmNoaXZlZAEAASEBBGxpc3QHZGVsZXRlZAEAASEBBGxpc3QFdG9kb3MBIQEEbGlzdAljcmVhdGVkQXQBABghAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEAAQGr3OkCAQA1", deleted: false, todos: [], name: "", color: "", pinned: false, archived: false }
+TodoListPage.tsx:216:13
+Active List Todos: 
+Array []
+TodoListPage.tsx:217:13
+Todos to use: 
+Array []
+TodoListPage.tsx:218:13
+Active todos: 
+Array []
+TodoListPage.tsx:219:13
+Sorted active todos: 
+Array []
+TodoListPage.tsx:220:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 17 yjsPocketBase.ts:410:13
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
+Active List: 
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "Ag2S0v7MBQAnAQRsaXN0BG5hbWUCJwEEbGlzdAVjb2xvcgInAQRsaXN0BXRvZG9zACcBBGxpc3QGcGlubmVkASgAktL+zAUDBXZhbHVlAXknAQRsaXN0CGFyY2hpdmVkASgAktL+zAUFBXZhbHVlAXknAQRsaXN0B2RlbGV0ZWQBKACS0v7MBQcFdmFsdWUBeScBBGxpc3QJY3JlYXRlZEF0AgQAktL+zAUJGDIwMjUtMDctMTdUMTA6MjA6NDcuOTUzWicBBGxpc3QPbWV0YWRhdGFWZXJzaW9uASgAktL+zAUiBXZhbHVlAX0BD6vc6QIAIQEEbGlzdARuYW1lAQAFIQEEbGlzdAVjb2xvcgEADCEBBGxpc3QGcGlubmVkAQABIQEEbGlzdAhhcmNoaXZlZAEAASEBBGxpc3QHZGVsZXRlZAEAASEBBGxpc3QFdG9kb3MBIQEEbGlzdAljcmVhdGVkQXQBABghAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEAAQGr3OkCAQA1", deleted: false, todos: [], name: "", color: "", pinned: false, archived: false }
+TodoListPage.tsx:216:13
+Active List Todos: 
+Array []
+TodoListPage.tsx:217:13
+Todos to use: 
+Array []
+TodoListPage.tsx:218:13
+Active todos: 
+Array []
+TodoListPage.tsx:219:13
+Sorted active todos: 
+Array []
+TodoListPage.tsx:220:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 18 yjsPocketBase.ts:410:13
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
+Active List: 
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "Ag2S0v7MBQAnAQRsaXN0BG5hbWUCJwEEbGlzdAVjb2xvcgInAQRsaXN0BXRvZG9zACcBBGxpc3QGcGlubmVkASgAktL+zAUDBXZhbHVlAXknAQRsaXN0CGFyY2hpdmVkASgAktL+zAUFBXZhbHVlAXknAQRsaXN0B2RlbGV0ZWQBKACS0v7MBQcFdmFsdWUBeScBBGxpc3QJY3JlYXRlZEF0AgQAktL+zAUJGDIwMjUtMDctMTdUMTA6MjA6NDcuOTUzWicBBGxpc3QPbWV0YWRhdGFWZXJzaW9uASgAktL+zAUiBXZhbHVlAX0BD6vc6QIAIQEEbGlzdARuYW1lAQAFIQEEbGlzdAVjb2xvcgEADCEBBGxpc3QGcGlubmVkAQABIQEEbGlzdAhhcmNoaXZlZAEAASEBBGxpc3QHZGVsZXRlZAEAASEBBGxpc3QFdG9kb3MBIQEEbGlzdAljcmVhdGVkQXQBABghAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEAAQGr3OkCAQA1", deleted: false, todos: [], name: "", color: "", pinned: false, archived: false }
+TodoListPage.tsx:216:13
+Active List Todos: 
+Array []
+TodoListPage.tsx:217:13
+Todos to use: 
+Array []
+TodoListPage.tsx:218:13
+Active todos: 
+Array []
+TodoListPage.tsx:219:13
+Sorted active todos: 
+Array []
+TodoListPage.tsx:220:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 19 yjsPocketBase.ts:410:13
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
+Active List: 
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "Ag2S0v7MBQAnAQRsaXN0BG5hbWUCJwEEbGlzdAVjb2xvcgInAQRsaXN0BXRvZG9zACcBBGxpc3QGcGlubmVkASgAktL+zAUDBXZhbHVlAXknAQRsaXN0CGFyY2hpdmVkASgAktL+zAUFBXZhbHVlAXknAQRsaXN0B2RlbGV0ZWQBKACS0v7MBQcFdmFsdWUBeScBBGxpc3QJY3JlYXRlZEF0AgQAktL+zAUJGDIwMjUtMDctMTdUMTA6MjA6NDcuOTUzWicBBGxpc3QPbWV0YWRhdGFWZXJzaW9uASgAktL+zAUiBXZhbHVlAX0BD6vc6QIAIQEEbGlzdARuYW1lAQAFIQEEbGlzdAVjb2xvcgEADCEBBGxpc3QGcGlubmVkAQABIQEEbGlzdAhhcmNoaXZlZAEAASEBBGxpc3QHZGVsZXRlZAEAASEBBGxpc3QFdG9kb3MBIQEEbGlzdAljcmVhdGVkQXQBABghAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEAAQGr3OkCAQA1", deleted: false, todos: [], name: "", color: "", pinned: false, archived: false }
+TodoListPage.tsx:216:13
+Active List Todos: 
+Array []
+TodoListPage.tsx:217:13
+Todos to use: 
+Array []
+TodoListPage.tsx:218:13
+Active todos: 
+Array []
+TodoListPage.tsx:219:13
+Sorted active todos: 
+Array []
+TodoListPage.tsx:220:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 20 yjsPocketBase.ts:410:13
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
+Active List: 
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "Ag2S0v7MBQAnAQRsaXN0BG5hbWUCJwEEbGlzdAVjb2xvcgInAQRsaXN0BXRvZG9zACcBBGxpc3QGcGlubmVkASgAktL+zAUDBXZhbHVlAXknAQRsaXN0CGFyY2hpdmVkASgAktL+zAUFBXZhbHVlAXknAQRsaXN0B2RlbGV0ZWQBKACS0v7MBQcFdmFsdWUBeScBBGxpc3QJY3JlYXRlZEF0AgQAktL+zAUJGDIwMjUtMDctMTdUMTA6MjA6NDcuOTUzWicBBGxpc3QPbWV0YWRhdGFWZXJzaW9uASgAktL+zAUiBXZhbHVlAX0BD6vc6QIAIQEEbGlzdARuYW1lAQAFIQEEbGlzdAVjb2xvcgEADCEBBGxpc3QGcGlubmVkAQABIQEEbGlzdAhhcmNoaXZlZAEAASEBBGxpc3QHZGVsZXRlZAEAASEBBGxpc3QFdG9kb3MBIQEEbGlzdAljcmVhdGVkQXQBABghAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEAAQGr3OkCAQA1", deleted: false, todos: [], name: "", color: "", pinned: false, archived: false }
+TodoListPage.tsx:216:13
+Active List Todos: 
+Array []
+TodoListPage.tsx:217:13
+Todos to use: 
+Array []
+TodoListPage.tsx:218:13
+Active todos: 
+Array []
+TodoListPage.tsx:219:13
+Sorted active todos: 
+Array []
+TodoListPage.tsx:220:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 21 yjsPocketBase.ts:410:13
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
+Active List: 
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "Ag2S0v7MBQAnAQRsaXN0BG5hbWUCJwEEbGlzdAVjb2xvcgInAQRsaXN0BXRvZG9zACcBBGxpc3QGcGlubmVkASgAktL+zAUDBXZhbHVlAXknAQRsaXN0CGFyY2hpdmVkASgAktL+zAUFBXZhbHVlAXknAQRsaXN0B2RlbGV0ZWQBKACS0v7MBQcFdmFsdWUBeScBBGxpc3QJY3JlYXRlZEF0AgQAktL+zAUJGDIwMjUtMDctMTdUMTA6MjA6NDcuOTUzWicBBGxpc3QPbWV0YWRhdGFWZXJzaW9uASgAktL+zAUiBXZhbHVlAX0BD6vc6QIAIQEEbGlzdARuYW1lAQAFIQEEbGlzdAVjb2xvcgEADCEBBGxpc3QGcGlubmVkAQABIQEEbGlzdAhhcmNoaXZlZAEAASEBBGxpc3QHZGVsZXRlZAEAASEBBGxpc3QFdG9kb3MBIQEEbGlzdAljcmVhdGVkQXQBABghAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEAAQGr3OkCAQA1", deleted: false, todos: [], name: "", color: "", pinned: false, archived: false }
+TodoListPage.tsx:216:13
+Active List Todos: 
+Array []
+TodoListPage.tsx:217:13
+Todos to use: 
+Array []
+TodoListPage.tsx:218:13
+Active todos: 
+Array []
+TodoListPage.tsx:219:13
+Sorted active todos: 
+Array []
+TodoListPage.tsx:220:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 22 yjsPocketBase.ts:410:13
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
+Active List: 
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "Ag2S0v7MBQAnAQRsaXN0BG5hbWUCJwEEbGlzdAVjb2xvcgInAQRsaXN0BXRvZG9zACcBBGxpc3QGcGlubmVkASgAktL+zAUDBXZhbHVlAXknAQRsaXN0CGFyY2hpdmVkASgAktL+zAUFBXZhbHVlAXknAQRsaXN0B2RlbGV0ZWQBKACS0v7MBQcFdmFsdWUBeScBBGxpc3QJY3JlYXRlZEF0AgQAktL+zAUJGDIwMjUtMDctMTdUMTA6MjA6NDcuOTUzWicBBGxpc3QPbWV0YWRhdGFWZXJzaW9uASgAktL+zAUiBXZhbHVlAX0BD6vc6QIAIQEEbGlzdARuYW1lAQAFIQEEbGlzdAVjb2xvcgEADCEBBGxpc3QGcGlubmVkAQABIQEEbGlzdAhhcmNoaXZlZAEAASEBBGxpc3QHZGVsZXRlZAEAASEBBGxpc3QFdG9kb3MBIQEEbGlzdAljcmVhdGVkQXQBABghAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEAAQGr3OkCAQA1", deleted: false, todos: [], name: "", color: "", pinned: false, archived: false }
+TodoListPage.tsx:216:13
+Active List Todos: 
+Array []
+TodoListPage.tsx:217:13
+Todos to use: 
+Array []
+TodoListPage.tsx:218:13
+Active todos: 
+Array []
+TodoListPage.tsx:219:13
+Sorted active todos: 
+Array []
+TodoListPage.tsx:220:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 23 yjsPocketBase.ts:410:13
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
+Active List: 
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "Ag2S0v7MBQAnAQRsaXN0BG5hbWUCJwEEbGlzdAVjb2xvcgInAQRsaXN0BXRvZG9zACcBBGxpc3QGcGlubmVkASgAktL+zAUDBXZhbHVlAXknAQRsaXN0CGFyY2hpdmVkASgAktL+zAUFBXZhbHVlAXknAQRsaXN0B2RlbGV0ZWQBKACS0v7MBQcFdmFsdWUBeScBBGxpc3QJY3JlYXRlZEF0AgQAktL+zAUJGDIwMjUtMDctMTdUMTA6MjA6NDcuOTUzWicBBGxpc3QPbWV0YWRhdGFWZXJzaW9uASgAktL+zAUiBXZhbHVlAX0BD6vc6QIAIQEEbGlzdARuYW1lAQAFIQEEbGlzdAVjb2xvcgEADCEBBGxpc3QGcGlubmVkAQABIQEEbGlzdAhhcmNoaXZlZAEAASEBBGxpc3QHZGVsZXRlZAEAASEBBGxpc3QFdG9kb3MBIQEEbGlzdAljcmVhdGVkQXQBABghAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEAAQGr3OkCAQA1", deleted: false, todos: [], name: "", color: "", pinned: false, archived: false }
+TodoListPage.tsx:216:13
+Active List Todos: 
+Array []
+TodoListPage.tsx:217:13
+Todos to use: 
+Array []
+TodoListPage.tsx:218:13
+Active todos: 
+Array []
+TodoListPage.tsx:219:13
+Sorted active todos: 
+Array []
+TodoListPage.tsx:220:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 24 yjsPocketBase.ts:410:13
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
+Active List: 
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "Ag2S0v7MBQAnAQRsaXN0BG5hbWUCJwEEbGlzdAVjb2xvcgInAQRsaXN0BXRvZG9zACcBBGxpc3QGcGlubmVkASgAktL+zAUDBXZhbHVlAXknAQRsaXN0CGFyY2hpdmVkASgAktL+zAUFBXZhbHVlAXknAQRsaXN0B2RlbGV0ZWQBKACS0v7MBQcFdmFsdWUBeScBBGxpc3QJY3JlYXRlZEF0AgQAktL+zAUJGDIwMjUtMDctMTdUMTA6MjA6NDcuOTUzWicBBGxpc3QPbWV0YWRhdGFWZXJzaW9uASgAktL+zAUiBXZhbHVlAX0BD6vc6QIAIQEEbGlzdARuYW1lAQAFIQEEbGlzdAVjb2xvcgEADCEBBGxpc3QGcGlubmVkAQABIQEEbGlzdAhhcmNoaXZlZAEAASEBBGxpc3QHZGVsZXRlZAEAASEBBGxpc3QFdG9kb3MBIQEEbGlzdAljcmVhdGVkQXQBABghAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEAAQGr3OkCAQA1", deleted: false, todos: [], name: "", color: "", pinned: false, archived: false }
+TodoListPage.tsx:216:13
+Active List Todos: 
+Array []
+TodoListPage.tsx:217:13
+Todos to use: 
+Array []
+TodoListPage.tsx:218:13
+Active todos: 
+Array []
+TodoListPage.tsx:219:13
+Sorted active todos: 
+Array []
+TodoListPage.tsx:220:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 25 yjsPocketBase.ts:410:13
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
+Active List: 
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "Ag2S0v7MBQAnAQRsaXN0BG5hbWUCJwEEbGlzdAVjb2xvcgInAQRsaXN0BXRvZG9zACcBBGxpc3QGcGlubmVkASgAktL+zAUDBXZhbHVlAXknAQRsaXN0CGFyY2hpdmVkASgAktL+zAUFBXZhbHVlAXknAQRsaXN0B2RlbGV0ZWQBKACS0v7MBQcFdmFsdWUBeScBBGxpc3QJY3JlYXRlZEF0AgQAktL+zAUJGDIwMjUtMDctMTdUMTA6MjA6NDcuOTUzWicBBGxpc3QPbWV0YWRhdGFWZXJzaW9uASgAktL+zAUiBXZhbHVlAX0BD6vc6QIAIQEEbGlzdARuYW1lAQAFIQEEbGlzdAVjb2xvcgEADCEBBGxpc3QGcGlubmVkAQABIQEEbGlzdAhhcmNoaXZlZAEAASEBBGxpc3QHZGVsZXRlZAEAASEBBGxpc3QFdG9kb3MBIQEEbGlzdAljcmVhdGVkQXQBABghAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEAAQGr3OkCAQA1", deleted: false, todos: [], name: "", color: "", pinned: false, archived: false }
+TodoListPage.tsx:216:13
+Active List Todos: 
+Array []
+TodoListPage.tsx:217:13
+Todos to use: 
+Array []
+TodoListPage.tsx:218:13
+Active todos: 
+Array []
+TodoListPage.tsx:219:13
+Sorted active todos: 
+Array []
+TodoListPage.tsx:220:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 26 yjsPocketBase.ts:410:13
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
+Active List: 
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "Ag2S0v7MBQAnAQRsaXN0BG5hbWUCJwEEbGlzdAVjb2xvcgInAQRsaXN0BXRvZG9zACcBBGxpc3QGcGlubmVkASgAktL+zAUDBXZhbHVlAXknAQRsaXN0CGFyY2hpdmVkASgAktL+zAUFBXZhbHVlAXknAQRsaXN0B2RlbGV0ZWQBKACS0v7MBQcFdmFsdWUBeScBBGxpc3QJY3JlYXRlZEF0AgQAktL+zAUJGDIwMjUtMDctMTdUMTA6MjA6NDcuOTUzWicBBGxpc3QPbWV0YWRhdGFWZXJzaW9uASgAktL+zAUiBXZhbHVlAX0BD6vc6QIAIQEEbGlzdARuYW1lAQAFIQEEbGlzdAVjb2xvcgEADCEBBGxpc3QGcGlubmVkAQABIQEEbGlzdAhhcmNoaXZlZAEAASEBBGxpc3QHZGVsZXRlZAEAASEBBGxpc3QFdG9kb3MBIQEEbGlzdAljcmVhdGVkQXQBABghAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEAAQGr3OkCAQA1", deleted: false, todos: [], name: "", color: "", pinned: false, archived: false }
+TodoListPage.tsx:216:13
+Active List Todos: 
+Array []
+TodoListPage.tsx:217:13
+Todos to use: 
+Array []
+TodoListPage.tsx:218:13
+Active todos: 
+Array []
+TodoListPage.tsx:219:13
+Sorted active todos: 
+Array []
+TodoListPage.tsx:220:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 27 yjsPocketBase.ts:410:13
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
+Active List: 
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "Ag2S0v7MBQAnAQRsaXN0BG5hbWUCJwEEbGlzdAVjb2xvcgInAQRsaXN0BXRvZG9zACcBBGxpc3QGcGlubmVkASgAktL+zAUDBXZhbHVlAXknAQRsaXN0CGFyY2hpdmVkASgAktL+zAUFBXZhbHVlAXknAQRsaXN0B2RlbGV0ZWQBKACS0v7MBQcFdmFsdWUBeScBBGxpc3QJY3JlYXRlZEF0AgQAktL+zAUJGDIwMjUtMDctMTdUMTA6MjA6NDcuOTUzWicBBGxpc3QPbWV0YWRhdGFWZXJzaW9uASgAktL+zAUiBXZhbHVlAX0BD6vc6QIAIQEEbGlzdARuYW1lAQAFIQEEbGlzdAVjb2xvcgEADCEBBGxpc3QGcGlubmVkAQABIQEEbGlzdAhhcmNoaXZlZAEAASEBBGxpc3QHZGVsZXRlZAEAASEBBGxpc3QFdG9kb3MBIQEEbGlzdAljcmVhdGVkQXQBABghAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEAAQGr3OkCAQA1", deleted: false, todos: [], name: "", color: "", pinned: false, archived: false }
+TodoListPage.tsx:216:13
+Active List Todos: 
+Array []
+TodoListPage.tsx:217:13
+Todos to use: 
+Array []
+TodoListPage.tsx:218:13
+Active todos: 
+Array []
+TodoListPage.tsx:219:13
+Sorted active todos: 
+Array []
+TodoListPage.tsx:220:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 28 yjsPocketBase.ts:410:13
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
+Active List: 
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "Ag2S0v7MBQAnAQRsaXN0BG5hbWUCJwEEbGlzdAVjb2xvcgInAQRsaXN0BXRvZG9zACcBBGxpc3QGcGlubmVkASgAktL+zAUDBXZhbHVlAXknAQRsaXN0CGFyY2hpdmVkASgAktL+zAUFBXZhbHVlAXknAQRsaXN0B2RlbGV0ZWQBKACS0v7MBQcFdmFsdWUBeScBBGxpc3QJY3JlYXRlZEF0AgQAktL+zAUJGDIwMjUtMDctMTdUMTA6MjA6NDcuOTUzWicBBGxpc3QPbWV0YWRhdGFWZXJzaW9uASgAktL+zAUiBXZhbHVlAX0BD6vc6QIAIQEEbGlzdARuYW1lAQAFIQEEbGlzdAVjb2xvcgEADCEBBGxpc3QGcGlubmVkAQABIQEEbGlzdAhhcmNoaXZlZAEAASEBBGxpc3QHZGVsZXRlZAEAASEBBGxpc3QFdG9kb3MBIQEEbGlzdAljcmVhdGVkQXQBABghAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEAAQGr3OkCAQA1", deleted: false, todos: [], name: "", color: "", pinned: false, archived: false }
+TodoListPage.tsx:216:13
+Active List Todos: 
+Array []
+TodoListPage.tsx:217:13
+Todos to use: 
+Array []
+TodoListPage.tsx:218:13
+Active todos: 
+Array []
+TodoListPage.tsx:219:13
+Sorted active todos: 
+Array []
+TodoListPage.tsx:220:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 29 yjsPocketBase.ts:410:13
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
+Active List: 
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "Ag2S0v7MBQAnAQRsaXN0BG5hbWUCJwEEbGlzdAVjb2xvcgInAQRsaXN0BXRvZG9zACcBBGxpc3QGcGlubmVkASgAktL+zAUDBXZhbHVlAXknAQRsaXN0CGFyY2hpdmVkASgAktL+zAUFBXZhbHVlAXknAQRsaXN0B2RlbGV0ZWQBKACS0v7MBQcFdmFsdWUBeScBBGxpc3QJY3JlYXRlZEF0AgQAktL+zAUJGDIwMjUtMDctMTdUMTA6MjA6NDcuOTUzWicBBGxpc3QPbWV0YWRhdGFWZXJzaW9uASgAktL+zAUiBXZhbHVlAX0BD6vc6QIAIQEEbGlzdARuYW1lAQAFIQEEbGlzdAVjb2xvcgEADCEBBGxpc3QGcGlubmVkAQABIQEEbGlzdAhhcmNoaXZlZAEAASEBBGxpc3QHZGVsZXRlZAEAASEBBGxpc3QFdG9kb3MBIQEEbGlzdAljcmVhdGVkQXQBABghAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEAAQGr3OkCAQA1", deleted: false, todos: [], name: "", color: "", pinned: false, archived: false }
+TodoListPage.tsx:216:13
+Active List Todos: 
+Array []
+TodoListPage.tsx:217:13
+Todos to use: 
+Array []
+TodoListPage.tsx:218:13
+Active todos: 
+Array []
+TodoListPage.tsx:219:13
+Sorted active todos: 
+Array []
+TodoListPage.tsx:220:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 30 yjsPocketBase.ts:410:13
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
+Active List: 
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "Ag2S0v7MBQAnAQRsaXN0BG5hbWUCJwEEbGlzdAVjb2xvcgInAQRsaXN0BXRvZG9zACcBBGxpc3QGcGlubmVkASgAktL+zAUDBXZhbHVlAXknAQRsaXN0CGFyY2hpdmVkASgAktL+zAUFBXZhbHVlAXknAQRsaXN0B2RlbGV0ZWQBKACS0v7MBQcFdmFsdWUBeScBBGxpc3QJY3JlYXRlZEF0AgQAktL+zAUJGDIwMjUtMDctMTdUMTA6MjA6NDcuOTUzWicBBGxpc3QPbWV0YWRhdGFWZXJzaW9uASgAktL+zAUiBXZhbHVlAX0BD6vc6QIAIQEEbGlzdARuYW1lAQAFIQEEbGlzdAVjb2xvcgEADCEBBGxpc3QGcGlubmVkAQABIQEEbGlzdAhhcmNoaXZlZAEAASEBBGxpc3QHZGVsZXRlZAEAASEBBGxpc3QFdG9kb3MBIQEEbGlzdAljcmVhdGVkQXQBABghAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEAAQGr3OkCAQA1", deleted: false, todos: [], name: "", color: "", pinned: false, archived: false }
+TodoListPage.tsx:216:13
+Active List Todos: 
+Array []
+TodoListPage.tsx:217:13
+Todos to use: 
+Array []
+TodoListPage.tsx:218:13
+Active todos: 
+Array []
+TodoListPage.tsx:219:13
+Sorted active todos: 
+Array []
+TodoListPage.tsx:220:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 31 yjsPocketBase.ts:410:13
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
+Active List: 
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "Ag2S0v7MBQAnAQRsaXN0BG5hbWUCJwEEbGlzdAVjb2xvcgInAQRsaXN0BXRvZG9zACcBBGxpc3QGcGlubmVkASgAktL+zAUDBXZhbHVlAXknAQRsaXN0CGFyY2hpdmVkASgAktL+zAUFBXZhbHVlAXknAQRsaXN0B2RlbGV0ZWQBKACS0v7MBQcFdmFsdWUBeScBBGxpc3QJY3JlYXRlZEF0AgQAktL+zAUJGDIwMjUtMDctMTdUMTA6MjA6NDcuOTUzWicBBGxpc3QPbWV0YWRhdGFWZXJzaW9uASgAktL+zAUiBXZhbHVlAX0BD6vc6QIAIQEEbGlzdARuYW1lAQAFIQEEbGlzdAVjb2xvcgEADCEBBGxpc3QGcGlubmVkAQABIQEEbGlzdAhhcmNoaXZlZAEAASEBBGxpc3QHZGVsZXRlZAEAASEBBGxpc3QFdG9kb3MBIQEEbGlzdAljcmVhdGVkQXQBABghAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEAAQGr3OkCAQA1", deleted: false, todos: [], name: "", color: "", pinned: false, archived: false }
+TodoListPage.tsx:216:13
+Active List Todos: 
+Array []
+TodoListPage.tsx:217:13
+Todos to use: 
+Array []
+TodoListPage.tsx:218:13
+Active todos: 
+Array []
+TodoListPage.tsx:219:13
+Sorted active todos: 
+Array []
+TodoListPage.tsx:220:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 32 yjsPocketBase.ts:410:13
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
+Active List: 
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "Ag2S0v7MBQAnAQRsaXN0BG5hbWUCJwEEbGlzdAVjb2xvcgInAQRsaXN0BXRvZG9zACcBBGxpc3QGcGlubmVkASgAktL+zAUDBXZhbHVlAXknAQRsaXN0CGFyY2hpdmVkASgAktL+zAUFBXZhbHVlAXknAQRsaXN0B2RlbGV0ZWQBKACS0v7MBQcFdmFsdWUBeScBBGxpc3QJY3JlYXRlZEF0AgQAktL+zAUJGDIwMjUtMDctMTdUMTA6MjA6NDcuOTUzWicBBGxpc3QPbWV0YWRhdGFWZXJzaW9uASgAktL+zAUiBXZhbHVlAX0BD6vc6QIAIQEEbGlzdARuYW1lAQAFIQEEbGlzdAVjb2xvcgEADCEBBGxpc3QGcGlubmVkAQABIQEEbGlzdAhhcmNoaXZlZAEAASEBBGxpc3QHZGVsZXRlZAEAASEBBGxpc3QFdG9kb3MBIQEEbGlzdAljcmVhdGVkQXQBABghAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEAAQGr3OkCAQA1", deleted: false, todos: [], name: "", color: "", pinned: false, archived: false }
+TodoListPage.tsx:216:13
+Active List Todos: 
+Array []
+TodoListPage.tsx:217:13
+Todos to use: 
+Array []
+TodoListPage.tsx:218:13
+Active todos: 
+Array []
+TodoListPage.tsx:219:13
+Sorted active todos: 
+Array []
+TodoListPage.tsx:220:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 33 yjsPocketBase.ts:410:13
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
+Active List: 
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "Ag2S0v7MBQAnAQRsaXN0BG5hbWUCJwEEbGlzdAVjb2xvcgInAQRsaXN0BXRvZG9zACcBBGxpc3QGcGlubmVkASgAktL+zAUDBXZhbHVlAXknAQRsaXN0CGFyY2hpdmVkASgAktL+zAUFBXZhbHVlAXknAQRsaXN0B2RlbGV0ZWQBKACS0v7MBQcFdmFsdWUBeScBBGxpc3QJY3JlYXRlZEF0AgQAktL+zAUJGDIwMjUtMDctMTdUMTA6MjA6NDcuOTUzWicBBGxpc3QPbWV0YWRhdGFWZXJzaW9uASgAktL+zAUiBXZhbHVlAX0BD6vc6QIAIQEEbGlzdARuYW1lAQAFIQEEbGlzdAVjb2xvcgEADCEBBGxpc3QGcGlubmVkAQABIQEEbGlzdAhhcmNoaXZlZAEAASEBBGxpc3QHZGVsZXRlZAEAASEBBGxpc3QFdG9kb3MBIQEEbGlzdAljcmVhdGVkQXQBABghAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEAAQGr3OkCAQA1", deleted: false, todos: [], name: "", color: "", pinned: false, archived: false }
+TodoListPage.tsx:216:13
+Active List Todos: 
+Array []
+TodoListPage.tsx:217:13
+Todos to use: 
+Array []
+TodoListPage.tsx:218:13
+Active todos: 
+Array []
+TodoListPage.tsx:219:13
+Sorted active todos: 
+Array []
+TodoListPage.tsx:220:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 34 yjsPocketBase.ts:410:13
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
+Active List: 
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "Ag2S0v7MBQAnAQRsaXN0BG5hbWUCJwEEbGlzdAVjb2xvcgInAQRsaXN0BXRvZG9zACcBBGxpc3QGcGlubmVkASgAktL+zAUDBXZhbHVlAXknAQRsaXN0CGFyY2hpdmVkASgAktL+zAUFBXZhbHVlAXknAQRsaXN0B2RlbGV0ZWQBKACS0v7MBQcFdmFsdWUBeScBBGxpc3QJY3JlYXRlZEF0AgQAktL+zAUJGDIwMjUtMDctMTdUMTA6MjA6NDcuOTUzWicBBGxpc3QPbWV0YWRhdGFWZXJzaW9uASgAktL+zAUiBXZhbHVlAX0BD6vc6QIAIQEEbGlzdARuYW1lAQAFIQEEbGlzdAVjb2xvcgEADCEBBGxpc3QGcGlubmVkAQABIQEEbGlzdAhhcmNoaXZlZAEAASEBBGxpc3QHZGVsZXRlZAEAASEBBGxpc3QFdG9kb3MBIQEEbGlzdAljcmVhdGVkQXQBABghAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEAAQGr3OkCAQA1", deleted: false, todos: [], name: "", color: "", pinned: false, archived: false }
+TodoListPage.tsx:216:13
+Active List Todos: 
+Array []
+TodoListPage.tsx:217:13
+Todos to use: 
+Array []
+TodoListPage.tsx:218:13
+Active todos: 
+Array []
+TodoListPage.tsx:219:13
+Sorted active todos: 
+Array []
+TodoListPage.tsx:220:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 35 yjsPocketBase.ts:410:13
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
+Active List: 
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "Ag2S0v7MBQAnAQRsaXN0BG5hbWUCJwEEbGlzdAVjb2xvcgInAQRsaXN0BXRvZG9zACcBBGxpc3QGcGlubmVkASgAktL+zAUDBXZhbHVlAXknAQRsaXN0CGFyY2hpdmVkASgAktL+zAUFBXZhbHVlAXknAQRsaXN0B2RlbGV0ZWQBKACS0v7MBQcFdmFsdWUBeScBBGxpc3QJY3JlYXRlZEF0AgQAktL+zAUJGDIwMjUtMDctMTdUMTA6MjA6NDcuOTUzWicBBGxpc3QPbWV0YWRhdGFWZXJzaW9uASgAktL+zAUiBXZhbHVlAX0BD6vc6QIAIQEEbGlzdARuYW1lAQAFIQEEbGlzdAVjb2xvcgEADCEBBGxpc3QGcGlubmVkAQABIQEEbGlzdAhhcmNoaXZlZAEAASEBBGxpc3QHZGVsZXRlZAEAASEBBGxpc3QFdG9kb3MBIQEEbGlzdAljcmVhdGVkQXQBABghAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEAAQGr3OkCAQA1", deleted: false, todos: [], name: "", color: "", pinned: false, archived: false }
+TodoListPage.tsx:216:13
+Active List Todos: 
+Array []
+TodoListPage.tsx:217:13
+Todos to use: 
+Array []
+TodoListPage.tsx:218:13
+Active todos: 
+Array []
+TodoListPage.tsx:219:13
+Sorted active todos: 
+Array []
+TodoListPage.tsx:220:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 36 yjsPocketBase.ts:410:13
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
+Active List: 
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "Ag2S0v7MBQAnAQRsaXN0BG5hbWUCJwEEbGlzdAVjb2xvcgInAQRsaXN0BXRvZG9zACcBBGxpc3QGcGlubmVkASgAktL+zAUDBXZhbHVlAXknAQRsaXN0CGFyY2hpdmVkASgAktL+zAUFBXZhbHVlAXknAQRsaXN0B2RlbGV0ZWQBKACS0v7MBQcFdmFsdWUBeScBBGxpc3QJY3JlYXRlZEF0AgQAktL+zAUJGDIwMjUtMDctMTdUMTA6MjA6NDcuOTUzWicBBGxpc3QPbWV0YWRhdGFWZXJzaW9uASgAktL+zAUiBXZhbHVlAX0BD6vc6QIAIQEEbGlzdARuYW1lAQAFIQEEbGlzdAVjb2xvcgEADCEBBGxpc3QGcGlubmVkAQABIQEEbGlzdAhhcmNoaXZlZAEAASEBBGxpc3QHZGVsZXRlZAEAASEBBGxpc3QFdG9kb3MBIQEEbGlzdAljcmVhdGVkQXQBABghAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEAAQGr3OkCAQA1", deleted: false, todos: [], name: "", color: "", pinned: false, archived: false }
+TodoListPage.tsx:216:13
+Active List Todos: 
+Array []
+TodoListPage.tsx:217:13
+Todos to use: 
+Array []
+TodoListPage.tsx:218:13
+Active todos: 
+Array []
+TodoListPage.tsx:219:13
+Sorted active todos: 
+Array []
+TodoListPage.tsx:220:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 37 yjsPocketBase.ts:410:13
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
+Active List: 
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "Ag2S0v7MBQAnAQRsaXN0BG5hbWUCJwEEbGlzdAVjb2xvcgInAQRsaXN0BXRvZG9zACcBBGxpc3QGcGlubmVkASgAktL+zAUDBXZhbHVlAXknAQRsaXN0CGFyY2hpdmVkASgAktL+zAUFBXZhbHVlAXknAQRsaXN0B2RlbGV0ZWQBKACS0v7MBQcFdmFsdWUBeScBBGxpc3QJY3JlYXRlZEF0AgQAktL+zAUJGDIwMjUtMDctMTdUMTA6MjA6NDcuOTUzWicBBGxpc3QPbWV0YWRhdGFWZXJzaW9uASgAktL+zAUiBXZhbHVlAX0BD6vc6QIAIQEEbGlzdARuYW1lAQAFIQEEbGlzdAVjb2xvcgEADCEBBGxpc3QGcGlubmVkAQABIQEEbGlzdAhhcmNoaXZlZAEAASEBBGxpc3QHZGVsZXRlZAEAASEBBGxpc3QFdG9kb3MBIQEEbGlzdAljcmVhdGVkQXQBABghAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEAAQGr3OkCAQA1", deleted: false, todos: [], name: "", color: "", pinned: false, archived: false }
+TodoListPage.tsx:216:13
+Active List Todos: 
+Array []
+TodoListPage.tsx:217:13
+Todos to use: 
+Array []
+TodoListPage.tsx:218:13
+Active todos: 
+Array []
+TodoListPage.tsx:219:13
+Sorted active todos: 
+Array []
+TodoListPage.tsx:220:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 38 yjsPocketBase.ts:410:13
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
+Active List: 
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "Ag2S0v7MBQAnAQRsaXN0BG5hbWUCJwEEbGlzdAVjb2xvcgInAQRsaXN0BXRvZG9zACcBBGxpc3QGcGlubmVkASgAktL+zAUDBXZhbHVlAXknAQRsaXN0CGFyY2hpdmVkASgAktL+zAUFBXZhbHVlAXknAQRsaXN0B2RlbGV0ZWQBKACS0v7MBQcFdmFsdWUBeScBBGxpc3QJY3JlYXRlZEF0AgQAktL+zAUJGDIwMjUtMDctMTdUMTA6MjA6NDcuOTUzWicBBGxpc3QPbWV0YWRhdGFWZXJzaW9uASgAktL+zAUiBXZhbHVlAX0BD6vc6QIAIQEEbGlzdARuYW1lAQAFIQEEbGlzdAVjb2xvcgEADCEBBGxpc3QGcGlubmVkAQABIQEEbGlzdAhhcmNoaXZlZAEAASEBBGxpc3QHZGVsZXRlZAEAASEBBGxpc3QFdG9kb3MBIQEEbGlzdAljcmVhdGVkQXQBABghAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEAAQGr3OkCAQA1", deleted: false, todos: [], name: "", color: "", pinned: false, archived: false }
+TodoListPage.tsx:216:13
+Active List Todos: 
+Array []
+TodoListPage.tsx:217:13
+Todos to use: 
+Array []
+TodoListPage.tsx:218:13
+Active todos: 
+Array []
+TodoListPage.tsx:219:13
+Sorted active todos: 
+Array []
+TodoListPage.tsx:220:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 39 yjsPocketBase.ts:410:13
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
+Active List: 
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "Ag2S0v7MBQAnAQRsaXN0BG5hbWUCJwEEbGlzdAVjb2xvcgInAQRsaXN0BXRvZG9zACcBBGxpc3QGcGlubmVkASgAktL+zAUDBXZhbHVlAXknAQRsaXN0CGFyY2hpdmVkASgAktL+zAUFBXZhbHVlAXknAQRsaXN0B2RlbGV0ZWQBKACS0v7MBQcFdmFsdWUBeScBBGxpc3QJY3JlYXRlZEF0AgQAktL+zAUJGDIwMjUtMDctMTdUMTA6MjA6NDcuOTUzWicBBGxpc3QPbWV0YWRhdGFWZXJzaW9uASgAktL+zAUiBXZhbHVlAX0BD6vc6QIAIQEEbGlzdARuYW1lAQAFIQEEbGlzdAVjb2xvcgEADCEBBGxpc3QGcGlubmVkAQABIQEEbGlzdAhhcmNoaXZlZAEAASEBBGxpc3QHZGVsZXRlZAEAASEBBGxpc3QFdG9kb3MBIQEEbGlzdAljcmVhdGVkQXQBABghAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEAAQGr3OkCAQA1", deleted: false, todos: [], name: "", color: "", pinned: false, archived: false }
+TodoListPage.tsx:216:13
+Active List Todos: 
+Array []
+TodoListPage.tsx:217:13
+Todos to use: 
+Array []
+TodoListPage.tsx:218:13
+Active todos: 
+Array []
+TodoListPage.tsx:219:13
+Sorted active todos: 
+Array []
+TodoListPage.tsx:220:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 40 yjsPocketBase.ts:410:13
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
+Active List: 
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "Ag2S0v7MBQAnAQRsaXN0BG5hbWUCJwEEbGlzdAVjb2xvcgInAQRsaXN0BXRvZG9zACcBBGxpc3QGcGlubmVkASgAktL+zAUDBXZhbHVlAXknAQRsaXN0CGFyY2hpdmVkASgAktL+zAUFBXZhbHVlAXknAQRsaXN0B2RlbGV0ZWQBKACS0v7MBQcFdmFsdWUBeScBBGxpc3QJY3JlYXRlZEF0AgQAktL+zAUJGDIwMjUtMDctMTdUMTA6MjA6NDcuOTUzWicBBGxpc3QPbWV0YWRhdGFWZXJzaW9uASgAktL+zAUiBXZhbHVlAX0BD6vc6QIAIQEEbGlzdARuYW1lAQAFIQEEbGlzdAVjb2xvcgEADCEBBGxpc3QGcGlubmVkAQABIQEEbGlzdAhhcmNoaXZlZAEAASEBBGxpc3QHZGVsZXRlZAEAASEBBGxpc3QFdG9kb3MBIQEEbGlzdAljcmVhdGVkQXQBABghAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEAAQGr3OkCAQA1", deleted: false, todos: [], name: "", color: "", pinned: false, archived: false }
+TodoListPage.tsx:216:13
+Active List Todos: 
+Array []
+TodoListPage.tsx:217:13
+Todos to use: 
+Array []
+TodoListPage.tsx:218:13
+Active todos: 
+Array []
+TodoListPage.tsx:219:13
+Sorted active todos: 
+Array []
+TodoListPage.tsx:220:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 41 yjsPocketBase.ts:410:13
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
+Active List: 
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "Ag2S0v7MBQAnAQRsaXN0BG5hbWUCJwEEbGlzdAVjb2xvcgInAQRsaXN0BXRvZG9zACcBBGxpc3QGcGlubmVkASgAktL+zAUDBXZhbHVlAXknAQRsaXN0CGFyY2hpdmVkASgAktL+zAUFBXZhbHVlAXknAQRsaXN0B2RlbGV0ZWQBKACS0v7MBQcFdmFsdWUBeScBBGxpc3QJY3JlYXRlZEF0AgQAktL+zAUJGDIwMjUtMDctMTdUMTA6MjA6NDcuOTUzWicBBGxpc3QPbWV0YWRhdGFWZXJzaW9uASgAktL+zAUiBXZhbHVlAX0BD6vc6QIAIQEEbGlzdARuYW1lAQAFIQEEbGlzdAVjb2xvcgEADCEBBGxpc3QGcGlubmVkAQABIQEEbGlzdAhhcmNoaXZlZAEAASEBBGxpc3QHZGVsZXRlZAEAASEBBGxpc3QFdG9kb3MBIQEEbGlzdAljcmVhdGVkQXQBABghAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEAAQGr3OkCAQA1", deleted: false, todos: [], name: "", color: "", pinned: false, archived: false }
+TodoListPage.tsx:216:13
+Active List Todos: 
+Array []
+TodoListPage.tsx:217:13
+Todos to use: 
+Array []
+TodoListPage.tsx:218:13
+Active todos: 
+Array []
+TodoListPage.tsx:219:13
+Sorted active todos: 
+Array []
+TodoListPage.tsx:220:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 42 yjsPocketBase.ts:410:13
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
+Active List: 
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "Ag2S0v7MBQAnAQRsaXN0BG5hbWUCJwEEbGlzdAVjb2xvcgInAQRsaXN0BXRvZG9zACcBBGxpc3QGcGlubmVkASgAktL+zAUDBXZhbHVlAXknAQRsaXN0CGFyY2hpdmVkASgAktL+zAUFBXZhbHVlAXknAQRsaXN0B2RlbGV0ZWQBKACS0v7MBQcFdmFsdWUBeScBBGxpc3QJY3JlYXRlZEF0AgQAktL+zAUJGDIwMjUtMDctMTdUMTA6MjA6NDcuOTUzWicBBGxpc3QPbWV0YWRhdGFWZXJzaW9uASgAktL+zAUiBXZhbHVlAX0BD6vc6QIAIQEEbGlzdARuYW1lAQAFIQEEbGlzdAVjb2xvcgEADCEBBGxpc3QGcGlubmVkAQABIQEEbGlzdAhhcmNoaXZlZAEAASEBBGxpc3QHZGVsZXRlZAEAASEBBGxpc3QFdG9kb3MBIQEEbGlzdAljcmVhdGVkQXQBABghAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEAAQGr3OkCAQA1", deleted: false, todos: [], name: "", color: "", pinned: false, archived: false }
+TodoListPage.tsx:216:13
+Active List Todos: 
+Array []
+TodoListPage.tsx:217:13
+Todos to use: 
+Array []
+TodoListPage.tsx:218:13
+Active todos: 
+Array []
+TodoListPage.tsx:219:13
+Sorted active todos: 
+Array []
+TodoListPage.tsx:220:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 43 yjsPocketBase.ts:410:13
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
+Active List: 
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "Ag2S0v7MBQAnAQRsaXN0BG5hbWUCJwEEbGlzdAVjb2xvcgInAQRsaXN0BXRvZG9zACcBBGxpc3QGcGlubmVkASgAktL+zAUDBXZhbHVlAXknAQRsaXN0CGFyY2hpdmVkASgAktL+zAUFBXZhbHVlAXknAQRsaXN0B2RlbGV0ZWQBKACS0v7MBQcFdmFsdWUBeScBBGxpc3QJY3JlYXRlZEF0AgQAktL+zAUJGDIwMjUtMDctMTdUMTA6MjA6NDcuOTUzWicBBGxpc3QPbWV0YWRhdGFWZXJzaW9uASgAktL+zAUiBXZhbHVlAX0BD6vc6QIAIQEEbGlzdARuYW1lAQAFIQEEbGlzdAVjb2xvcgEADCEBBGxpc3QGcGlubmVkAQABIQEEbGlzdAhhcmNoaXZlZAEAASEBBGxpc3QHZGVsZXRlZAEAASEBBGxpc3QFdG9kb3MBIQEEbGlzdAljcmVhdGVkQXQBABghAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEAAQGr3OkCAQA1", deleted: false, todos: [], name: "", color: "", pinned: false, archived: false }
+TodoListPage.tsx:216:13
+Active List Todos: 
+Array []
+TodoListPage.tsx:217:13
+Todos to use: 
+Array []
+TodoListPage.tsx:218:13
+Active todos: 
+Array []
+TodoListPage.tsx:219:13
+Sorted active todos: 
+Array []
+TodoListPage.tsx:220:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 44 yjsPocketBase.ts:410:13
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
+Active List: 
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "Ag2S0v7MBQAnAQRsaXN0BG5hbWUCJwEEbGlzdAVjb2xvcgInAQRsaXN0BXRvZG9zACcBBGxpc3QGcGlubmVkASgAktL+zAUDBXZhbHVlAXknAQRsaXN0CGFyY2hpdmVkASgAktL+zAUFBXZhbHVlAXknAQRsaXN0B2RlbGV0ZWQBKACS0v7MBQcFdmFsdWUBeScBBGxpc3QJY3JlYXRlZEF0AgQAktL+zAUJGDIwMjUtMDctMTdUMTA6MjA6NDcuOTUzWicBBGxpc3QPbWV0YWRhdGFWZXJzaW9uASgAktL+zAUiBXZhbHVlAX0BD6vc6QIAIQEEbGlzdARuYW1lAQAFIQEEbGlzdAVjb2xvcgEADCEBBGxpc3QGcGlubmVkAQABIQEEbGlzdAhhcmNoaXZlZAEAASEBBGxpc3QHZGVsZXRlZAEAASEBBGxpc3QFdG9kb3MBIQEEbGlzdAljcmVhdGVkQXQBABghAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEAAQGr3OkCAQA1", deleted: false, todos: [], name: "", color: "", pinned: false, archived: false }
+TodoListPage.tsx:216:13
+Active List Todos: 
+Array []
+TodoListPage.tsx:217:13
+Todos to use: 
+Array []
+TodoListPage.tsx:218:13
+Active todos: 
+Array []
+TodoListPage.tsx:219:13
+Sorted active todos: 
+Array []
+TodoListPage.tsx:220:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 45 yjsPocketBase.ts:410:13
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
+Active List: 
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "Ag2S0v7MBQAnAQRsaXN0BG5hbWUCJwEEbGlzdAVjb2xvcgInAQRsaXN0BXRvZG9zACcBBGxpc3QGcGlubmVkASgAktL+zAUDBXZhbHVlAXknAQRsaXN0CGFyY2hpdmVkASgAktL+zAUFBXZhbHVlAXknAQRsaXN0B2RlbGV0ZWQBKACS0v7MBQcFdmFsdWUBeScBBGxpc3QJY3JlYXRlZEF0AgQAktL+zAUJGDIwMjUtMDctMTdUMTA6MjA6NDcuOTUzWicBBGxpc3QPbWV0YWRhdGFWZXJzaW9uASgAktL+zAUiBXZhbHVlAX0BD6vc6QIAIQEEbGlzdARuYW1lAQAFIQEEbGlzdAVjb2xvcgEADCEBBGxpc3QGcGlubmVkAQABIQEEbGlzdAhhcmNoaXZlZAEAASEBBGxpc3QHZGVsZXRlZAEAASEBBGxpc3QFdG9kb3MBIQEEbGlzdAljcmVhdGVkQXQBABghAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEAAQGr3OkCAQA1", deleted: false, todos: [], name: "", color: "", pinned: false, archived: false }
+TodoListPage.tsx:216:13
+Active List Todos: 
+Array []
+TodoListPage.tsx:217:13
+Todos to use: 
+Array []
+TodoListPage.tsx:218:13
+Active todos: 
+Array []
+TodoListPage.tsx:219:13
+Sorted active todos: 
+Array []
+TodoListPage.tsx:220:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 46 yjsPocketBase.ts:410:13
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
+Active List: 
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "Ag2S0v7MBQAnAQRsaXN0BG5hbWUCJwEEbGlzdAVjb2xvcgInAQRsaXN0BXRvZG9zACcBBGxpc3QGcGlubmVkASgAktL+zAUDBXZhbHVlAXknAQRsaXN0CGFyY2hpdmVkASgAktL+zAUFBXZhbHVlAXknAQRsaXN0B2RlbGV0ZWQBKACS0v7MBQcFdmFsdWUBeScBBGxpc3QJY3JlYXRlZEF0AgQAktL+zAUJGDIwMjUtMDctMTdUMTA6MjA6NDcuOTUzWicBBGxpc3QPbWV0YWRhdGFWZXJzaW9uASgAktL+zAUiBXZhbHVlAX0BD6vc6QIAIQEEbGlzdARuYW1lAQAFIQEEbGlzdAVjb2xvcgEADCEBBGxpc3QGcGlubmVkAQABIQEEbGlzdAhhcmNoaXZlZAEAASEBBGxpc3QHZGVsZXRlZAEAASEBBGxpc3QFdG9kb3MBIQEEbGlzdAljcmVhdGVkQXQBABghAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEAAQGr3OkCAQA1", deleted: false, todos: [], name: "", color: "", pinned: false, archived: false }
+TodoListPage.tsx:216:13
+Active List Todos: 
+Array []
+TodoListPage.tsx:217:13
+Todos to use: 
+Array []
+TodoListPage.tsx:218:13
+Active todos: 
+Array []
+TodoListPage.tsx:219:13
+Sorted active todos: 
+Array []
+TodoListPage.tsx:220:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 47 yjsPocketBase.ts:410:13
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
+Active List: 
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "Ag2S0v7MBQAnAQRsaXN0BG5hbWUCJwEEbGlzdAVjb2xvcgInAQRsaXN0BXRvZG9zACcBBGxpc3QGcGlubmVkASgAktL+zAUDBXZhbHVlAXknAQRsaXN0CGFyY2hpdmVkASgAktL+zAUFBXZhbHVlAXknAQRsaXN0B2RlbGV0ZWQBKACS0v7MBQcFdmFsdWUBeScBBGxpc3QJY3JlYXRlZEF0AgQAktL+zAUJGDIwMjUtMDctMTdUMTA6MjA6NDcuOTUzWicBBGxpc3QPbWV0YWRhdGFWZXJzaW9uASgAktL+zAUiBXZhbHVlAX0BD6vc6QIAIQEEbGlzdARuYW1lAQAFIQEEbGlzdAVjb2xvcgEADCEBBGxpc3QGcGlubmVkAQABIQEEbGlzdAhhcmNoaXZlZAEAASEBBGxpc3QHZGVsZXRlZAEAASEBBGxpc3QFdG9kb3MBIQEEbGlzdAljcmVhdGVkQXQBABghAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEAAQGr3OkCAQA1", deleted: false, todos: [], name: "", color: "", pinned: false, archived: false }
+TodoListPage.tsx:216:13
+Active List Todos: 
+Array []
+TodoListPage.tsx:217:13
+Todos to use: 
+Array []
+TodoListPage.tsx:218:13
+Active todos: 
+Array []
+TodoListPage.tsx:219:13
+Sorted active todos: 
+Array []
+TodoListPage.tsx:220:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 48 yjsPocketBase.ts:410:13
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
+Active List: 
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "Ag2S0v7MBQAnAQRsaXN0BG5hbWUCJwEEbGlzdAVjb2xvcgInAQRsaXN0BXRvZG9zACcBBGxpc3QGcGlubmVkASgAktL+zAUDBXZhbHVlAXknAQRsaXN0CGFyY2hpdmVkASgAktL+zAUFBXZhbHVlAXknAQRsaXN0B2RlbGV0ZWQBKACS0v7MBQcFdmFsdWUBeScBBGxpc3QJY3JlYXRlZEF0AgQAktL+zAUJGDIwMjUtMDctMTdUMTA6MjA6NDcuOTUzWicBBGxpc3QPbWV0YWRhdGFWZXJzaW9uASgAktL+zAUiBXZhbHVlAX0BD6vc6QIAIQEEbGlzdARuYW1lAQAFIQEEbGlzdAVjb2xvcgEADCEBBGxpc3QGcGlubmVkAQABIQEEbGlzdAhhcmNoaXZlZAEAASEBBGxpc3QHZGVsZXRlZAEAASEBBGxpc3QFdG9kb3MBIQEEbGlzdAljcmVhdGVkQXQBABghAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEAAQGr3OkCAQA1", deleted: false, todos: [], name: "", color: "", pinned: false, archived: false }
+TodoListPage.tsx:216:13
+Active List Todos: 
+Array []
+TodoListPage.tsx:217:13
+Todos to use: 
+Array []
+TodoListPage.tsx:218:13
+Active todos: 
+Array []
+TodoListPage.tsx:219:13
+Sorted active todos: 
+Array []
+TodoListPage.tsx:220:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 49 yjsPocketBase.ts:410:13
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
+Active List: 
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "Ag2S0v7MBQAnAQRsaXN0BG5hbWUCJwEEbGlzdAVjb2xvcgInAQRsaXN0BXRvZG9zACcBBGxpc3QGcGlubmVkASgAktL+zAUDBXZhbHVlAXknAQRsaXN0CGFyY2hpdmVkASgAktL+zAUFBXZhbHVlAXknAQRsaXN0B2RlbGV0ZWQBKACS0v7MBQcFdmFsdWUBeScBBGxpc3QJY3JlYXRlZEF0AgQAktL+zAUJGDIwMjUtMDctMTdUMTA6MjA6NDcuOTUzWicBBGxpc3QPbWV0YWRhdGFWZXJzaW9uASgAktL+zAUiBXZhbHVlAX0BD6vc6QIAIQEEbGlzdARuYW1lAQAFIQEEbGlzdAVjb2xvcgEADCEBBGxpc3QGcGlubmVkAQABIQEEbGlzdAhhcmNoaXZlZAEAASEBBGxpc3QHZGVsZXRlZAEAASEBBGxpc3QFdG9kb3MBIQEEbGlzdAljcmVhdGVkQXQBABghAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEAAQGr3OkCAQA1", deleted: false, todos: [], name: "", color: "", pinned: false, archived: false }
+TodoListPage.tsx:216:13
+Active List Todos: 
+Array []
+TodoListPage.tsx:217:13
+Todos to use: 
+Array []
+TodoListPage.tsx:218:13
+Active todos: 
+Array []
+TodoListPage.tsx:219:13
+Sorted active todos: 
+Array []
+TodoListPage.tsx:220:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 50 yjsPocketBase.ts:410:13
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
+Active List: 
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "Ag2S0v7MBQAnAQRsaXN0BG5hbWUCJwEEbGlzdAVjb2xvcgInAQRsaXN0BXRvZG9zACcBBGxpc3QGcGlubmVkASgAktL+zAUDBXZhbHVlAXknAQRsaXN0CGFyY2hpdmVkASgAktL+zAUFBXZhbHVlAXknAQRsaXN0B2RlbGV0ZWQBKACS0v7MBQcFdmFsdWUBeScBBGxpc3QJY3JlYXRlZEF0AgQAktL+zAUJGDIwMjUtMDctMTdUMTA6MjA6NDcuOTUzWicBBGxpc3QPbWV0YWRhdGFWZXJzaW9uASgAktL+zAUiBXZhbHVlAX0BD6vc6QIAIQEEbGlzdARuYW1lAQAFIQEEbGlzdAVjb2xvcgEADCEBBGxpc3QGcGlubmVkAQABIQEEbGlzdAhhcmNoaXZlZAEAASEBBGxpc3QHZGVsZXRlZAEAASEBBGxpc3QFdG9kb3MBIQEEbGlzdAljcmVhdGVkQXQBABghAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEAAQGr3OkCAQA1", deleted: false, todos: [], name: "", color: "", pinned: false, archived: false }
+TodoListPage.tsx:216:13
+Active List Todos: 
+Array []
+TodoListPage.tsx:217:13
+Todos to use: 
+Array []
+TodoListPage.tsx:218:13
+Active todos: 
+Array []
+TodoListPage.tsx:219:13
+Sorted active todos: 
+Array []
+TodoListPage.tsx:220:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 51 yjsPocketBase.ts:410:13
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
+Active List: 
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "Ag2S0v7MBQAnAQRsaXN0BG5hbWUCJwEEbGlzdAVjb2xvcgInAQRsaXN0BXRvZG9zACcBBGxpc3QGcGlubmVkASgAktL+zAUDBXZhbHVlAXknAQRsaXN0CGFyY2hpdmVkASgAktL+zAUFBXZhbHVlAXknAQRsaXN0B2RlbGV0ZWQBKACS0v7MBQcFdmFsdWUBeScBBGxpc3QJY3JlYXRlZEF0AgQAktL+zAUJGDIwMjUtMDctMTdUMTA6MjA6NDcuOTUzWicBBGxpc3QPbWV0YWRhdGFWZXJzaW9uASgAktL+zAUiBXZhbHVlAX0BD6vc6QIAIQEEbGlzdARuYW1lAQAFIQEEbGlzdAVjb2xvcgEADCEBBGxpc3QGcGlubmVkAQABIQEEbGlzdAhhcmNoaXZlZAEAASEBBGxpc3QHZGVsZXRlZAEAASEBBGxpc3QFdG9kb3MBIQEEbGlzdAljcmVhdGVkQXQBABghAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEAAQGr3OkCAQA1", deleted: false, todos: [], name: "", color: "", pinned: false, archived: false }
+TodoListPage.tsx:216:13
+Active List Todos: 
+Array []
+TodoListPage.tsx:217:13
+Todos to use: 
+Array []
+TodoListPage.tsx:218:13
+Active todos: 
+Array []
+TodoListPage.tsx:219:13
+Sorted active todos: 
+Array []
+TodoListPage.tsx:220:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 52 yjsPocketBase.ts:410:13
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
+Active List: 
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "Ag2S0v7MBQAnAQRsaXN0BG5hbWUCJwEEbGlzdAVjb2xvcgInAQRsaXN0BXRvZG9zACcBBGxpc3QGcGlubmVkASgAktL+zAUDBXZhbHVlAXknAQRsaXN0CGFyY2hpdmVkASgAktL+zAUFBXZhbHVlAXknAQRsaXN0B2RlbGV0ZWQBKACS0v7MBQcFdmFsdWUBeScBBGxpc3QJY3JlYXRlZEF0AgQAktL+zAUJGDIwMjUtMDctMTdUMTA6MjA6NDcuOTUzWicBBGxpc3QPbWV0YWRhdGFWZXJzaW9uASgAktL+zAUiBXZhbHVlAX0BD6vc6QIAIQEEbGlzdARuYW1lAQAFIQEEbGlzdAVjb2xvcgEADCEBBGxpc3QGcGlubmVkAQABIQEEbGlzdAhhcmNoaXZlZAEAASEBBGxpc3QHZGVsZXRlZAEAASEBBGxpc3QFdG9kb3MBIQEEbGlzdAljcmVhdGVkQXQBABghAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEAAQGr3OkCAQA1", deleted: false, todos: [], name: "", color: "", pinned: false, archived: false }
+TodoListPage.tsx:216:13
+Active List Todos: 
+Array []
+TodoListPage.tsx:217:13
+Todos to use: 
+Array []
+TodoListPage.tsx:218:13
+Active todos: 
+Array []
+TodoListPage.tsx:219:13
+Sorted active todos: 
+Array []
+TodoListPage.tsx:220:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 53 yjsPocketBase.ts:410:13
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
+Active List: 
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "Ag2S0v7MBQAnAQRsaXN0BG5hbWUCJwEEbGlzdAVjb2xvcgInAQRsaXN0BXRvZG9zACcBBGxpc3QGcGlubmVkASgAktL+zAUDBXZhbHVlAXknAQRsaXN0CGFyY2hpdmVkASgAktL+zAUFBXZhbHVlAXknAQRsaXN0B2RlbGV0ZWQBKACS0v7MBQcFdmFsdWUBeScBBGxpc3QJY3JlYXRlZEF0AgQAktL+zAUJGDIwMjUtMDctMTdUMTA6MjA6NDcuOTUzWicBBGxpc3QPbWV0YWRhdGFWZXJzaW9uASgAktL+zAUiBXZhbHVlAX0BD6vc6QIAIQEEbGlzdARuYW1lAQAFIQEEbGlzdAVjb2xvcgEADCEBBGxpc3QGcGlubmVkAQABIQEEbGlzdAhhcmNoaXZlZAEAASEBBGxpc3QHZGVsZXRlZAEAASEBBGxpc3QFdG9kb3MBIQEEbGlzdAljcmVhdGVkQXQBABghAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEAAQGr3OkCAQA1", deleted: false, todos: [], name: "", color: "", pinned: false, archived: false }
+TodoListPage.tsx:216:13
+Active List Todos: 
+Array []
+TodoListPage.tsx:217:13
+Todos to use: 
+Array []
+TodoListPage.tsx:218:13
+Active todos: 
+Array []
+TodoListPage.tsx:219:13
+Sorted active todos: 
+Array []
+TodoListPage.tsx:220:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 54 yjsPocketBase.ts:410:13
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
+Active List: 
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "Ag2S0v7MBQAnAQRsaXN0BG5hbWUCJwEEbGlzdAVjb2xvcgInAQRsaXN0BXRvZG9zACcBBGxpc3QGcGlubmVkASgAktL+zAUDBXZhbHVlAXknAQRsaXN0CGFyY2hpdmVkASgAktL+zAUFBXZhbHVlAXknAQRsaXN0B2RlbGV0ZWQBKACS0v7MBQcFdmFsdWUBeScBBGxpc3QJY3JlYXRlZEF0AgQAktL+zAUJGDIwMjUtMDctMTdUMTA6MjA6NDcuOTUzWicBBGxpc3QPbWV0YWRhdGFWZXJzaW9uASgAktL+zAUiBXZhbHVlAX0BD6vc6QIAIQEEbGlzdARuYW1lAQAFIQEEbGlzdAVjb2xvcgEADCEBBGxpc3QGcGlubmVkAQABIQEEbGlzdAhhcmNoaXZlZAEAASEBBGxpc3QHZGVsZXRlZAEAASEBBGxpc3QFdG9kb3MBIQEEbGlzdAljcmVhdGVkQXQBABghAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEAAQGr3OkCAQA1", deleted: false, todos: [], name: "", color: "", pinned: false, archived: false }
+TodoListPage.tsx:216:13
+Active List Todos: 
+Array []
+TodoListPage.tsx:217:13
+Todos to use: 
+Array []
+TodoListPage.tsx:218:13
+Active todos: 
+Array []
+TodoListPage.tsx:219:13
+Sorted active todos: 
+Array []
+TodoListPage.tsx:220:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 55 yjsPocketBase.ts:410:13
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
+Active List: 
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "Ag2S0v7MBQAnAQRsaXN0BG5hbWUCJwEEbGlzdAVjb2xvcgInAQRsaXN0BXRvZG9zACcBBGxpc3QGcGlubmVkASgAktL+zAUDBXZhbHVlAXknAQRsaXN0CGFyY2hpdmVkASgAktL+zAUFBXZhbHVlAXknAQRsaXN0B2RlbGV0ZWQBKACS0v7MBQcFdmFsdWUBeScBBGxpc3QJY3JlYXRlZEF0AgQAktL+zAUJGDIwMjUtMDctMTdUMTA6MjA6NDcuOTUzWicBBGxpc3QPbWV0YWRhdGFWZXJzaW9uASgAktL+zAUiBXZhbHVlAX0BD6vc6QIAIQEEbGlzdARuYW1lAQAFIQEEbGlzdAVjb2xvcgEADCEBBGxpc3QGcGlubmVkAQABIQEEbGlzdAhhcmNoaXZlZAEAASEBBGxpc3QHZGVsZXRlZAEAASEBBGxpc3QFdG9kb3MBIQEEbGlzdAljcmVhdGVkQXQBABghAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEAAQGr3OkCAQA1", deleted: false, todos: [], name: "", color: "", pinned: false, archived: false }
+TodoListPage.tsx:216:13
+Active List Todos: 
+Array []
+TodoListPage.tsx:217:13
+Todos to use: 
+Array []
+TodoListPage.tsx:218:13
+Active todos: 
+Array []
+TodoListPage.tsx:219:13
+Sorted active todos: 
+Array []
+TodoListPage.tsx:220:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 56 yjsPocketBase.ts:410:13
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
+Active List: 
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "Ag2S0v7MBQAnAQRsaXN0BG5hbWUCJwEEbGlzdAVjb2xvcgInAQRsaXN0BXRvZG9zACcBBGxpc3QGcGlubmVkASgAktL+zAUDBXZhbHVlAXknAQRsaXN0CGFyY2hpdmVkASgAktL+zAUFBXZhbHVlAXknAQRsaXN0B2RlbGV0ZWQBKACS0v7MBQcFdmFsdWUBeScBBGxpc3QJY3JlYXRlZEF0AgQAktL+zAUJGDIwMjUtMDctMTdUMTA6MjA6NDcuOTUzWicBBGxpc3QPbWV0YWRhdGFWZXJzaW9uASgAktL+zAUiBXZhbHVlAX0BD6vc6QIAIQEEbGlzdARuYW1lAQAFIQEEbGlzdAVjb2xvcgEADCEBBGxpc3QGcGlubmVkAQABIQEEbGlzdAhhcmNoaXZlZAEAASEBBGxpc3QHZGVsZXRlZAEAASEBBGxpc3QFdG9kb3MBIQEEbGlzdAljcmVhdGVkQXQBABghAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEAAQGr3OkCAQA1", deleted: false, todos: [], name: "", color: "", pinned: false, archived: false }
+TodoListPage.tsx:216:13
+Active List Todos: 
+Array []
+TodoListPage.tsx:217:13
+Todos to use: 
+Array []
+TodoListPage.tsx:218:13
+Active todos: 
+Array []
+TodoListPage.tsx:219:13
+Sorted active todos: 
+Array []
+TodoListPage.tsx:220:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 57 yjsPocketBase.ts:410:13
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
+Active List: 
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "Ag2S0v7MBQAnAQRsaXN0BG5hbWUCJwEEbGlzdAVjb2xvcgInAQRsaXN0BXRvZG9zACcBBGxpc3QGcGlubmVkASgAktL+zAUDBXZhbHVlAXknAQRsaXN0CGFyY2hpdmVkASgAktL+zAUFBXZhbHVlAXknAQRsaXN0B2RlbGV0ZWQBKACS0v7MBQcFdmFsdWUBeScBBGxpc3QJY3JlYXRlZEF0AgQAktL+zAUJGDIwMjUtMDctMTdUMTA6MjA6NDcuOTUzWicBBGxpc3QPbWV0YWRhdGFWZXJzaW9uASgAktL+zAUiBXZhbHVlAX0BD6vc6QIAIQEEbGlzdARuYW1lAQAFIQEEbGlzdAVjb2xvcgEADCEBBGxpc3QGcGlubmVkAQABIQEEbGlzdAhhcmNoaXZlZAEAASEBBGxpc3QHZGVsZXRlZAEAASEBBGxpc3QFdG9kb3MBIQEEbGlzdAljcmVhdGVkQXQBABghAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEAAQGr3OkCAQA1", deleted: false, todos: [], name: "", color: "", pinned: false, archived: false }
+TodoListPage.tsx:216:13
+Active List Todos: 
+Array []
+TodoListPage.tsx:217:13
+Todos to use: 
+Array []
+TodoListPage.tsx:218:13
+Active todos: 
+Array []
+TodoListPage.tsx:219:13
+Sorted active todos: 
+Array []
+TodoListPage.tsx:220:13
+[GlobalPocketBaseProvider] Local document updated for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, origin: null yjsPocketBase.ts:233:15
+[GlobalPocketBaseProvider] Queued sync operation for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32, queue length: 58 yjsPocketBase.ts:410:13
+Active List ID: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 TodoListPage.tsx:215:13
+Active List: 
+Object { id: "c8fb55c1-929d-4a62-bdc1-ca10789f2a32", user_id: "51612qsjktu0i93", createdAt: "2025-07-17 10:20:47.872Z", yjsUpdate: "Ag2S0v7MBQAnAQRsaXN0BG5hbWUCJwEEbGlzdAVjb2xvcgInAQRsaXN0BXRvZG9zACcBBGxpc3QGcGlubmVkASgAktL+zAUDBXZhbHVlAXknAQRsaXN0CGFyY2hpdmVkASgAktL+zAUFBXZhbHVlAXknAQRsaXN0B2RlbGV0ZWQBKACS0v7MBQcFdmFsdWUBeScBBGxpc3QJY3JlYXRlZEF0AgQAktL+zAUJGDIwMjUtMDctMTdUMTA6MjA6NDcuOTUzWicBBGxpc3QPbWV0YWRhdGFWZXJzaW9uASgAktL+zAUiBXZhbHVlAX0BD6vc6QIAIQEEbGlzdARuYW1lAQAFIQEEbGlzdAVjb2xvcgEADCEBBGxpc3QGcGlubmVkAQABIQEEbGlzdAhhcmNoaXZlZAEAASEBBGxpc3QHZGVsZXRlZAEAASEBBGxpc3QFdG9kb3MBIQEEbGlzdAljcmVhdGVkQXQBABghAQRsaXN0D21ldGFkYXRhVmVyc2lvbgEAAQGr3OkCAQA1", deleted: false, todos: [], name: "", color: "", pinned: false, archived: false }
+TodoListPage.tsx:216:13
+Active List Todos: 
+Array []
+TodoListPage.tsx:217:13
+Todos to use: 
+Array []
+TodoListPage.tsx:218:13
+Active todos: 
+Array []
+TodoListPage.tsx:219:13
+Sorted active todos: 
+Array []
+TodoListPage.tsx:220:13
+Uncaught Error: Maximum update depth exceeded. This can happen when a component repeatedly calls setState inside componentWillUpdate or componentDidUpdate. React limits the number of nested updates to prevent infinite loops.
+    React 4
+    setRef compose-refs.tsx:11
+    cleanups compose-refs.tsx:25
+    composeRefs compose-refs.tsx:24
+    setRef compose-refs.tsx:11
+    cleanups compose-refs.tsx:25
+react-dom_client.js:3001:128
+An error occurred in the <div> component.
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://react.dev/link/error-boundaries to learn more about error boundaries.
+react-dom_client.js:6229:17
+[useYjsTodoList] Cleanup for listId: c8fb55c1-929d-4a62-bdc1-ca10789f2a32 useYjsTodoList.ts:31:15
+[GlobalPocketBaseProvider] Applied real-time update for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 6 yjsPocketBase.ts:264:21
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Applied real-time update for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:264:21
+[GlobalPocketBaseProvider] Applied real-time update for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:264:21
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Successfully synced document for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32 yjsPocketBase.ts:497:15
+[GlobalPocketBaseProvider] Finished processing sync queue for list c8fb55c1-929d-4a62-bdc1-ca10789f2a32. Processed: 61, Failed: 0, Remaining: 0 yjsPocketBase.ts:457:13
