@@ -272,7 +272,6 @@ ListMenuItem.displayName = "ListMenuItem";
 interface AppSidebarProps {
   todoLists: TodoList[];
   activeListId: string | null;
-  setActiveListId: (id: string | null) => void;
   newListName: string;
   setNewListName: (name: string) => void;
   showNewListInput: boolean;
@@ -300,7 +299,6 @@ interface AppSidebarProps {
 const AppSidebar = memo(({
   todoLists,
   activeListId,
-  setActiveListId,
   newListName,
   setNewListName,
   showNewListInput,
@@ -346,38 +344,8 @@ const AppSidebar = memo(({
   const handleSidebarListClick = useCallback((listId: string) => {
     // Prevent rapid navigation and unnecessary state updates
     if (activeListId === listId) return;
-    setActiveListId(listId);
-  }, [activeListId, setActiveListId]);
-
-  // Track the previous list ids to detect when a new list is added
-  const prevListIdsRef = useRef<string[]>(todoLists.map(list => list.id));
-  
-  // Focus on the newly created list when it's added
-  useEffect(() => {
-    // Get current list ids
-    const currentListIds = todoLists.map(list => list.id);
-    
-    // If we have more lists than before, find the newly added list id
-    if (currentListIds.length > prevListIdsRef.current.length) {
-      // Find the id that is in the current list but not in the previous list
-      const newListId = currentListIds.find(id => !prevListIdsRef.current.includes(id));
-      
-      if (newListId) {
-        navigate(`/list/${newListId}`);
-        // Use a small timeout to ensure the DOM has updated
-        setTimeout(() => {
-          // Find the button for the newly created list and focus it
-          const newListButton = document.querySelector(`[data-list-id="${newListId}"]`) as HTMLButtonElement;
-          if (newListButton) {
-            newListButton.focus();
-          }
-        }, 50);
-      }
-    }
-    
-    // Update the previous list ids
-    prevListIdsRef.current = currentListIds;
-  }, [todoLists, navigate]);
+    navigate(`/list/${listId}`); // Only update the URL, do not call setActiveListId
+  }, [activeListId, navigate]);
 
   return (
     <Sidebar className="border-r-0 overflow-hidden min-h-screen flex flex-col relative bg-white/90">

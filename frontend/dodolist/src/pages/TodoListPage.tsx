@@ -311,7 +311,9 @@ export default function DodoListApp() {
     if (newListName.trim() === "") return;
     setIsAddingList(true);
     try {
-      const newId = await createNewList(newListName, colors[0].value);
+      // Pick a random color from the colors array
+      const randomColor = colors[Math.floor(Math.random() * colors.length)].value;
+      const newId = await createNewList(newListName, randomColor);
       setNewListName("");
       setShowNewListInput(false);
       navigate(`/list/${newId}`);
@@ -1008,7 +1010,6 @@ export default function DodoListApp() {
         <AppSidebar
           todoLists={todoLists}
           activeListId={activeListId}
-          setActiveListId={setActiveListId}
           newListName={newListName}
           setNewListName={setNewListName}
           showNewListInput={showNewListInput}
