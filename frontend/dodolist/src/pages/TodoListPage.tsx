@@ -116,6 +116,7 @@ export default function DodoListApp() {
     toggleTodo,
     deleteTodo,
     updateTodo: updateTodoItem,
+    updateListMetadata, // <-- import the new method
     isConnected: isPocketBaseConnected,
     syncStatus, // Add this
   } = useYjsTodoList(activeListId)
@@ -136,8 +137,8 @@ export default function DodoListApp() {
   const [tempProfile, setTempProfile] = useState<UserProfile>(userProfile)
   const [showCompleted, setShowCompleted] = useState(true)
 
-  const [editingListId, setEditingListId] = useState<string | null>(null)
   const [isEditingHeader, setIsEditingHeader] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   // --- Notification System ---
   type NotificationType = "success" | "error" | "info" | "warning";
@@ -173,7 +174,7 @@ export default function DodoListApp() {
   }, [listId, activeListId, setActiveListId]);
 
   const activeList = todoLists.find((list) => list.id === activeListId)
-  const activeColor = colors.find((color) => color.value === activeList?.color) || colors[0]
+  const activeColor = colors.find((color) => color.value === activeListData.color) || colors[0];
 
   // Combine local yjs state with server state for a seamless experience
   const todosToUse = useMemo(() => {
@@ -374,11 +375,11 @@ export default function DodoListApp() {
     }
   };
 
-  // Update list name (updated to use our persistence service)
+  // Update list name (now uses Yjs metadata)
   const handleUpdateListName = useCallback(async (listId: string, newName: string | null) => {
     if (newName && newName.trim() !== "") {
       try {
-        await updateList(listId, { name: newName });
+        await updateListMetadata({ name: newName });
         addNotification({
           message: "List name updated.",
           type: "success",
@@ -393,14 +394,13 @@ export default function DodoListApp() {
         });
       }
     }
-    setEditingListId(null);
     setIsEditingHeader(false);
-  }, [updateList, addNotification]);
+  }, [updateListMetadata, addNotification]);
 
-  // Update list color (updated to use our persistence service)
+  // Update list color (now uses Yjs metadata)
   const updateListColor = async (listId: string, newColor: string) => {
     try {
-      await updateList(listId, { color: newColor });
+      await updateListMetadata({ color: newColor });
       addNotification({
         message: "List color updated.",
         type: "success",
@@ -416,14 +416,12 @@ export default function DodoListApp() {
     }
   };
 
-  // Toggle pin list (updated to use our persistence service)
+  // Toggle pin list (now uses Yjs metadata)
   const togglePinList = async (listId: string) => {
-    const list = todoLists.find(l => l.id === listId);
-    if (!list) return;
     try {
-      await updateList(listId, { pinned: !list.pinned });
+      await updateListMetadata({ pinned: !activeListData.pinned });
       addNotification({
-        message: list.pinned ? "List unpinned." : "List pinned.",
+        message: activeListData.pinned ? "List unpinned." : "List pinned.",
         type: "success",
         duration: 3000,
       });
@@ -437,14 +435,12 @@ export default function DodoListApp() {
     }
   };
 
-  // Toggle archive list (updated to use our persistence service)
+  // Toggle archive list (now uses Yjs metadata)
   const toggleArchiveList = async (listId: string) => {
-    const list = todoLists.find(l => l.id === listId);
-    if (!list) return;
     try {
-      await updateList(listId, { archived: !list.archived });
+      await updateListMetadata({ archived: !activeListData.archived });
       addNotification({
-        message: list.archived ? "List unarchived." : "List archived.",
+        message: activeListData.archived ? "List unarchived." : "List archived.",
         type: "success",
         duration: 3000,
       });
@@ -462,11 +458,6 @@ export default function DodoListApp() {
     if (e.key === "Enter" && !isAddingTodo) {
       handleAddTodo()
     }
-  }
-
-  const saveProfile = () => {
-    setUserProfile(tempProfile)
-    setIsEditingProfile(false)
   }
 
   const formatDateTime = (date: Date, includeTime = true) => {
@@ -1002,6 +993,37 @@ export default function DodoListApp() {
     </div>
   );
 
+  // Remove legacy PocketBase state/props and use Yjs-centric state for sidebar
+  // Build yjsListDataMap for all lists (for sidebar and elsewhere)
+  const yjsListDataMap = useMemo(() => {
+    const map: Record<string, any> = {};
+    todoLists.forEach(list => {
+      // If this is the active list, use the live Yjs state
+      if (activeListId === list.id && activeListData) {
+        map[list.id] = activeListData;
+      } else {
+        // For other lists, fallback to their last known Yjs metadata (if available)
+        // You may want to load this from IndexedDB or keep a cache in the future
+        map[list.id] = {
+          name: list.name,
+          color: list.color,
+          pinned: list.pinned,
+          archived: list.archived,
+          deleted: list.deleted,
+          todos: list.todos || [],
+        };
+      }
+    });
+    return map;
+  }, [todoLists, activeListId, activeListData]);
+
+  const handleColorSelect = (colorValue: string) => {
+    if (activeList) {
+      updateListMetadata({ color: colorValue });
+    }
+    setDropdownOpen(false);
+  };
+
   return (
     <div className={`min-h-screen relative overflow-hidden ${activeColor.light}`}>
       {/* <NotificationPortal notifications={notifications} removeNotification={removeNotification} /> */}
@@ -1009,6 +1031,7 @@ export default function DodoListApp() {
       <SidebarProvider>
         <AppSidebar
           todoLists={todoLists}
+          yjsListDataMap={yjsListDataMap}
           activeListId={activeListId}
           newListName={newListName}
           setNewListName={setNewListName}
@@ -1016,21 +1039,10 @@ export default function DodoListApp() {
           setShowNewListInput={setShowNewListInput}
           isAddingList={isAddingList}
           createNewList={handleCreateNewList}
-          updateListName={handleUpdateListName}
-          togglePinList={togglePinList}
-          toggleArchiveList={toggleArchiveList}
-          cloneList={handleCloneList}
-          updateListColor={updateListColor}
-          deleteList={handleDeleteList}
           colors={colors}
           userProfile={userProfile}
-          tempProfile={tempProfile}
-          setTempProfile={setTempProfile}
           isEditingProfile={isEditingProfile}
           setIsEditingProfile={setIsEditingProfile}
-          saveProfile={saveProfile}
-          editingListId={editingListId}
-          setEditingListId={setEditingListId}
           onLogout={handleLogout}
         />
         <SidebarInset className="h-svh flex flex-col">
@@ -1125,35 +1137,34 @@ export default function DodoListApp() {
           <SidebarTrigger className="-ml-1" />
             {activeList && (
               <>
-                {/* List Icon/Color */}
-                {activeList.archived ? (
+                {/* List Icon/Color - use Yjs metadata */}
+                {activeListData.archived ? (
                   <Archive className={`w-3 h-3 ml-2 ${activeColor.text}`} />
-                ) : activeList.pinned ? (
+                ) : activeListData.pinned ? (
                   <Pin className={`w-3 h-3 ml-2 ${activeColor.text}`} />
                 ) : (
-                  <div className={`w-3 h-3 rounded-full ${activeList.color} ml-2`} />
+                  <div className={`w-3 h-3 rounded-full ${activeListData.color} ml-2`} />
                 )}
 
-                {/* List Name (Editable) */}
+                {/* List Name (Editable) - use Yjs metadata only */}
                 <div className="flex-1 min-w-0 max-w-xs md:max-w-md">
                   {isEditingHeader ? (
                     <Input
-                      value={editingListName !== null ? editingListName : activeList.name} // Use editingListName
-                      onChange={(e) => setEditingListName(e.target.value)} // Update editingListName
+                      value={editingListName !== null ? editingListName : activeListData.name}
+                      onChange={(e) => setEditingListName(e.target.value)}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter') {
-                          e.preventDefault();
                           handleUpdateListName(activeList.id, editingListName);
-                          setIsEditingHeader(false); // Exit edit mode
+                          setIsEditingHeader(false);
                         } else if (e.key === 'Escape') {
-                          setEditingListName(null); // Reset temp name
-                          setIsEditingHeader(false); // Exit edit mode
+                          setEditingListName(null);
+                          setIsEditingHeader(false);
                           (document.activeElement as HTMLElement)?.blur();
                         }
                       }}
                       onBlur={() => {
                         handleUpdateListName(activeList.id, editingListName);
-                        setIsEditingHeader(false); // Exit edit mode
+                        setIsEditingHeader(false);
                       }}
                       autoFocus
                       className="text-lg font-semibold text-slate-800 border-none focus:ring-0 focus:outline-none bg-transparent w-full p-0 !h-auto !text-lg"
@@ -1162,109 +1173,98 @@ export default function DodoListApp() {
                     <h2
                       className="text-lg font-semibold text-slate-800 cursor-pointer truncate"
                       onClick={() => {
-                        setEditingListName(activeList.name); // Set initial name for editing
+                        setEditingListName(activeListData.name);
                         setIsEditingHeader(true);
                       }}
                     >
-                      {activeList.name}
+                      {activeListData.name || "Untitled List"}
                     </h2>
                   )}
                 </div>
 
-                {activeList.archived && <span className="text-sm text-slate-500 ml-2">(Archived)</span>}
+                {activeListData.archived && <span className="text-sm text-slate-500 ml-2">(Archived)</span>}
                 {activeCount > 0 && (
                   <CircularProgress
-                    percentage={totalCount > 0 ? ((totalCount - activeCount) / totalCount) * 100 : 0}
-                    size={32}
-                    strokeWidth={4}
-                    color={activeList.color}
+                  percentage={totalCount > 0 ? ((totalCount - activeCount) / totalCount) * 100 : 0}
+                  size={32}
+                  strokeWidth={4}
+                  color={activeListData.color}
                   />
                 )}
 
-                {/* List Options Menu */}
+                <SyncStatusIndicator syncStatus={syncStatus} activeColor={activeColor} />
+                
+                {/* List Settings Dropdown */}
                 <div className="ml-auto flex items-center gap-1">
-                  <Button
-                      variant="ghost"
-                      size="icon"
-                      aria-label="Clone List"
-                      className="h-8 w-8 p-0 text-slate-600 hover:text-slate-800"
-                      onClick={() => cloneList(activeList.id)}
-                      title="Clone List"
-                  >
-                      <Copy className="w-4 h-4" />
-                  </Button>
-
-                  <SyncStatusIndicator syncStatus={syncStatus} activeColor={activeColor} />
-
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button
                         variant="ghost"
                         size="icon"
-                        aria-label="More list options"
+                        aria-label="List settings"
                         className="h-8 w-8 p-0 text-slate-600 hover:text-slate-800"
                       >
                         <MoreVertical className="w-4 h-4" />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="bg-white/95 backdrop-blur-sm">
-                      {!activeList.archived && (
-                        <DropdownMenuItem
-                          onClick={() => {
-                            setShowTaskOptions(null) // Close any open task options
-                            // Logic to show options for creating a recurring task
-                            // This could open a dialog or another overlay
-                            addNotification({
-                              message: "Recurring task setup coming soon!",
-                              type: "info",
-                            })
-                          }}
-                        >
-                          <Repeat className="w-4 h-4 mr-2" />
-                          <span>Make Recurring</span>
-                        </DropdownMenuItem>
-                      )}
-                      <DropdownMenuItem
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          cloneList(activeList.id)
-                        }}
-                      >
-                        <Copy className="w-4 h-4 mr-2" />
-                        <span>Clone List</span>
+                      {/* Pin/Unpin */}
+                      <DropdownMenuItem onClick={() => togglePinList(activeList.id)}>
+                        {activeListData.pinned ? (
+                          <>
+                            <PinOff className="w-4 h-4 mr-2" />
+                            <span>Unpin List</span>
+                          </>
+                        ) : (
+                          <>
+                            <Pin className="w-4 h-4 mr-2" />
+                            <span>Pin List</span>
+                          </>
+                        )}
                       </DropdownMenuItem>
-                      <DropdownMenuSub>
-                        <DropdownMenuSubTrigger>
-                          <Palette className="w-4 h-4 mr-2" />
-                          <span>Change Color</span>
-                        </DropdownMenuSubTrigger>
-                        <DropdownMenuPortal>
-                          <DropdownMenuSubContent>
-                            <div className="grid grid-cols-5 gap-2 p-2">
+                      {/* Color Palette */}
+                      <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <DropdownMenuItem>
+                              <Palette className="w-4 h-4 mr-2" />
+                              Change Color
+                            </DropdownMenuItem>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent side="right">
+                            <div className="grid grid-cols-4 gap-2 p-2">
                               {colors.map((color) => (
                                 <button
                                   key={color.value}
-                                  className={`w-6 h-6 rounded-full ${color.value} hover:scale-110 transition-transform ${
-                                    activeList.color === color.value ? "ring-2 ring-offset-2 ring-slate-800" : ""
-                                  }`}
-                                  onClick={() => updateListColor(activeList.id, color.value)}
+                                  className={`w-6 h-6 rounded-full ${color.value} hover:scale-110 transition-transform`}
+                                  onClick={() => handleColorSelect(color.value)}
                                 />
                               ))}
                             </div>
-                          </DropdownMenuSubContent>
-                        </DropdownMenuPortal>
-                      </DropdownMenuSub>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       <DropdownMenuSeparator />
+                      {/* Archive/Unarchive */}
                       <DropdownMenuItem onClick={() => toggleArchiveList(activeList.id)}>
-                        {activeList.archived ? (
-                          <ArchiveRestore className="w-4 h-4 mr-2" />
+                        {activeListData.archived ? (
+                          <>
+                            <ArchiveRestore className="w-4 h-4 mr-2" />
+                            <span>Unarchive List</span>
+                          </>
                         ) : (
-                          <Archive className="w-4 h-4 mr-2" />
+                          <>
+                            <Archive className="w-4 h-4 mr-2" />
+                            <span>Archive List</span>
+                          </>
                         )}
-                        <span>{activeList.archived ? "Unarchive" : "Archive"} List</span>
                       </DropdownMenuItem>
+                      {/* Clone */}
+                      <DropdownMenuItem onClick={() => handleCloneList(activeList.id)}>
+                        <Copy className="w-4 h-4 mr-2" />
+                        <span>Clone List</span>
+                      </DropdownMenuItem>
+                      {/* Delete */}
                       <DropdownMenuItem
-                        onClick={() => deleteList(activeList.id)}
+                        onClick={() => handleDeleteList(activeList.id)}
                         className="text-red-500 hover:!text-red-600 focus:!bg-red-50 focus:!text-red-600"
                       >
                         <Trash2 className="w-4 h-4 mr-2" />

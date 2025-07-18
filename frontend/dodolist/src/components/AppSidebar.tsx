@@ -61,17 +61,7 @@ interface ListMenuItemProps {
   isActive: boolean;
   isArchived?: boolean;
   activeColor: Color;
-  editingListId: string | null;
-  setEditingListId: (id: string | null) => void;
-  updateListName: (listId: string, newName: string) => void;
-  togglePinList: (listId: string) => void;
-  toggleArchiveList: (listId: string) => void;
-  cloneList: (listId: string) => void;
-  updateListColor: (listId: string, newColor: string) => void;
-  deleteList: (listId: string) => void;
-  todoLists: TodoList[];
   onListClick: (listId: string) => void;
-  colors: Color[];
 }
 
 const ListMenuItem = memo(
@@ -80,45 +70,27 @@ const ListMenuItem = memo(
     isActive,
     isArchived = false,
     activeColor,
-    editingListId,
-    setEditingListId,
-    updateListName,
-    togglePinList,
-    toggleArchiveList,
-    updateListColor,
-    deleteList,
-    todoLists,
-    onListClick,
-    colors,
-  }: ListMenuItemProps) => {
+    onListClick
+  }: Pick<ListMenuItemProps, 'list' | 'isActive' | 'isArchived' | 'activeColor' | 'onListClick'>) => {
     const inputRef = useRef<HTMLInputElement>(null);
-    const [currentName, setCurrentName] = useState(list.name);
-    const [renameIntent, setRenameIntent] = useState(false);
-    const [dropdownOpen, setDropdownOpen] = useState(false);
     const { isMobile, setOpenMobile } = useSidebar(); // Use the hook
     const navigate = useNavigate();
     const lastNavRef = useRef<number>(0);
 
-    // Sync local state if the prop changes from parent
-    useEffect(() => {
-      setCurrentName(list.name);
-    }, [list.name]);
-
     // Focus input when editing starts
     useEffect(() => {
-      if (editingListId === list.id && inputRef.current) {
+      if (inputRef.current) {
         inputRef.current.focus();
         const len = inputRef.current.value.length;
         inputRef.current.setSelectionRange(len, len);
       }
-    }, [editingListId, list.id]);
+    }, []);
 
-    const listColor = colors.find((color) => color.value === list.color) || colors[0];
-    const activeTaskCount = (list.todos || []).filter((todo) => !todo.completed).length;
+    // Remove all settings controls: rename, color, pin, archive, delete, dropdown, etc.
+    // Only allow navigation and display list name and color indicator.
 
     // Memoized navigation handler with guards
     const handleListClick = useCallback(() => {
-      if (editingListId === list.id) return;
       // Prevent rapid successive navigations (e.g., double click)
       const now = Date.now();
       if (now - lastNavRef.current < 400) return;
@@ -129,31 +101,13 @@ const ListMenuItem = memo(
       }
       onListClick(list.id);
       if (isMobile) setOpenMobile(false);
-    }, [editingListId, list.id, navigate, onListClick, isMobile, setOpenMobile]);
-
-    const handleRename = () => {
-      setRenameIntent(true);
-      setEditingListId(list.id);
-    };
-
-    const handleUpdateName = () => {
-      if (currentName.trim()) {
-        updateListName(list.id, currentName.trim());
-      } else {
-        setCurrentName(list.name); // Revert if the name is empty
-      }
-    };
-
-    const handleColorSelect = (colorValue: string) => {
-      updateListColor(list.id, colorValue);
-      setDropdownOpen(false);
-    };
+    }, [list.id, navigate, onListClick, isMobile, setOpenMobile]);
 
     return (
       <SidebarMenuItem key={list.id}>
         <SidebarMenuButton
           isActive={isActive}
-          onClick={editingListId === list.id ? (e) => e.preventDefault() : handleListClick}
+          onClick={handleListClick}
           data-list-id={list.id}
           className={`pr-12 transition-all duration-300 will-change-transform ${
             isActive ? "bg-white/30 text-white font-medium shadow-sm" : `${activeColor.darkText} hover:bg-white/15`
@@ -166,102 +120,9 @@ const ListMenuItem = memo(
           ) : (
             <div className={`w-3 h-3 rounded-full ${list.color} transition-all duration-300 ${isActive ? "ring-1 ring-white" : ""}`} />
           )}
-          {editingListId === list.id ? (
-            <Input
-              ref={inputRef}
-              value={currentName}
-              onChange={(e) => setCurrentName(e.target.value)}
-              onBlur={handleUpdateName}
-              onKeyPress={(e) => {
-                if (e.key === "Enter") {
-                  handleUpdateName();
-                }
-              }}
-              className="flex-1 h-6 text-sm border-none p-0 focus:ring-0 focus:outline-none bg-transparent selection:bg-white/30"
-            />
-          ) : (
-            <span
-              className="flex-1 truncate"
-              onDoubleClick={(e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                handleRename();
-              }}
-            >
-              {list.name}
-            </span>
-          )}
-          <span className={`text-xs ml-auto font-medium ${isActive ? listColor.text : `${activeColor.darkText} opacity-60`}`}>
-            {activeTaskCount}
-          </span>
+          {/* Only show the list name, no settings controls */}
+          <span className="ml-2 truncate text-sm font-medium">{list.name}</span>
         </SidebarMenuButton>
-
-        {/* Hide menu actions on mobile */}
-        <div className="absolute right-1 top-1/2 -translate-y-1/2 opacity-0 group-hover/menu-item:opacity-100 transition-opacity duration-200">
-            <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  aria-label="More list options"
-                  className={`h-6 w-6 p-0 ${activeColor.darkText} hover:bg-white/20 focus:bg-white/20 focus:ring-2 focus:ring-white/30`}
-                >
-                  <MoreHorizontal className="w-3 h-3" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                align="end"
-                className="bg-white/95 backdrop-blur-sm"
-                onCloseAutoFocus={(e) => {
-                  if (renameIntent) {
-                    e.preventDefault();
-                    if (inputRef.current) {
-                      const len = inputRef.current.value.length;
-                      inputRef.current.focus();
-                      inputRef.current.setSelectionRange(len, len);
-                    }
-                    setRenameIntent(false);
-                  }
-                }}
-              >
-                {!isArchived && (
-                  <DropdownMenuItem onClick={() => togglePinList(list.id)}>
-                    {list.pinned ? <PinOff className="w-4 h-4 mr-2" /> : <Pin className="w-4 h-4 mr-2" />}
-                    {list.pinned ? "Unpin" : "Pin"} List
-                  </DropdownMenuItem>
-                )}
-                <DropdownMenuItem onClick={() => toggleArchiveList(list.id)}>
-                  {list.archived ? <ArchiveRestore className="w-4 h-4 mr-2" /> : <Archive className="w-4 h-4 mr-2" />}
-                  {list.archived ? "Unarchive" : "Archive"} List
-                </DropdownMenuItem>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <DropdownMenuItem>
-                      <Palette className="w-4 h-4 mr-2" />
-                      Change Color
-                    </DropdownMenuItem>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent side="right">
-                    <div className="grid grid-cols-4 gap-2 p-2">
-                      {colors.map((color) => (
-                        <button
-                          key={color.value}
-                          className={`w-6 h-6 rounded-full ${color.value} hover:scale-110 transition-transform`}
-                          onClick={() => handleColorSelect(color.value)}
-                        />
-                      ))}
-                    </div>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-                {todoLists.length > 1 && (
-                  <DropdownMenuItem onClick={() => deleteList(list.id)} className="text-red-600">
-                    <Trash2 className="w-4 h-4 mr-2" />
-                    Delete
-                  </DropdownMenuItem>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
       </SidebarMenuItem>
     );
   }
@@ -271,6 +132,7 @@ ListMenuItem.displayName = "ListMenuItem";
 
 interface AppSidebarProps {
   todoLists: TodoList[];
+  yjsListDataMap: Record<string, Partial<TodoList>>; // New prop: Yjs metadata for each list
   activeListId: string | null;
   newListName: string;
   setNewListName: (name: string) => void;
@@ -278,26 +140,16 @@ interface AppSidebarProps {
   setShowNewListInput: (show: boolean) => void;
   isAddingList: boolean;
   createNewList: () => void;
-  updateListName: (listId: string, newName: string) => void;
-  togglePinList: (listId: string) => void;
-  toggleArchiveList: (listId: string) => void;
-  cloneList: (listId: string) => void;
-  updateListColor: (listId: string, newColor: string) => void;
-  deleteList: (listId: string) => void;
   colors: Color[];
   userProfile: UserProfile;
-  tempProfile: UserProfile;
-  setTempProfile: (profile: UserProfile) => void;
   isEditingProfile: boolean;
   setIsEditingProfile: (editing: boolean) => void;
-  saveProfile: () => void;
-  editingListId: string | null;
-  setEditingListId: (id: string | null) => void;
   onLogout?: () => void;
 }
 
 const AppSidebar = memo(({
   todoLists,
+  yjsListDataMap,
   activeListId,
   newListName,
   setNewListName,
@@ -305,19 +157,11 @@ const AppSidebar = memo(({
   setShowNewListInput,
   isAddingList,
   createNewList,
-  updateListName,
-  togglePinList,
-  toggleArchiveList,
-  cloneList,
-  updateListColor,
-  deleteList,
   colors,
   userProfile,
   isEditingProfile,
   setIsEditingProfile,
-  editingListId,
-  setEditingListId,
-  onLogout,
+  onLogout
 }: AppSidebarProps) => {
   const navigate = useNavigate()
   const [authService] = useState(() => new AuthService())
@@ -331,12 +175,16 @@ const AppSidebar = memo(({
     }
   }
 
-  const activeList = todoLists.find((list) => list.id === activeListId);
-  const activeColor = colors.find((color) => color.value === activeList?.color) || colors[0];
+  // Use Yjs metadata for all lists
+  const listsWithYjs = todoLists.map(list => ({
+    ...list,
+    ...yjsListDataMap[list.id],
+  }));
 
-  // Separate lists by status
-  const activeLists = todoLists.filter((list) => !list.archived);
-  const archivedLists = todoLists.filter((list) => list.archived);
+  const activeList = listsWithYjs.find((list) => list.id === activeListId);
+  const activeColor = colors.find((color) => color.value === activeList?.color) || colors[0];
+  const activeLists = listsWithYjs.filter((list) => !list.archived);
+  const archivedLists = listsWithYjs.filter((list) => list.archived);
   const pinnedLists = activeLists.filter((list) => list.pinned);
   const unpinnedLists = activeLists.filter((list) => !list.pinned);
 
@@ -346,6 +194,33 @@ const AppSidebar = memo(({
     if (activeListId === listId) return;
     navigate(`/list/${listId}`); // Only update the URL, do not call setActiveListId
   }, [activeListId, navigate]);
+
+  // Add custom scrollbar styles for SidebarContent
+  const customScrollbarStyle = `
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 8px;
+      background: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(0,0,0,0.12);
+      border-radius: 6px;
+      transition: background 0.2s;
+    }
+    .custom-scrollbar:hover::-webkit-scrollbar-thumb {
+      background: rgba(0,0,0,0.22);
+    }
+    .custom-scrollbar {
+      scrollbar-width: thin;
+      scrollbar-color: rgba(0,0,0,0.12) transparent;
+    }
+  `;
+
+  if (typeof window !== 'undefined' && !document.getElementById('custom-scrollbar-style')) {
+    const style = document.createElement('style');
+    style.id = 'custom-scrollbar-style';
+    style.innerHTML = customScrollbarStyle;
+    document.head.appendChild(style);
+  }
 
   return (
     <Sidebar className="border-r-0 overflow-hidden min-h-screen flex flex-col relative bg-white/90">
@@ -386,7 +261,7 @@ const AppSidebar = memo(({
       </SidebarHeader>
 
       {/* Lists */}
-      <SidebarContent className="relative z-10 flex-1 overflow-y-auto px-2 py-4">
+      <SidebarContent className="custom-scrollbar relative z-10 flex-1 overflow-y-auto px-2 py-4">
         {/* Pinned Lists */}
         {pinnedLists.length > 0 && (
           <SidebarGroup className="mb-2">
@@ -400,17 +275,7 @@ const AppSidebar = memo(({
                     isActive={activeListId === list.id}
                     isArchived={false}
                     activeColor={activeColor}
-                    editingListId={editingListId}
-                    setEditingListId={setEditingListId}
-                    updateListName={updateListName}
-                    togglePinList={togglePinList}
-                    toggleArchiveList={toggleArchiveList}
-                    cloneList={cloneList}
-                    updateListColor={updateListColor}
-                    deleteList={deleteList}
-                    todoLists={todoLists}
                     onListClick={handleSidebarListClick}
-                    colors={colors}
                   />
                 ))}
               </SidebarMenu>
@@ -430,17 +295,7 @@ const AppSidebar = memo(({
                     isActive={activeListId === list.id}
                     isArchived={false}
                     activeColor={activeColor}
-                    editingListId={editingListId}
-                    setEditingListId={setEditingListId}
-                    updateListName={updateListName}
-                    togglePinList={togglePinList}
-                    toggleArchiveList={toggleArchiveList}
-                    cloneList={cloneList}
-                    updateListColor={updateListColor}
-                    deleteList={deleteList}
-                    todoLists={todoLists}
                     onListClick={handleSidebarListClick}
-                    colors={colors}
                   />
                 ))}
               </SidebarMenu>
@@ -460,17 +315,7 @@ const AppSidebar = memo(({
                     isActive={activeListId === list.id}
                     isArchived={true}
                     activeColor={activeColor}
-                    editingListId={editingListId}
-                    setEditingListId={setEditingListId}
-                    updateListName={updateListName}
-                    togglePinList={togglePinList}
-                    toggleArchiveList={toggleArchiveList}
-                    cloneList={cloneList}
-                    updateListColor={updateListColor}
-                    deleteList={deleteList}
-                    todoLists={todoLists}
                     onListClick={handleSidebarListClick}
-                    colors={colors}
                   />
                 ))}
               </SidebarMenu>

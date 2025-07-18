@@ -410,15 +410,53 @@ export class GlobalPocketBaseProvider {
         return;
       }
 
-      const remoteDoc = await this.pb.collection(this.collectionName).getOne(listId, { requestKey: null });
-      
-      if (remoteDoc.yjsUpdate) {
+      let remoteDoc: any = null;
+      try {
+        remoteDoc = await this.pb.collection(this.collectionName).getOne(listId, { requestKey: null });
+      } catch (error: any) {
+        // If the record does not exist (404), create it
+        if (error?.status === 404) {
+          // Extract initial metadata from the Yjs doc
+          const ylist = docInstance.doc.getMap('list');
+          let name = '';
+          let color = '';
+          if (ylist.has('name')) {
+            const yName = ylist.get('name') as Y.Text;
+            name = yName ? yName.toString() : '';
+          }
+          if (ylist.has('color')) {
+            const yColor = ylist.get('color') as Y.Text;
+            color = yColor ? yColor.toString() : '';
+          }
+          // You may want to add more fields as needed
+          const createdAt = new Date().toISOString();
+          const userId = (window as any)?.__pb_auth_store?.model?.id || null;
+          const data: any = {
+            id: listId,
+            user_id: userId,
+            name,
+            color,
+            createdAt,
+            pinned: ylist.get('pinned') ?? false,
+            archived: ylist.get('archived') ?? false,
+            deleted: ylist.get('deleted') ?? false,
+            // yjsUpdate will be set by syncDocumentToServer
+          };
+          await this.pb.collection(this.collectionName).create(data, { requestKey: null });
+          remoteDoc = null; // No remote state to merge
+          console.log(`[GlobalPocketBaseProvider] Created missing PocketBase record for list ${listId}`);
+        } else {
+          throw error;
+        }
+      }
+
+      if (remoteDoc && remoteDoc.yjsUpdate) {
         const remoteUpdate = base64ToUint8Array(remoteDoc.yjsUpdate);
         Y.applyUpdate(docInstance.doc, remoteUpdate, 'server-reconnect');
         console.log(`[GlobalPocketBaseProvider] Merged remote state for list ${listId}`);
       }
 
-      // After merging, immediately queue a sync to write the full state back
+      // After merging (or creating), immediately queue a sync to write the full state back
       console.log(`[GlobalPocketBaseProvider] Queuing sync-to-server after merge for list ${listId}`);
       this.queueSync(listId, () => this.syncDocumentToServer(listId));
 

@@ -4,6 +4,7 @@ import PocketBase from 'pocketbase';
 import { useState, useEffect, useCallback } from 'react';
 import { PB_URL } from '@/config';
 import AuthService from '@/services/authService';
+import { GlobalPocketBaseProvider } from '@/services/yjsPocketBase';
 
 // This interface should match your PocketBase collection schema
 export interface TodoList {
@@ -214,41 +215,52 @@ export function useTodoLists() {
 
   // --- List Management (via PocketBase REST API) ---
 
-  const createNewList = useCallback(async (name: string, color: string) => {
+  const createNewList = useCallback((name: string, color: string) => {
     const userId = authService.getCurrentUser()?.id;
     if (!userId) throw new Error("User not authenticated");
 
     const newId = crypto.randomUUID();
     const now = new Date().toISOString();
 
+    // --- Yjs metadata initialization (local-first) ---
+    try {
+      const yjsProvider = GlobalPocketBaseProvider.getInstance().getDocumentProvider(newId);
+      const ylist = yjsProvider.doc.getMap('list');
+      if (!ylist.has('name')) ylist.set('name', new Y.Text());
+      if (!ylist.has('color')) ylist.set('color', new Y.Text());
+      (ylist.get('name') as Y.Text).delete(0, (ylist.get('name') as Y.Text).length);
+      (ylist.get('name') as Y.Text).insert(0, name);
+      (ylist.get('color') as Y.Text).delete(0, (ylist.get('color') as Y.Text).length);
+      (ylist.get('color') as Y.Text).insert(0, color);
+      ylist.set('pinned', false);
+      ylist.set('archived', false);
+      ylist.set('deleted', false);
+      if (!ylist.has('todos')) ylist.set('todos', new Y.Array());
+    } catch (e) {
+      console.error('[createNewList] Failed to initialize Yjs metadata for new list', e);
+    }
+    // --- End Yjs metadata initialization ---
+
+    // Add to local UI state (Yjs is source of truth for metadata)
     const newList: TodoListWithTodos = {
       id: newId,
       user_id: userId,
-      name: name,
-      color: color,
+      name: name, // Will be replaced by Yjs state in UI
+      color: color, // Will be replaced by Yjs state in UI
       createdAt: now,
       pinned: false,
       archived: false,
       deleted: false,
       todos: [],
     };
-
     setTodoLists(prev => [newList, ...prev]);
     setActiveListId(newId);
 
-    queuePocketBaseOperation(async () => {
-      const freshPb = new PocketBase(PB_URL);
-      freshPb.authStore.save(pb.authStore.token, pb.authStore.model);
-      
-      const data = { id: newId, user_id: userId, name, color, createdAt: now, pinned: false, archived: false, deleted: false };
-      
-      await freshPb.collection('task_lists').create<TodoList>(data, { requestKey: null });
-      
-      console.log(`Successfully synced new list ${newId} to PocketBase`);
-    });
+    // Do NOT create the PocketBase record here. The Yjs provider will sync/upload when online.
+    // This is now a local-first, Yjs-centric approach.
 
     return newId;
-  }, [authService, pb.authStore.token, pb.authStore.model, queuePocketBaseOperation]);
+  }, [authService]);
 
   const deleteList = useCallback(async (listId: string) => {
     const remainingLists = todoLists.filter(list => list.id !== listId);
@@ -273,10 +285,23 @@ export function useTodoLists() {
   }, [todoLists, activeListId, createNewList, queuePocketBaseOperation, pb.authStore.token, pb.authStore.model]);
 
   const updateList = useCallback(async (listId: string, data: Partial<TodoList>) => {
+    // If the update is for metadata fields, warn and encourage using Yjs instead
+    const metaFields = ["name", "color", "pinned", "archived", "deleted"];
+    if (Object.keys(data).some(key => metaFields.includes(key))) {
+      console.warn("[useTodoLists] updateList called for metadata fields. Use updateListMetadata from useYjsTodoList instead for offline/online sync.");
+      // Do not update local state for metadata fields
+      queuePocketBaseOperation(async () => {
+        const freshPb = new PocketBase(PB_URL);
+        freshPb.authStore.save(pb.authStore.token, pb.authStore.model);
+        await freshPb.collection('task_lists').update<TodoList>(listId, data, { requestKey: null });
+        console.log(`Successfully synced list update ${listId} to PocketBase`);
+      });
+      return;
+    }
+    // Only update local state for non-metadata fields
     setTodoLists(prev => prev.map(list => 
       list.id === listId ? { ...list, ...data } : list
     ) as TodoListWithTodos[]);
-    
     queuePocketBaseOperation(async () => {
       const freshPb = new PocketBase(PB_URL);
       freshPb.authStore.save(pb.authStore.token, pb.authStore.model);

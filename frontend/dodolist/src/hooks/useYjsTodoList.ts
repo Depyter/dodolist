@@ -14,7 +14,14 @@ export interface YListDoc {
 }
 
 export function useYjsTodoList(listId: string | null) {
-    const [listData, setListData] = useState<{ name: string; color: string; todos: any[] }>({ name: '', color: '', todos: [] });
+    const [listData, setListData] = useState<{
+        name: string;
+        color: string;
+        todos: any[];
+        pinned?: boolean;
+        archived?: boolean;
+        deleted?: boolean;
+    }>({ name: '', color: '', todos: [] });
     const [syncStatus, setSyncStatus] = useState<SyncStatusInfo>({
         status: 'offline',
         isConnected: false,
@@ -72,24 +79,27 @@ export function useYjsTodoList(listId: string | null) {
 
         updateState = () => {
             if (!isMounted) return;
-            
             try {
                 const ytodos = ylist.get('todos') as Y.Array<YTodo>;
                 const yname = ylist.get('name') as Y.Text;
                 const ycolor = ylist.get('color') as Y.Text;
+                const pinned = ylist.get('pinned');
+                const archived = ylist.get('archived');
+                const deleted = ylist.get('deleted');
 
                 if (!yname) ylist.set('name', new Y.Text());
                 if (!ycolor) ylist.set('color', new Y.Text());
                 if (!ytodos) ylist.set('todos', new Y.Array());
 
                 const todos = ytodos ? ytodos.toArray().map(t => t.toJSON()) : [];
-                
                 const newListData = {
                     name: yname ? yname.toString() : '',
                     color: ycolor ? ycolor.toString() : '',
                     todos,
+                    pinned: typeof pinned === 'boolean' ? pinned : false,
+                    archived: typeof archived === 'boolean' ? archived : false,
+                    deleted: typeof deleted === 'boolean' ? deleted : false,
                 };
-                
                 setListData(newListData);
             } catch (error) {
                 console.error('[useYjsTodoList] Error in updateState:', error);
@@ -216,6 +226,24 @@ export function useYjsTodoList(listId: string | null) {
         }
       }, []);
 
+    // Add a generic metadata update method
+    const updateListMetadata = useCallback((updates: Partial<{ name: string; color: string; pinned: boolean; archived: boolean; deleted: boolean }>) => {
+        if (!providerRef.current) return;
+        const ylist = providerRef.current.doc.getMap('list');
+        providerRef.current.doc.transact(() => {
+            Object.entries(updates).forEach(([key, value]) => {
+                if (key === 'name' || key === 'color') {
+                    if (!ylist.has(key)) ylist.set(key, new Y.Text());
+                    const yText = ylist.get(key) as Y.Text;
+                    yText.delete(0, yText.length);
+                    yText.insert(0, value as string);
+                } else {
+                    ylist.set(key, value);
+                }
+            });
+        });
+    }, []);
+
     return {
         listData,
         addTodo,
@@ -224,6 +252,7 @@ export function useYjsTodoList(listId: string | null) {
         updateTodo,
         updateListName,
         updateListColor,
+        updateListMetadata, // <-- Expose the new method
         isConnected: syncStatus.isConnected,
         syncStatus,
     };
