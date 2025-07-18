@@ -262,27 +262,26 @@ export function useTodoLists() {
     return newId;
   }, [authService]);
 
-  const deleteList = useCallback(async (listId: string) => {
+  const deleteList = useCallback((listId: string) => {
+    // Soft-delete via Yjs. The provider will sync this change.
+    const yjsProvider = GlobalPocketBaseProvider.getInstance().getDocumentProvider(listId);
+    const ylist = yjsProvider.doc.getMap('list');
+    ylist.set('deleted', true);
+
+    // Update UI immediately
     const remainingLists = todoLists.filter(list => list.id !== listId);
     setTodoLists(remainingLists);
-    
+
     if (activeListId === listId) {
       if (remainingLists.length > 0) {
         setActiveListId(remainingLists[0].id);
       } else {
-        const newId = await createNewList("Default List", "bg-stone-400");
+        // Create a new list if the last one was deleted
+        const newId = createNewList("Default List", "bg-stone-400");
         setActiveListId(newId);
-        return;
       }
     }
-
-    queuePocketBaseOperation(async () => {
-      const freshPb = new PocketBase(PB_URL);
-      freshPb.authStore.save(pb.authStore.token, pb.authStore.model);
-      await freshPb.collection('task_lists').delete(listId, { requestKey: null });
-      console.log(`Successfully synced list deletion ${listId} to PocketBase`);
-    });
-  }, [todoLists, activeListId, createNewList, queuePocketBaseOperation, pb.authStore.token, pb.authStore.model]);
+  }, [todoLists, activeListId, createNewList]);
 
   const updateList = useCallback(async (listId: string, data: Partial<TodoList>) => {
     // If the update is for metadata fields, warn and encourage using Yjs instead
@@ -310,14 +309,14 @@ export function useTodoLists() {
     });
   }, [queuePocketBaseOperation, pb.authStore.token, pb.authStore.model]);
 
-  const cloneList = useCallback(async (listId: string) => {
+  const cloneList = useCallback((listId: string) => {
     const listToClone = todoLists.find(list => list.id === listId);
     if (!listToClone) {
       throw new Error("List not found");
     }
 
     const newName = `${listToClone.name} (Copy)`;
-    const newId = await createNewList(newName, listToClone.color);
+    const newId = createNewList(newName, listToClone.color);
 
     // The yjsUpdate is a base64 string. We can just copy it.
     const yjsUpdate = listToClone.yjsUpdate;
@@ -333,9 +332,10 @@ export function useTodoLists() {
 
 
       // Also update the local state immediately for better UX
+      const yjsData = getTodosFromYjsUpdate(yjsUpdate);
       setTodoLists(prev => prev.map(list =>
         list.id === newId
-          ? { ...list, yjsUpdate, todos: getTodosFromYjsUpdate(yjsUpdate) }
+          ? { ...list, yjsUpdate, ...yjsData }
           : list
       ));
     }

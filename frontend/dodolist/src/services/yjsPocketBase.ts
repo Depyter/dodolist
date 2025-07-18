@@ -610,10 +610,29 @@ export class GlobalPocketBaseProvider {
       const latestState = Y.encodeStateAsUpdate(docInstance.doc);
       const base64Update = uint8ArrayToBase64(latestState);
       
-      await this.pb.collection(this.collectionName).update(listId, {
+      // Extract metadata from Yjs doc to update record fields
+      const ylist = docInstance.doc.getMap('list');
+      const metadataUpdate: { [key: string]: any } = {
         yjsUpdate: base64Update,
-        yjsClientId: docInstance.doc.clientID.toString()
-      }, { requestKey: null });
+        yjsClientId: docInstance.doc.clientID.toString(),
+      };
+
+      const name = (ylist.get('name') as Y.Text)?.toString();
+      if (name !== undefined) metadataUpdate.name = name;
+
+      const color = (ylist.get('color') as Y.Text)?.toString();
+      if (color !== undefined) metadataUpdate.color = color;
+
+      const pinned = ylist.get('pinned');
+      if (pinned !== undefined) metadataUpdate.pinned = pinned;
+
+      const archived = ylist.get('archived');
+      if (archived !== undefined) metadataUpdate.archived = archived;
+
+      const deleted = ylist.get('deleted');
+      if (deleted !== undefined) metadataUpdate.deleted = deleted;
+      
+      await this.pb.collection(this.collectionName).update(listId, metadataUpdate, { requestKey: null });
       
       docInstance.lastSyncTime = new Date();
       

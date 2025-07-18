@@ -336,9 +336,9 @@ export default function DodoListApp() {
   };
 
   // Clone a list (updated to use our persistence service)
-  const handleCloneList = async (listId: string) => {
+  const handleCloneList = (listId: string) => {
     try {
-      const newId = await cloneList(listId);
+      const newId = cloneList(listId);
       navigate(`/list/${newId}`);
       addNotification({
         message: "List cloned successfully.",
@@ -356,9 +356,9 @@ export default function DodoListApp() {
   };
 
   // Handle deleting a list (updated to use our persistence service)
-  const handleDeleteList = async (listId: string) => {
+  const handleDeleteList = (listId: string) => {
     try {
-      await deleteList(listId);
+      deleteList(listId);
       addNotification({
         message: "List deleted.",
         type: "info",
