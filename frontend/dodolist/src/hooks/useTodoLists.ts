@@ -1,61 +1,11 @@
-import type { Todo } from '@/lib/types';
+import type { TodoList, TodoListWithTodos } from '@/lib/types';
 import * as Y from 'yjs';
 import PocketBase from 'pocketbase';
 import { useState, useEffect, useCallback } from 'react';
 import { PB_URL } from '@/config';
 import AuthService from '@/services/authService';
 import { GlobalPocketBaseProvider } from '@/services/yjsPocketBase';
-
-// This interface should match your PocketBase collection schema
-export interface TodoList {
-  id: string;
-  user_id: string;
-  name: string;
-  color: string;
-  createdAt: string;
-  pinned?: boolean;
-  archived?: boolean;
-  yjsUpdate?: string;
-  deleted?: boolean;
-}
-
-// This interface extends TodoList to include the array of todos
-export interface TodoListWithTodos extends TodoList {
-  todos: Todo[];
-}
-
-// Helper function to convert a base64 string to a Uint8Array
-function base64ToUint8Array(base64: string): Uint8Array {
-  try {
-    const binaryString = atob(base64);
-    const len = binaryString.length;
-    const bytes = new Uint8Array(len);
-    for (let i = 0; i < len; i++) {
-      bytes[i] = binaryString.charCodeAt(i);
-    }
-    return bytes;
-  } catch (error) {
-    console.error("Failed to decode base64 string:", error);
-    return new Uint8Array();
-  }
-}
-
-// Helper function to get todos from a yjsUpdate
-const getTodosFromYjsUpdate = (yjsUpdate: string): Todo[] => {
-  if (!yjsUpdate) return [];
-  try {
-    const doc = new Y.Doc();
-    const update = base64ToUint8Array(yjsUpdate);
-    if (update.length === 0) return [];
-    Y.applyUpdate(doc, update);
-    const ylist = doc.getMap('list');
-    const ytodos = ylist.get('todos') as Y.Array<Y.Map<any>>;
-    return ytodos ? ytodos.toArray().map(t => t.toJSON() as Todo) : [];
-  } catch (error) {
-    console.error("Failed to decode yjsUpdate:", error);
-    return [];
-  }
-};
+import { base64ToUint8Array, getTodosFromYjsUpdate } from '@/lib/utils';
 
 export function useTodoLists() {
   const [pb] = useState(() => new PocketBase(PB_URL));
@@ -213,8 +163,6 @@ export function useTodoLists() {
     }
   }, [fetchLists, isInitialized]);
 
-  // --- List Management (via PocketBase REST API) ---
-
   const createNewList = useCallback((name: string, color: string) => {
     const userId = authService.getCurrentUser()?.id;
     if (!userId) throw new Error("User not authenticated");
@@ -255,9 +203,6 @@ export function useTodoLists() {
     };
     setTodoLists(prev => [newList, ...prev]);
     setActiveListId(newId);
-
-    // Do NOT create the PocketBase record here. The Yjs provider will sync/upload when online.
-    // This is now a local-first, Yjs-centric approach.
 
     return newId;
   }, [authService]);

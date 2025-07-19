@@ -52,6 +52,9 @@ import { Input } from "@/components/ui/input"
 import { Notification } from "@/components/ui/Notification"
 import SyncStatusIndicator from "@/components/SyncStatusIndicator"
 import TexturedBackground from "@/components/TexturedBackground"
+import { GlobalPocketBaseProvider } from '@/services/yjsPocketBase';
+import * as Y from 'yjs';
+import { uint8ArrayToBase64, getAllLocalYjsTodoLists } from '@/lib/utils';
 
 export default function DodoListApp() {
   const { listId } = useParams()
@@ -130,7 +133,7 @@ export default function DodoListApp() {
   const [showTaskOptions, setShowTaskOptions] = useState<string | null>(null)
   const [progressAnimating, setProgressAnimating] = useState(false)
   const [userProfile, setUserProfile] = useState<UserProfile>({
-    name: "John Doe",
+    name: "Harley Van",
     email: "john@example.com",
   })
   const [isEditingProfile, setIsEditingProfile] = useState(false)
@@ -173,17 +176,15 @@ export default function DodoListApp() {
     }
   }, [listId, activeListId, setActiveListId]);
 
-  const activeList = todoLists.find((list) => list.id === activeListId)
-  const activeColor = colors.find((color) => color.value === activeListData.color) || colors[0];
+  // Get all known local Yjs lists (decoded)
+  const allYjsLists = getAllLocalYjsTodoLists();
 
-  // Combine local yjs state with server state for a seamless experience
-  const todosToUse = useMemo(() => {
-    if (activeListId && activeListData && activeListData.todos.length > 0) {
-      return activeListData.todos;
-    }
-    return activeList?.todos || [];
-  }, [activeListId, activeListData, activeList?.todos]);
+  // Use the Yjs lists for sidebar and active list selection
+  const activeList = allYjsLists.find((list) => list.id === activeListId);
+  const activeColor = colors.find((color) => color.value === activeList?.color) || colors[0];
 
+  // Use the Yjs todos for the active list
+  const todosToUse = activeList ? activeList.todos : [];
   const activeTodos = todosToUse.filter((todo) => !todo.completed)
   const completedTodos = todosToUse.filter((todo) => todo.completed)
 
@@ -870,24 +871,37 @@ export default function DodoListApp() {
   }
 
   const TaskCard = ({ todo, isCompleted = false }: { todo: Todo; isCompleted?: boolean }) => {
-    const isDueTodayTask = todo.deadline && isDueToday(todo.deadline)
+    // Defensive: fallback to a default color if activeList or color is missing
+    const colorClass = (activeList && typeof activeList.color === 'string')
+      ? activeList.color.replace("bg-", "text-")
+      : "text-blue-500";
+    const borderClass = (activeColor && typeof activeColor.border === 'string') ? activeColor.border : "border-slate-200";
+    const lightClass = (activeColor && typeof activeColor.light === 'string') ? activeColor.light : "bg-slate-50";
+
+    // Defensive: ensure todo fields are present and of correct type
+    const todoText = typeof todo.text === 'string' ? todo.text : '';
+    const recurring = typeof todo.recurring === 'string' ? todo.recurring : undefined;
+    const completed = Boolean(todo.completed);
+    const deadline = todo.deadline instanceof Date && !isNaN(todo.deadline.getTime()) ? todo.deadline : undefined;
+    const reminder = todo.reminder instanceof Date && !isNaN(todo.reminder.getTime()) ? todo.reminder : undefined;
+    const isDueTodayTask = !!deadline && isDueToday(deadline);
 
     return (
       <Card
         key={todo.id}
         className={`p-3 transition-all duration-300 hover:shadow-md will-change-transform 
           ${isCompleted
-            ? `${activeColor.light} ${activeColor.border} border opacity-60`
-            : `${activeColor.light} ${activeColor.border} border backdrop-blur-sm`}
+            ? `${lightClass} ${borderClass} border opacity-60`
+            : `${lightClass} ${borderClass} border backdrop-blur-sm`}
           ${isDueTodayTask && !isCompleted ? "border-red-500 border-2" : ""}`}
       >
         <div className="flex items-start gap-3">
           <button
-            onClick={() => handleToggleTodo(todo.id)}
+            onClick={() => todo.id && handleToggleTodo(todo.id)}
             className="mt-0.5 text-slate-400 hover:text-slate-600 transition-colors min-w-[20px]"
           >
-            {todo.completed ? (
-              <CheckCircle2 className={`w-4 h-4 ${activeList?.color.replace("bg-", "text-")}`} />
+            {completed ? (
+              <CheckCircle2 className={`w-4 h-4 ${colorClass}`} />
             ) : (
               <Circle className="w-4 h-4" />
             )}
@@ -895,37 +909,37 @@ export default function DodoListApp() {
 
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <p className={`text-slate-800 leading-snug ${todo.completed ? "line-through text-slate-400" : ""}`}>
-                {todo.text}
+              <p className={`text-slate-800 leading-snug ${completed ? "line-through text-slate-400" : ""}`}>
+                {todoText}
               </p>
-              {todo.recurring && todo.recurring !== "none" && (
+              {recurring && recurring !== "none" && (
                 <span
                   className="text-xs px-1.5 py-0.5 bg-slate-100 text-slate-600 rounded-full"
-                  title={`Repeats ${todo.recurring}`}
+                  title={`Repeats ${recurring}`}
                 >
-                  {todo.recurring}
+                  {recurring}
                 </span>
               )}
             </div>
 
-            {(todo.deadline || (todo.reminder && !todo.completed)) && (
+            {(deadline || (reminder && !completed)) && (
               <div className="flex flex-wrap gap-3 mt-1.5 text-xs">
-                {todo.deadline && (
-                  <span className={`font-medium ${getDeadlineColor(todo.deadline)}`}>
+                {deadline && (
+                  <span className={`font-medium ${getDeadlineColor(deadline)}`}>
                     Due{" "}
-                    {todo.deadline.getHours() === 0 && todo.deadline.getMinutes() === 0
-                      ? formatDateTime(todo.deadline, false)
-                      : formatDateTime(todo.deadline, true)}
-                    {isOverdue(todo.deadline) && " (Overdue)"}
-                    {isDueToday(todo.deadline) && " (Today)"}
+                    {deadline.getHours && deadline.getMinutes && deadline.getHours() === 0 && deadline.getMinutes() === 0
+                      ? formatDateTime(deadline, false)
+                      : formatDateTime(deadline, true)}
+                    {isOverdue(deadline) && " (Overdue)"}
+                    {isDueToday(deadline) && " (Today)"}
                   </span>
                 )}
-                {todo.reminder && !todo.completed && (
+                {reminder && !completed && (
                   <span className="text-slate-500">
                     Remind{" "}
-                    {todo.reminder.getHours() === 0 && todo.reminder.getMinutes() === 0
-                      ? formatDateTime(todo.reminder, false)
-                      : formatDateTime(todo.reminder, true)}
+                    {reminder.getHours && reminder.getMinutes && reminder.getHours() === 0 && reminder.getMinutes() === 0
+                      ? formatDateTime(reminder, false)
+                      : formatDateTime(reminder, true)}
                   </span>
                 )}
               </div>
@@ -937,7 +951,7 @@ export default function DodoListApp() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setShowTaskOptions(todo.id)}
+                onClick={() => todo.id && setShowTaskOptions(todo.id)}
                 className="h-7 w-7 p-0 text-slate-400 hover:text-slate-600"
                 title="Set deadline and reminder"
               >
@@ -948,7 +962,7 @@ export default function DodoListApp() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => handleDeleteTodo(todo.id)}
+              onClick={() => todo.id && handleDeleteTodo(todo.id)}
               className="text-slate-400 hover:text-red-500 hover:bg-red-50 h-7 w-7 p-0"
             >
               <Trash2 className="w-3.5 h-3.5" />
@@ -994,28 +1008,17 @@ export default function DodoListApp() {
   );
 
   // Remove legacy PocketBase state/props and use Yjs-centric state for sidebar
-  // Build yjsListDataMap for all lists (for sidebar and elsewhere)
+  // Build yjsListDataMap from all local Yjs docs (not just those in todoLists), so the sidebar shows all known local lists, even those not yet synced to PocketBase. Pass this map to AppSidebar.
   const yjsListDataMap = useMemo(() => {
-    const map: Record<string, any> = {};
-    todoLists.forEach(list => {
-      // If this is the active list, use the live Yjs state
-      if (activeListId === list.id && activeListData) {
-        map[list.id] = activeListData;
-      } else {
-        // For other lists, fallback to their last known Yjs metadata (if available)
-        // You may want to load this from IndexedDB or keep a cache in the future
-        map[list.id] = {
-          name: list.name,
-          color: list.color,
-          pinned: list.pinned,
-          archived: list.archived,
-          deleted: list.deleted,
-          todos: list.todos || [],
-        };
-      }
-    });
+    // Get all known Yjs docs from the provider
+    const provider = GlobalPocketBaseProvider.getInstance();
+    const map: Record<string, { yjsUpdate: string }> = {};
+    for (const [listId, docInstance] of (provider as any).documents.entries()) {
+      const yjsUpdate = uint8ArrayToBase64(Y.encodeStateAsUpdate(docInstance.doc));
+      map[listId] = { yjsUpdate };
+    }
     return map;
-  }, [todoLists, activeListId, activeListData]);
+  }, [/* optionally, dependencies that would change the set of local docs */]);
 
   const handleColorSelect = (colorValue: string) => {
     if (activeList) {
@@ -1030,8 +1033,7 @@ export default function DodoListApp() {
       <TexturedBackground className="absolute inset-0" intensity="normal" />
       <SidebarProvider>
         <AppSidebar
-          todoLists={todoLists}
-          yjsListDataMap={yjsListDataMap}
+          allYjsLists={allYjsLists}
           activeListId={activeListId}
           newListName={newListName}
           setNewListName={setNewListName}
@@ -1138,19 +1140,19 @@ export default function DodoListApp() {
             {activeList && (
               <>
                 {/* List Icon/Color - use Yjs metadata */}
-                {activeListData.archived ? (
+                {activeList.archived ? (
                   <Archive className={`w-3 h-3 ml-2 ${activeColor.text}`} />
-                ) : activeListData.pinned ? (
+                ) : activeList.pinned ? (
                   <Pin className={`w-3 h-3 ml-2 ${activeColor.text}`} />
                 ) : (
-                  <div className={`w-3 h-3 rounded-full ${activeListData.color} ml-2`} />
+                  <div className={`w-3 h-3 rounded-full ${activeList.color} ml-2`} />
                 )}
 
                 {/* List Name (Editable) - use Yjs metadata only */}
                 <div className="flex-1 min-w-0 max-w-xs md:max-w-md">
                   {isEditingHeader ? (
                     <Input
-                      value={editingListName !== null ? editingListName : activeListData.name}
+                      value={editingListName !== null ? editingListName : activeList.name}
                       onChange={(e) => setEditingListName(e.target.value)}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter') {
@@ -1173,22 +1175,22 @@ export default function DodoListApp() {
                     <h2
                       className="text-lg font-semibold text-slate-800 cursor-pointer truncate"
                       onClick={() => {
-                        setEditingListName(activeListData.name);
+                        setEditingListName(activeList.name);
                         setIsEditingHeader(true);
                       }}
                     >
-                      {activeListData.name || "Untitled List"}
+                      {activeList.name || "Untitled List"}
                     </h2>
                   )}
                 </div>
 
-                {activeListData.archived && <span className="text-sm text-slate-500 ml-2">(Archived)</span>}
+                {activeList.archived && <span className="text-sm text-slate-500 ml-2">(Archived)</span>}
                 {activeCount > 0 && (
                   <CircularProgress
                   percentage={totalCount > 0 ? ((totalCount - activeCount) / totalCount) * 100 : 0}
                   size={32}
                   strokeWidth={4}
-                  color={activeListData.color}
+                  color={activeList.color}
                   />
                 )}
 
@@ -1210,7 +1212,7 @@ export default function DodoListApp() {
                     <DropdownMenuContent align="end" className="bg-white/95 backdrop-blur-sm">
                       {/* Pin/Unpin */}
                       <DropdownMenuItem onClick={() => togglePinList(activeList.id)}>
-                        {activeListData.pinned ? (
+                        {activeList.pinned ? (
                           <>
                             <PinOff className="w-4 h-4 mr-2" />
                             <span>Unpin List</span>
@@ -1245,7 +1247,7 @@ export default function DodoListApp() {
                       <DropdownMenuSeparator />
                       {/* Archive/Unarchive */}
                       <DropdownMenuItem onClick={() => toggleArchiveList(activeList.id)}>
-                        {activeListData.archived ? (
+                        {activeList.archived ? (
                           <>
                             <ArchiveRestore className="w-4 h-4 mr-2" />
                             <span>Unarchive List</span>

@@ -24,10 +24,10 @@ import {
   Palette,
   Trash2,
 } from "lucide-react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { useNavigate } from 'react-router-dom'
 import AuthService from '@/services/authService'
+import type { TodoListWithTodos } from '@/lib/types'
 
 interface Color {
   name: string;
@@ -40,16 +40,6 @@ interface Color {
   texture: string;
 }
 
-interface TodoList {
-  id: string;
-  name: string;
-  color: string;
-  todos: any[];
-  createdAt: string; // Changed to string to match the hook
-  pinned?: boolean;
-  archived?: boolean;
-}
-
 interface UserProfile {
   name: string;
   email: string;
@@ -57,7 +47,7 @@ interface UserProfile {
 }
 
 interface ListMenuItemProps {
-  list: TodoList;
+  list: TodoListWithTodos;
   isActive: boolean;
   isArchived?: boolean;
   activeColor: Color;
@@ -131,8 +121,7 @@ const ListMenuItem = memo(
 ListMenuItem.displayName = "ListMenuItem";
 
 interface AppSidebarProps {
-  todoLists: TodoList[];
-  yjsListDataMap: Record<string, Partial<TodoList>>; // New prop: Yjs metadata for each list
+  allYjsLists: TodoListWithTodos[];
   activeListId: string | null;
   newListName: string;
   setNewListName: (name: string) => void;
@@ -148,8 +137,7 @@ interface AppSidebarProps {
 }
 
 const AppSidebar = memo(({
-  todoLists,
-  yjsListDataMap,
+  allYjsLists,
   activeListId,
   newListName,
   setNewListName,
@@ -175,11 +163,8 @@ const AppSidebar = memo(({
     }
   }
 
-  // Use Yjs metadata for all lists
-  const listsWithYjs = todoLists.map(list => ({
-    ...list,
-    ...yjsListDataMap[list.id],
-  }));
+  // Use allYjsLists directly (already decoded)
+  const listsWithYjs = allYjsLists;
 
   const activeList = listsWithYjs.find((list) => list.id === activeListId);
   const activeColor = colors.find((color) => color.value === activeList?.color) || colors[0];

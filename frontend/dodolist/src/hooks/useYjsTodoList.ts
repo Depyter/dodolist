@@ -1,17 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import * as Y from 'yjs';
 import { PocketBaseProvider, type SyncStatusInfo } from '@/services/yjsPocketBase';
-
-// Define the structure of a Todo item within Yjs
-export type YTodo = Y.Map<any>;
-
-// Define the structure of the entire list document
-export interface YListDoc {
-    name: Y.Text;
-    color: Y.Text;
-    todos: Y.Array<YTodo>;
-    // other metadata fields can be Y.Text, Y.Number etc.
-}
+import type { YTodo, YListDoc } from '@/lib/yjsTypes';
+import type { Todo } from '@/lib/types';
 
 export function useYjsTodoList(listId: string | null) {
     const [listData, setListData] = useState<{
@@ -75,30 +66,59 @@ export function useYjsTodoList(listId: string | null) {
         providerRef.current = newProvider;
         
         doc = newProvider.doc;
-        const ylist = doc.getMap('list') as Y.Map<any>;
+        const ylist = doc.getMap('list') as unknown as YListDoc;
+
+        function extractBool(val: any): boolean {
+            if (typeof val === 'boolean') return val;
+            if (val && typeof val.get === 'function') return val.get('value') ?? false;
+            return false;
+        }
 
         updateState = () => {
             if (!isMounted) return;
             try {
-                const ytodos = ylist.get('todos') as Y.Array<YTodo>;
-                const yname = ylist.get('name') as Y.Text;
-                const ycolor = ylist.get('color') as Y.Text;
-                const pinned = ylist.get('pinned');
-                const archived = ylist.get('archived');
-                const deleted = ylist.get('deleted');
+                // Always use Yjs Map API to get/set types
+                let ytodos = ylist.todos;
+                let yname = ylist.name;
+                let ycolor = ylist.color;
+                let pinned = ylist.pinned;
+                let archived = ylist.archived;
+                let deleted = ylist.deleted;
 
-                if (!yname) ylist.set('name', new Y.Text());
-                if (!ycolor) ylist.set('color', new Y.Text());
-                if (!ytodos) ylist.set('todos', new Y.Array());
+                // Ensure Yjs types are initialized
+                if (!(ytodos instanceof Y.Array)) {
+                    ytodos = new Y.Array();
+                    (ylist as any).todos = ytodos;
+                }
+                if (!(yname instanceof Y.Text)) {
+                    yname = new Y.Text();
+                    (ylist as any).name = yname;
+                }
+                if (!(ycolor instanceof Y.Text)) {
+                    ycolor = new Y.Text();
+                    (ylist as any).color = ycolor;
+                }
 
-                const todos = ytodos ? ytodos.toArray().map(t => t.toJSON()) : [];
+                // Deserialize todos, converting date strings to Date objects
+                const todos = ytodos
+                  ? ytodos.toArray().map(t => {
+                        const obj = t.toJSON() as Todo;
+                        return {
+                            ...obj,
+                            createdAt: obj.createdAt ? new Date(obj.createdAt) : undefined,
+                            completedAt: obj.completedAt ? new Date(obj.completedAt) : undefined,
+                            deadline: obj.deadline ? new Date(obj.deadline) : undefined,
+                            reminder: obj.reminder ? new Date(obj.reminder) : undefined,
+                        };
+                    })
+                  : [];
                 const newListData = {
                     name: yname ? yname.toString() : '',
                     color: ycolor ? ycolor.toString() : '',
                     todos,
-                    pinned: typeof pinned === 'boolean' ? pinned : false,
-                    archived: typeof archived === 'boolean' ? archived : false,
-                    deleted: typeof deleted === 'boolean' ? deleted : false,
+                    pinned: extractBool(pinned),
+                    archived: extractBool(archived),
+                    deleted: extractBool(deleted),
                 };
                 setListData(newListData);
             } catch (error) {
@@ -121,56 +141,69 @@ export function useYjsTodoList(listId: string | null) {
             cleanup();
         };
     }, [listId]);
-    
+
+    // --- Todo CRUD ---
     const addTodo = useCallback((text: string) => {
         if (!providerRef.current) return;
-        const ylist = providerRef.current.doc.getMap('list');
-        
-        if (!ylist.has('todos')) {
-            ylist.set('todos', new Y.Array());
+        const ylist = providerRef.current.doc.getMap('list') as unknown as YListDoc;
+        // Ensure todos is a Y.Array
+        let ytodos = ylist.todos;
+        if (!(ytodos instanceof Y.Array)) {
+            ytodos = new Y.Array<YTodo>();
+            (ylist as any).todos = ytodos;
         }
-        
-        const ytodos = ylist.get('todos') as Y.Array<YTodo>;
-        
-        const newTodo = new Y.Map();
-        newTodo.set('id', crypto.randomUUID());
-        newTodo.set('text', text);
-        newTodo.set('completed', false);
-        newTodo.set('createdAt', new Date().toISOString());
-
+        const todoObj: Todo = {
+            id: crypto.randomUUID(),
+            text,
+            completed: false,
+            createdAt: new Date(),
+            listId: providerRef.current ? providerRef.current.doc.guid : '',
+        };
+        // Serialize Date fields to ISO strings for Yjs
+        const yTodoObj: Record<string, any> = {
+            ...todoObj,
+            createdAt: todoObj.createdAt.toISOString(),
+        };
+        const newTodo = new Y.Map<any>(Object.entries(yTodoObj));
         providerRef.current.doc.transact(() => {
-            ytodos.push([newTodo]);
+            ytodos.push([newTodo as YTodo]);
         });
     }, []);
 
     const toggleTodo = useCallback((todoId: string) => {
         if (!providerRef.current) return;
-        const ylist = providerRef.current.doc.getMap('list');
-        const ytodos = ylist.get('todos') as Y.Array<YTodo>;
-        if (!ytodos) return;
-        
-        const todo = ytodos.toArray().find(t => t.get('id') === todoId);
+        const ylist = providerRef.current.doc.getMap('list') as unknown as YListDoc;
+        let ytodos = ylist.todos;
+        if (!(ytodos instanceof Y.Array)) {
+            ytodos = new Y.Array<YTodo>();
+            (ylist as any).todos = ytodos;
+        }
+        const todo = ytodos.toArray().find(t => String(t.get('id')) === todoId);
         if (todo) {
             providerRef.current.doc.transact(() => {
-                todo.set('completed', !todo.get('completed'));
+                const completed = Boolean(todo.get('completed'));
+                todo.set('completed', !completed);
             });
         }
     }, []);
 
-    const updateTodo = useCallback((todoId: string, updates: Partial<{ text: string; completed: boolean; [key: string]: any }>) => {
+    const updateTodo = useCallback((todoId: string, updates: Partial<Todo>) => {
         if (!providerRef.current) return;
-        const ylist = providerRef.current.doc.getMap('list');
-        const ytodos = ylist.get('todos') as Y.Array<YTodo>;
-        if (!ytodos) return;
-        
-        const todo = ytodos.toArray().find(t => t.get('id') === todoId);
+        const ylist = providerRef.current.doc.getMap('list') as unknown as YListDoc;
+        let ytodos = ylist.todos;
+        if (!(ytodos instanceof Y.Array)) {
+            ytodos = new Y.Array<YTodo>();
+            (ylist as any).todos = ytodos;
+        }
+        const todo = ytodos.toArray().find(t => String(t.get('id')) === todoId);
         if (todo) {
             providerRef.current.doc.transact(() => {
                 for (const key in updates) {
                     if (Object.prototype.hasOwnProperty.call(updates, key)) {
-                        const value = updates[key as keyof typeof updates];
+                        let value = updates[key as keyof Todo];
+                        if (value instanceof Date) value = value.toISOString();
                         if (value !== undefined) {
-                            todo.set(key, value);
+                            (todo as Y.Map<any>).set(key, value);
                         }
                     }
                 }
@@ -180,11 +213,13 @@ export function useYjsTodoList(listId: string | null) {
 
     const deleteTodo = useCallback((todoId: string) => {
         if (!providerRef.current) return;
-        const ylist = providerRef.current.doc.getMap('list');
-        const ytodos = ylist.get('todos') as Y.Array<YTodo>;
-        if (!ytodos) return;
-        
-        const todoIndex = ytodos.toArray().findIndex(t => t.get('id') === todoId);
+        const ylist = providerRef.current.doc.getMap('list') as unknown as YListDoc;
+        let ytodos = ylist.todos;
+        if (!(ytodos instanceof Y.Array)) {
+            ytodos = new Y.Array<YTodo>();
+            (ylist as any).todos = ytodos;
+        }
+        const todoIndex = ytodos.toArray().findIndex(t => String(t.get('id')) === todoId);
         if (todoIndex > -1) {
             providerRef.current.doc.transact(() => {
                 ytodos.delete(todoIndex, 1);
