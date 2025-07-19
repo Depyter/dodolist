@@ -236,8 +236,14 @@ export class GlobalPocketBaseProvider {
     if (action === 'create') {
       if (!this.documents.has(record.id)) {
         console.log(`[GlobalPocketBaseProvider] New list detected: ${record.id}. Creating local document.`);
-        this.getDocumentProvider(record.id);
+        const docProvider = this.getDocumentProvider(record.id);
+        if (record.yjsUpdate) {
+          const remoteUpdate = base64ToUint8Array(record.yjsUpdate);
+          Y.applyUpdate(docProvider.doc, remoteUpdate, 'server-create-event');
+          console.log(`[GlobalPocketBaseProvider] Applied initial state from create event for list ${record.id}`);
+        }
       }
+      this.notifyDocumentListChange();
     } else if (action === 'update') {
       this.notifyDocumentListChange();
     }
@@ -419,6 +425,7 @@ export class GlobalPocketBaseProvider {
           const remoteUpdate = base64ToUint8Array(e.record.yjsUpdate);
           Y.applyUpdate(docInstance.doc, remoteUpdate, 'server-update');
           console.log(`[GlobalPocketBaseProvider] Applied real-time update for list ${listId}`);
+          this.notifyDocumentListChange();
         }
       }, { requestKey: null });
       this.subscriptions.set(listId, listId);
