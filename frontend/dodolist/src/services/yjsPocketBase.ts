@@ -403,6 +403,8 @@ export class GlobalPocketBaseProvider {
       this.queueSync(listId, async () => {
         await this.syncDocumentToServer(listId);
       });
+      // Notify UI about local changes to ensure immediate reactivity
+      this.notifyDocumentListChange();
     };
     docInstance.doc.on('update', handleDocUpdate);
     docInstance.updateHandler = handleDocUpdate;
