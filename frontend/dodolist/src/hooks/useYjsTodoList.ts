@@ -40,6 +40,8 @@ export function useYjsTodoList(listId: string | null) {
                 doc.off('update', updateState);
             }
             if (providerRef.current) {
+                // The global provider will manage the actual document lifecycle.
+                // This just signals that this hook instance is no longer using it.
                 providerRef.current.destroy();
                 providerRef.current = null;
             }
@@ -63,7 +65,7 @@ export function useYjsTodoList(listId: string | null) {
         providerRef.current = newProvider;
         
         doc = newProvider.doc;
-        const ylist = doc.getMap('list') as Y.Map<any>;
+        const ylist = doc.getMap('list');
 
         updateState = () => {
             if (!isMounted) return;
@@ -78,9 +80,9 @@ export function useYjsTodoList(listId: string | null) {
                     name: yname instanceof Y.Text ? yname.toString() : '',
                     color: ycolor instanceof Y.Text ? ycolor.toString() : '',
                     todos,
-                    pinned: ylist.get('pinned') || false,
-                    archived: ylist.get('archived') || false,
-                    deleted: ylist.get('deleted') || false,
+                    pinned: Boolean(ylist.get('pinned')),
+                    archived: Boolean(ylist.get('archived')),
+                    deleted: Boolean(ylist.get('deleted')),
                 };
                 setListData(newListData);
             } catch (error) {
@@ -107,14 +109,17 @@ export function useYjsTodoList(listId: string | null) {
     const addTodo = useCallback((text: string) => {
         if (!providerRef.current) return;
         const ylist = providerRef.current.doc.getMap('list');
-        const ytodos = ylist.get('todos') as Y.Array<YTodo>;
-        if (!(ytodos instanceof Y.Array)) return;
-        const newTodo = new Y.Map();
-        newTodo.set('id', crypto.randomUUID());
-        newTodo.set('text', text);
-        newTodo.set('completed', false);
-        newTodo.set('createdAt', new Date().toISOString());
         providerRef.current.doc.transact(() => {
+            let ytodos = ylist.get('todos') as Y.Array<YTodo>;
+            if (!(ytodos instanceof Y.Array)) {
+                ytodos = new Y.Array<YTodo>();
+                ylist.set('todos', ytodos);
+            }
+            const newTodo = new Y.Map();
+            newTodo.set('id', crypto.randomUUID());
+            newTodo.set('text', text);
+            newTodo.set('completed', false);
+            newTodo.set('createdAt', new Date().toISOString());
             ytodos.push([newTodo as YTodo]);
         });
     }, []);
@@ -170,9 +175,12 @@ export function useYjsTodoList(listId: string | null) {
     const updateListName = useCallback((newName: string) => {
         if (!providerRef.current) return;
         const ylist = providerRef.current.doc.getMap('list');
-        const yName = ylist.get('name') as Y.Text;
-        if (!(yName instanceof Y.Text)) return;
         providerRef.current.doc.transact(() => {
+            let yName = ylist.get('name') as Y.Text;
+            if (!(yName instanceof Y.Text)) {
+                yName = new Y.Text();
+                ylist.set('name', yName);
+            }
             yName.delete(0, yName.length);
             yName.insert(0, newName);
         });
@@ -181,9 +189,12 @@ export function useYjsTodoList(listId: string | null) {
     const updateListColor = useCallback((newColor: string) => {
         if (!providerRef.current) return;
         const ylist = providerRef.current.doc.getMap('list');
-        const yColor = ylist.get('color') as Y.Text;
-        if (!(yColor instanceof Y.Text)) return;
         providerRef.current.doc.transact(() => {
+            let yColor = ylist.get('color') as Y.Text;
+            if (!(yColor instanceof Y.Text)) {
+                yColor = new Y.Text();
+                ylist.set('color', yColor);
+            }
             yColor.delete(0, yColor.length);
             yColor.insert(0, newColor);
         });
@@ -196,8 +207,11 @@ export function useYjsTodoList(listId: string | null) {
         providerRef.current.doc.transact(() => {
             Object.entries(updates).forEach(([key, value]) => {
                 if (key === 'name' || key === 'color') {
-                    const yText = ylist.get(key) as Y.Text;
-                    if (!(yText instanceof Y.Text)) return;
+                    let yText = ylist.get(key) as Y.Text;
+                    if (!(yText instanceof Y.Text)) {
+                        yText = new Y.Text();
+                        ylist.set(key, yText);
+                    }
                     yText.delete(0, yText.length);
                     yText.insert(0, value as string);
                 } else {

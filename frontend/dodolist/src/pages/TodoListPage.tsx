@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import { Card } from "@/components/ui/card"
 import { useState, useEffect, useMemo, useCallback } from "react"
@@ -41,7 +41,7 @@ import {
 import { useTodoLists } from "@/hooks/useTodoLists"
 import { useYjsTodoList } from "@/hooks/useYjsTodoList"
 import AuthService from "@/services/authService"
-import { type Todo, type UserProfile } from "@/lib/types"
+import { type Todo, type UserProfile, type TodoListWithTodos } from "@/lib/types"
 import { colors } from "@/lib/colors"
 import AppSidebar from "@/components/AppSidebar"
 import { SidebarProvider } from "@/components/ui/sidebar"
@@ -107,7 +107,6 @@ export default function DodoListApp() {
     activeListId,
     setActiveListId,
     createNewList,
-    updateList,
     deleteList,
     cloneList,
   } = useTodoLists()
@@ -176,17 +175,22 @@ export default function DodoListApp() {
     }
   }, [listId, activeListId, setActiveListId]);
 
-  // Get all known local Yjs lists (decoded) for the sidebar
-  const allYjsLists = getAllLocalYjsTodoLists();
-
   // The active list's data comes directly from the useYjsTodoList hook for reactivity.
   const activeList = useMemo(() => {
     if (!activeListId) return null;
+    // Find the active list from our state, which is kept in sync with the provider
+    const list = todoLists.find(l => l.id === activeListId);
+    if (!list || list.deleted) return null; // Don't show deleted lists
+
     return {
       id: activeListId,
-      ...activeListData,
+      ...activeListData, // This ensures we still get the live Yjs data for the active list
+      name: list.name, // But we take metadata from the snapshot
+      color: list.color,
+      pinned: list.pinned,
+      archived: list.archived,
     };
-  }, [activeListId, activeListData]);
+  }, [activeListId, activeListData, todoLists]);
 
   const activeColor = colors.find((color) => color.value === activeList?.color) || colors[0];
 
@@ -319,7 +323,7 @@ export default function DodoListApp() {
     try {
       // Pick a random color from the colors array
       const randomColor = colors[Math.floor(Math.random() * colors.length)].value;
-      const newId = await createNewList(newListName, randomColor);
+      const newId = createNewList(newListName, randomColor);
       setNewListName("");
       setShowNewListInput(false);
       navigate(`/list/${newId}`);
@@ -384,7 +388,7 @@ export default function DodoListApp() {
   const handleUpdateListName = useCallback(async (listId: string, newName: string | null) => {
     if (newName && newName.trim() !== "") {
       try {
-        await updateListMetadata({ name: newName });
+        updateListMetadata({ name: newName });
         addNotification({
           message: "List name updated.",
           type: "success",
@@ -405,7 +409,7 @@ export default function DodoListApp() {
   // Update list color (now uses Yjs metadata)
   const updateListColor = async (listId: string, newColor: string) => {
     try {
-      await updateListMetadata({ color: newColor });
+      updateListMetadata({ color: newColor });
       addNotification({
         message: "List color updated.",
         type: "success",
@@ -422,9 +426,9 @@ export default function DodoListApp() {
   };
 
   // Toggle pin list (now uses Yjs metadata)
-  const togglePinList = async (listId: string) => {
+  const togglePinList = (listId: string) => {
     try {
-      await updateListMetadata({ pinned: !activeListData.pinned });
+      updateListMetadata({ pinned: !activeListData.pinned });
       addNotification({
         message: activeListData.pinned ? "List unpinned." : "List pinned.",
         type: "success",
@@ -441,9 +445,9 @@ export default function DodoListApp() {
   };
 
   // Toggle archive list (now uses Yjs metadata)
-  const toggleArchiveList = async (listId: string) => {
+  const toggleArchiveList = (listId: string) => {
     try {
-      await updateListMetadata({ archived: !activeListData.archived });
+      updateListMetadata({ archived: !activeListData.archived });
       addNotification({
         message: activeListData.archived ? "List unarchived." : "List archived.",
         type: "success",
@@ -977,13 +981,7 @@ export default function DodoListApp() {
     )
   }
 
-  // Only set activeListId from the URL param if it changes
-  useEffect(() => {
-    if (listId && listId !== activeListId) {
-      setActiveListId(listId);
-    }
-    // Do NOT navigate here
-  }, [listId, setActiveListId]);
+  
 
   // Only redirect to the first available list if there is no listId in the URL (on initial mount)
   useEffect(() => {
@@ -1037,7 +1035,7 @@ export default function DodoListApp() {
       <TexturedBackground className="absolute inset-0" intensity="normal" />
       <SidebarProvider>
         <AppSidebar
-          allYjsLists={allYjsLists}
+          allYjsLists={todoLists}
           activeListId={activeListId}
           newListName={newListName}
           setNewListName={setNewListName}
