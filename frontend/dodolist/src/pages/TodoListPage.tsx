@@ -176,17 +176,24 @@ export default function DodoListApp() {
     }
   }, [listId, activeListId, setActiveListId]);
 
-  // Get all known local Yjs lists (decoded)
+  // Get all known local Yjs lists (decoded) for the sidebar
   const allYjsLists = getAllLocalYjsTodoLists();
 
-  // Use the Yjs lists for sidebar and active list selection
-  const activeList = allYjsLists.find((list) => list.id === activeListId);
+  // The active list's data comes directly from the useYjsTodoList hook for reactivity.
+  const activeList = useMemo(() => {
+    if (!activeListId) return null;
+    return {
+      id: activeListId,
+      ...activeListData,
+    };
+  }, [activeListId, activeListData]);
+
   const activeColor = colors.find((color) => color.value === activeList?.color) || colors[0];
 
-  // Use the Yjs todos for the active list
-  const todosToUse = activeList ? activeList.todos : [];
-  const activeTodos = todosToUse.filter((todo) => !todo.completed)
-  const completedTodos = todosToUse.filter((todo) => todo.completed)
+  // Use the todos from the reactive listData
+  const todosToUse = activeListData.todos || [];
+  const activeTodos = todosToUse.filter((todo) => !todo.completed);
+  const completedTodos = todosToUse.filter((todo) => todo.completed);
 
   // Utility function to check for valid Date
   function isValidDate(date: any): date is Date {
@@ -244,9 +251,6 @@ export default function DodoListApp() {
       setIsAddingTodo(false)
     }
   }
-
-  // Create recurring task functionality is now handled in the todoService's toggleTodo method
-  // No need to implement it here anymore
 
   // Handle task toggle (updated to directly use the hook's function)
   const handleToggleTodo = async (todoId: string) => {
