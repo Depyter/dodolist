@@ -73,7 +73,7 @@ export class GlobalPocketBaseProvider {
   private collectionName = 'task_lists';
   private isConnected = false;
   private maxRetries = 5;
-  private documentListListeners = new Set<() => void>();
+  private documentListListeners = new Set<(listId?: string) => void>();
   private collectionUnsubscribe: (() => void) | null = null;
   private isInitialFetchDone = false;
 
@@ -93,16 +93,20 @@ export class GlobalPocketBaseProvider {
     return GlobalPocketBaseProvider.instance;
   }
 
-  public onDocumentListChange(listener: () => void): () => void {
+  public onDocumentListChange(listener: (listId?: string) => void): () => void {
     this.documentListListeners.add(listener);
     return () => {
       this.documentListListeners.delete(listener);
     };
   }
 
-  private notifyDocumentListChange() {
-    console.log('[GlobalPocketBaseProvider] Notifying UI of document list change.');
-    this.documentListListeners.forEach(listener => listener());
+  private notifyDocumentListChange(listId?: string) {
+    if (listId) {
+      console.log(`[GlobalPocketBaseProvider] Notifying UI of document list change for listId: ${listId}.`);
+    } else {
+      console.log('[GlobalPocketBaseProvider] Notifying UI of document list change.');
+    }
+    this.documentListListeners.forEach(listener => listener(listId));
   }
 
   private addKnownListId(listId: string) {
@@ -245,7 +249,11 @@ export class GlobalPocketBaseProvider {
       }
       this.notifyDocumentListChange();
     } else if (action === 'update') {
-      this.notifyDocumentListChange();
+      // The per-document subscription in `connectDocument` will handle applying the Yjs update.
+      // We just notify the UI that this specific list might have changed.
+      this.notifyDocumentListChange(record.id);
+    } else if (action === 'delete') {
+      this.destroyDocument(record.id);
     }
   };
 
@@ -404,7 +412,7 @@ export class GlobalPocketBaseProvider {
         await this.syncDocumentToServer(listId);
       });
       // Notify UI about local changes to ensure immediate reactivity
-      this.notifyDocumentListChange();
+      this.notifyDocumentListChange(listId);
     };
     docInstance.doc.on('update', handleDocUpdate);
     docInstance.updateHandler = handleDocUpdate;
@@ -427,7 +435,7 @@ export class GlobalPocketBaseProvider {
           const remoteUpdate = base64ToUint8Array(e.record.yjsUpdate);
           Y.applyUpdate(docInstance.doc, remoteUpdate, 'server-update');
           console.log(`[GlobalPocketBaseProvider] Applied real-time update for list ${listId}`);
-          this.notifyDocumentListChange();
+          this.notifyDocumentListChange(listId);
         }
       }, { requestKey: null });
       this.subscriptions.set(listId, listId);
@@ -743,6 +751,10 @@ export class GlobalPocketBaseProvider {
 
   public isConnectedToServer(): boolean {
     return this.isConnected && this.pb.authStore.isValid;
+  }
+
+  public getDocument(listId: string): Y.Doc | null {
+    return this.documents.get(listId)?.doc || null;
   }
 
   public destroy() {

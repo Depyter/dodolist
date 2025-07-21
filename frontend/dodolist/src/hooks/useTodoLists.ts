@@ -1,7 +1,7 @@
 import type { TodoListWithTodos } from '@/lib/types';
 import { useState, useEffect, useCallback } from 'react';
 import { GlobalPocketBaseProvider } from '@/services/yjsPocketBase';
-import { getAllLocalYjsTodoLists } from '@/lib/utils';
+import { getAllLocalYjsTodoLists, decodeYjsListDocFromMemory } from '@/lib/utils';
 
 export function useTodoLists() {
   const [todoLists, setTodoLists] = useState<TodoListWithTodos[]>([]);
@@ -12,30 +12,44 @@ export function useTodoLists() {
   useEffect(() => {
     const provider = GlobalPocketBaseProvider.getInstance();
 
-    const handleListChange = () => {
-      console.log('[useTodoLists] List change detected, updating state.');
+    const handleListChange = (listId?: string) => {
+      console.log(`[useTodoLists] List change detected for listId: ${listId}, updating state.`);
       try {
-        const lists = getAllLocalYjsTodoLists();
-        setTodoLists(lists);
-
-        setActiveListId(prevActiveListId => {
-            const currentActiveList = lists.find(l => l.id === prevActiveListId);
-            // If there's no active list, or the active one was deleted/archived, find a new one.
-            if (!prevActiveListId || (currentActiveList && (currentActiveList.deleted || currentActiveList.archived))) {
-                const nextList = lists.find(l => !l.deleted && !l.archived) || lists.find(l => !l.deleted);
-                if (nextList) {
-                  return nextList.id;
-                } else if (lists.length > 0) {
-                  // Fallback to any list if all are archived/deleted
-                  return lists[0].id;
-                } else {
-                  // No lists exist at all
-                  return null;
-                }
+        if (listId) {
+          // Update a single list
+          const updatedList = decodeYjsListDocFromMemory(listId);
+          setTodoLists(prevLists => {
+            const listExists = prevLists.some(l => l.id === listId);
+            if (updatedList && !updatedList.deleted) {
+              // If list exists, update it, otherwise add it
+              return listExists 
+                ? prevLists.map(l => l.id === listId ? updatedList : l)
+                : [...prevLists, updatedList];
+            } else {
+              // If list is deleted or doesn't exist anymore, remove it
+              return prevLists.filter(l => l.id !== listId);
             }
-            return prevActiveListId;
-        });
-        
+          });
+        } else {
+          // Full refresh
+          const lists = getAllLocalYjsTodoLists();
+          setTodoLists(lists);
+
+          setActiveListId(prevActiveListId => {
+              const currentActiveList = lists.find(l => l.id === prevActiveListId);
+              if (!prevActiveListId || (currentActiveList && (currentActiveList.deleted || currentActiveList.archived))) {
+                  const nextList = lists.find(l => !l.deleted && !l.archived) || lists.find(l => !l.deleted);
+                  if (nextList) {
+                    return nextList.id;
+                  } else if (lists.length > 0) {
+                    return lists[0].id;
+                  } else {
+                    return null;
+                  }
+              }
+              return prevActiveListId;
+          });
+        }
         setLoading(false);
       } catch (e: any) {
         console.error("[useTodoLists] Error handling list change:", e);

@@ -137,3 +137,30 @@ export function getAllLocalYjsTodoLists(): TodoListWithTodos[] {
   }
   return lists;
 }
+
+export function decodeYjsListDocFromMemory(listId: string): TodoListWithTodos | null {
+    const provider = GlobalPocketBaseProvider.getInstance();
+    const doc = provider.getDocument(listId);
+    if (!doc) return null;
+
+    const ylist = doc.getMap("list");
+    const name = (ylist.get("name") as Y.Text)?.toString() || "";
+    const color = (ylist.get("color") as Y.Text)?.toString() || "";
+    const pinned = ylist.get("pinned") as boolean || false;
+    const archived = ylist.get("archived") as boolean || false;
+    const deleted = ylist.get("deleted") as boolean || false;
+    const ytodos = ylist.get("todos") as Y.Array<Y.Map<any>>;
+    const todos = ytodos ? ytodos.toArray().map((t) => t.toJSON() as Todo) : [];
+
+    return {
+        id: listId,
+        name,
+        color,
+        pinned,
+        archived,
+        deleted,
+        todos,
+        createdAt: '', // This info is not in the Y.Doc
+        user_id: '', // This info is not in the Y.Doc
+    };
+}

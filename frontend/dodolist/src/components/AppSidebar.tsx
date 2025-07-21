@@ -99,7 +99,7 @@ const ListMenuItem = memo(
           isActive={isActive}
           onClick={handleListClick}
           data-list-id={list.id}
-          className={`pr-12 transition-all duration-300 will-change-transform ${
+          className={`flex items-center w-full transition-all duration-300 will-change-transform ${
             isActive ? "bg-white/30 text-white font-medium shadow-sm" : `${activeColor.darkText} hover:bg-white/15`
           } ${isArchived ? "opacity-70" : ""}`}
         >
@@ -110,8 +110,15 @@ const ListMenuItem = memo(
           ) : (
             <div className={`w-3 h-3 rounded-full ${list.color} transition-all duration-300 ${isActive ? "ring-1 ring-white" : ""}`} />
           )}
-          {/* Only show the list name, no settings controls */}
           <span className="ml-2 truncate text-sm font-medium">{list.name}</span>
+          {list.todos && list.todos.filter(todo => !todo.completed).length > 0 && (
+            <span
+              className={`ml-auto text-xs font-semibold px-2 py-0.5 rounded-full \
+                ${isActive ? `${activeColor.value} text-white` : 'bg-white/20 text-white/80'}`}
+            >
+              {list.todos.filter(todo => !todo.completed).length}
+            </span>
+          )}
         </SidebarMenuButton>
       </SidebarMenuItem>
     );
