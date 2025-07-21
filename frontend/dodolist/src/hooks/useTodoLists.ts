@@ -32,20 +32,14 @@ export function useTodoLists() {
           });
         } else {
           // Full refresh
-          const lists = getAllLocalYjsTodoLists();
+          const lists = getAllLocalYjsTodoLists().filter(l => !l.deleted);
           setTodoLists(lists);
 
           setActiveListId(prevActiveListId => {
               const currentActiveList = lists.find(l => l.id === prevActiveListId);
-              if (!prevActiveListId || (currentActiveList && (currentActiveList.deleted || currentActiveList.archived))) {
-                  const nextList = lists.find(l => !l.deleted && !l.archived) || lists.find(l => !l.deleted);
-                  if (nextList) {
-                    return nextList.id;
-                  } else if (lists.length > 0) {
-                    return lists[0].id;
-                  } else {
-                    return null;
-                  }
+              if (!prevActiveListId || !currentActiveList) {
+                  const nextList = lists.find(l => !l.archived) || lists[0];
+                  return nextList ? nextList.id : null;
               }
               return prevActiveListId;
           });

@@ -247,7 +247,7 @@ export class GlobalPocketBaseProvider {
           console.log(`[GlobalPocketBaseProvider] Applied initial state from create event for list ${record.id}`);
         }
       }
-      this.notifyDocumentListChange();
+      this.notifyDocumentListChange(record.id);
     } else if (action === 'update') {
       // The per-document subscription in `connectDocument` will handle applying the Yjs update.
       // We just notify the UI that this specific list might have changed.
@@ -312,7 +312,7 @@ export class GlobalPocketBaseProvider {
 
     // The 'update' event on the doc will trigger sync.
     // We need to notify that the list of documents has changed.
-    this.notifyDocumentListChange();
+    this.notifyDocumentListChange(newId);
 
     return newId;
   }
@@ -327,7 +327,7 @@ export class GlobalPocketBaseProvider {
     const ylist = docInstance.doc.getMap('list');
     ylist.set('deleted', true);
     // The doc 'update' event will handle the rest (syncing and notifying listeners)
-    this.notifyDocumentListChange();
+    this.notifyDocumentListChange(listId);
   }
 
   public cloneList(listId: string): string {
@@ -745,7 +745,7 @@ export class GlobalPocketBaseProvider {
     docInstance.doc.destroy();
     this.documents.delete(listId);
     if (options.notify) {
-      this.notifyDocumentListChange();
+      this.notifyDocumentListChange(listId);
     }
   }
 
