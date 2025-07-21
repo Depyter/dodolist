@@ -128,6 +128,51 @@ export class GlobalPocketBaseProvider {
     }
   }
 
+  public async clearAllLocalData() {
+    console.log('[GlobalPocketBaseProvider] Clearing all local data.');
+    // 1. Disconnect and destroy all in-memory documents
+    for (const listId of Array.from(this.documents.keys())) {
+        this.destroyDocument(listId, { notify: false });
+    }
+    this.documents.clear();
+
+    // 2. Clear known list IDs from localStorage
+    const knownListIdsJson = localStorage.getItem(KNOWN_LIST_IDS_KEY);
+    localStorage.removeItem(KNOWN_LIST_IDS_KEY);
+
+    // 3. Delete IndexedDB databases
+    if (knownListIdsJson) {
+        try {
+            const knownListIds = JSON.parse(knownListIdsJson);
+            if (Array.isArray(knownListIds)) {
+                const promises = knownListIds.map(listId => {
+                    const dbName = `${DB_NAME_PREFIX}${listId}`;
+                    console.log(`[GlobalPocketBaseProvider] Deleting IndexedDB: ${dbName}`);
+                    return new Promise<void>((resolve, reject) => {
+                        const request = indexedDB.deleteDatabase(dbName);
+                        request.onsuccess = () => resolve();
+                        request.onerror = (e) => {
+                            console.error(`[GlobalPocketBaseProvider] Error deleting DB ${dbName}`, request.error);
+                            reject(request.error);
+                        };
+                        request.onblocked = () => {
+                            console.warn(`[GlobalPocketBaseProvider] Deletion of ${dbName} is blocked.`);
+                            resolve(); // Resolve anyway, page might reload.
+                        };
+                    });
+                });
+                await Promise.all(promises);
+                console.log('[GlobalPocketBaseProvider] Finished deleting local databases.');
+            }
+        } catch (e) {
+            console.error('[GlobalPocketBaseProvider] Failed to parse or delete local databases:', e);
+        }
+    }
+    
+    // 4. Notify UI of the reset
+    this.notifyDocumentListChange(); 
+  }
+
   /**
    * Initialize authentication from global state or localStorage
    */
@@ -143,7 +188,7 @@ export class GlobalPocketBaseProvider {
       this.isConnected = false;
     }
 
-    this.pb.authStore.onChange(() => {
+    this.pb.authStore.onChange(async () => {
       if (this.pb.authStore.isValid) {
         this.isConnected = true;
         this.fetchInitialLists();
@@ -153,12 +198,7 @@ export class GlobalPocketBaseProvider {
         this.isConnected = false;
         this.isInitialFetchDone = false;
         this.unsubscribeFromCollectionChanges();
-        for (const listId of Array.from(this.documents.keys())) {
-          this.destroyDocument(listId, { notify: false });
-        }
-        this.documents.clear();
-        localStorage.removeItem(KNOWN_LIST_IDS_KEY);
-        this.notifyDocumentListChange();
+        await this.clearAllLocalData();
       }
     });
   }

@@ -37,6 +37,8 @@ import {
   PinOff, // Import PinOff icon
   Copy, // Import Copy icon
   Palette, // Import Palette icon
+  UserPlus,
+  Users,
 } from "lucide-react"
 import { useTodoLists } from "@/hooks/useTodoLists"
 import { useYjsTodoList } from "@/hooks/useYjsTodoList"
@@ -59,13 +61,37 @@ import { uint8ArrayToBase64, getAllLocalYjsTodoLists } from '@/lib/utils';
 export default function DodoListApp() {
   const { listId } = useParams()
   const navigate = useNavigate()
-  const authService = new AuthService()
+  const authService = useMemo(() => new AuthService(), []);
 
   // Logout function
   const handleLogout = () => {
-    authService.logout()
-    navigate('/login')
-  }
+    authService.logout();
+    // The effect below will handle the redirect.
+  };
+
+  // Listen for auth changes and redirect if logged out
+  useEffect(() => {
+    const unsubscribe = authService.onAuthChange(() => {
+      if (!authService.isAuthenticated()) {
+        console.log('[TodoListPage] Auth state changed to unauthenticated, redirecting to login.');
+        navigate('/login', { replace: true });
+      }
+    });
+
+    // Initial check in case the page loads with an invalid token
+    if (!authService.isAuthenticated()) {
+      navigate('/login', { replace: true });
+    }
+
+    return () => {
+      unsubscribe();
+      // The authService instance has a BroadcastChannel that should be closed
+      // when the component unmounts to prevent memory leaks.
+      if (authService.destroy) {
+        authService.destroy();
+      }
+    };
+  }, [navigate, authService]);
 
   // State for persistence notification
   const [showPersistenceWarning, setShowPersistenceWarning] = useState(false)
@@ -141,6 +167,7 @@ export default function DodoListApp() {
 
   const [isEditingHeader, setIsEditingHeader] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [isShared, setIsShared] = useState(false);
 
   // --- Notification System ---
   type NotificationType = "success" | "error" | "info" | "warning";
@@ -1151,7 +1178,7 @@ export default function DodoListApp() {
                 )}
 
                 {/* List Name (Editable) - use Yjs metadata only */}
-                <div className="flex-1 min-w-0 max-w-xs md:max-w-md">
+                <div className="flex-1 min-w-0 max-w-xs md:max-w-md flex items-center gap-2">
                   {isEditingHeader ? (
                     <Input
                       value={editingListName !== null ? editingListName : activeList.name}
@@ -1197,6 +1224,19 @@ export default function DodoListApp() {
                 )}
 
                 <SyncStatusIndicator syncStatus={syncStatus} activeColor={activeColor} />
+                <button
+                  onClick={() => setIsShared(!isShared)}
+                  className="flex items-center gap-2 px-2 py-1 rounded-md border bg-slate-100 border-slate-200"
+                >
+                  {isShared ? (
+                    <Users className="w-4 h-4 text-slate-500" />
+                  ) : (
+                    <UserPlus className="w-4 h-4 text-slate-500" />
+                  )}
+                  <span className="text-xs font-medium text-slate-700 hidden sm:inline">
+                    {isShared ? "Shared" : "Share"}
+                  </span>
+                </button>
                 
                 {/* List Settings Dropdown */}
                 <div className="ml-auto flex items-center gap-1">
@@ -1292,21 +1332,21 @@ export default function DodoListApp() {
                   <div className="mb-6 animate-in fade-in-0 slide-in-from-top-4 duration-500">
                     <Card className="p-4 bg-amber-50 border-amber-200 border">
                       <div className="flex items-center gap-3">
-                        <Archive className="w-5 h-5 text-amber-600" />
-                        <div>
+                        <Archive className="w-5 h-5 text-amber-600 flex-shrink-0" />
+                        <div className="flex-1 min-w-0">
                           <h3 className="font-medium text-amber-800">This list is archived</h3>
-                          <p className="text-sm text-amber-700">
-                            You can still view and manage tasks, but this list is hidden from your main workspace.
+                          <p className="text-sm text-amber-700 truncate">
+                            It's hidden from your main workspace.
                           </p>
                         </div>
                         <Button
                           variant="outline"
                           size="sm"
                           onClick={() => toggleArchiveList(activeList.id)}
-                          className="ml-auto text-amber-700 border-amber-300 hover:bg-amber-100"
+                          className="ml-auto text-amber-700 border-amber-300 hover:bg-amber-100 flex-shrink-0"
                         >
-                          <ArchiveRestore className="w-4 h-4 mr-2" />
-                          Unarchive
+                          <ArchiveRestore className="w-4 h-4 sm:mr-2" />
+                          <span className="hidden sm:inline">Unarchive</span>
                         </Button>
                       </div>
                     </Card>

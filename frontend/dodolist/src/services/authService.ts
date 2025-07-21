@@ -26,13 +26,27 @@ export interface LoginData {
   password: string
 }
 
+const LOGOUT_CHANNEL = 'dodolist-logout';
+
 class AuthService {
   private pb: PocketBase
+  private logoutChannel: BroadcastChannel;
 
   constructor() {
     this.pb = new PocketBase(PB_URL)
     // Store the auth store globally for sharing with other PocketBase instances
     ;(window as any).__pb_auth_store = this.pb.authStore
+    this.logoutChannel = new BroadcastChannel(LOGOUT_CHANNEL);
+    this.setupLogoutListener();
+  }
+
+  private setupLogoutListener() {
+    this.logoutChannel.onmessage = (event) => {
+        if (event.data === 'logout') {
+            console.log('[AuthService] Received logout message from another tab.');
+            this.pb.authStore.clear();
+        }
+    };
   }
 
   // Register new user
@@ -82,6 +96,7 @@ class AuthService {
   // Logout user
   logout(): void {
     this.pb.authStore.clear()
+    this.logoutChannel.postMessage('logout');
   }
 
   // Check if user is authenticated
@@ -176,6 +191,10 @@ class AuthService {
   // Subscribe to auth state changes
   onAuthChange(callback: (token: string, model: any) => void): () => void {
     return this.pb.authStore.onChange(callback)
+  }
+
+  destroy() {
+    this.logoutChannel.close();
   }
 }
 
