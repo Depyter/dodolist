@@ -74,7 +74,22 @@ export function useYjsTodoList(listId: string | null) {
                 const yname = ylist.get('name') as Y.Text | undefined;
                 const ycolor = ylist.get('color') as Y.Text | undefined;
                 
-                const todos = ytodos instanceof Y.Array ? ytodos.toArray().map(t => t.toJSON()) : [];
+                const todos = ytodos instanceof Y.Array ? ytodos.toArray().map(t => {
+                    const todoData = t.toJSON();
+                    // Convert date fields from ISO strings to Date objects
+                    for (const key of ['createdAt', 'completedAt', 'deadline', 'reminder']) {
+                        if (todoData[key] && typeof todoData[key] === 'string') {
+                            const date = new Date(todoData[key]);
+                            if (!isNaN(date.getTime())) {
+                                todoData[key] = date;
+                            } else {
+                                console.warn(`[useYjsTodoList] Invalid date string for key '${key}':`, todoData[key]);
+                                delete todoData[key];
+                            }
+                        }
+                    }
+                    return todoData;
+                }) : [];
                 
                 const newListData = {
                     name: yname instanceof Y.Text ? yname.toString() : '',

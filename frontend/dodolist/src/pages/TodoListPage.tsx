@@ -53,7 +53,6 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Notification } from "@/components/ui/Notification"
 import SyncStatusIndicator from "@/components/SyncStatusIndicator"
-import TexturedBackground from "@/components/TexturedBackground"
 import { GlobalPocketBaseProvider } from '@/services/yjsPocketBase';
 import * as Y from 'yjs';
 import { uint8ArrayToBase64, getAllLocalYjsTodoLists } from '@/lib/utils';
@@ -1059,7 +1058,7 @@ export default function DodoListApp() {
   return (
     <div className={`min-h-screen relative overflow-hidden ${activeColor.light}`}>
       {/* <NotificationPortal notifications={notifications} removeNotification={removeNotification} /> */}
-      <TexturedBackground className="absolute inset-0" intensity="normal" />
+      
       <SidebarProvider>
         <AppSidebar
           allYjsLists={todoLists}
@@ -1170,9 +1169,9 @@ export default function DodoListApp() {
               <>
                 {/* List Icon/Color - use Yjs metadata */}
                 {activeList.archived ? (
-                  <Archive className={`w-3 h-3 ml-2 ${activeColor.text}`} />
+                  <Archive className={`w-4 h-4 ml-2 ${activeColor.text}`} />
                 ) : activeList.pinned ? (
-                  <Pin className={`w-3 h-3 ml-2 ${activeColor.text}`} />
+                  <Pin className={`w-4 h-4 ml-2 ${activeColor.text}`} />
                 ) : (
                   <div className={`w-3 h-3 rounded-full ${activeList.color} ml-2`} />
                 )}

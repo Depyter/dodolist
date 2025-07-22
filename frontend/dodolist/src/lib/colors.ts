@@ -1,4 +1,16 @@
-export const colors = [
+export type Color = {
+  name: string;
+  value: string;
+  light: string;
+  border: string;
+  text: string;
+  dark: string;
+  darkText: string;
+  texture: string;
+  hex: string; // Added hex property for SVG coloring
+};
+
+export const colors: Color[] = [
   {
     name: "Taupe",
     value: "bg-stone-400",
@@ -8,6 +20,7 @@ export const colors = [
     dark: "bg-gradient-to-br from-stone-500 to-stone-700",
     darkText: "text-stone-50",
     texture: "bg-stone-400/10",
+    hex: "#44403c",
   },
   {
     name: "Olive",
@@ -18,6 +31,7 @@ export const colors = [
     dark: "bg-gradient-to-br from-emerald-700 to-emerald-900",
     darkText: "text-emerald-50",
     texture: "bg-emerald-600/10",
+    hex: "#065f46",
   },
   {
     name: "Sand",
@@ -28,6 +42,7 @@ export const colors = [
     dark: "bg-gradient-to-br from-amber-400 to-amber-600",
     darkText: "text-amber-50",
     texture: "bg-amber-300/10",
+    hex: "#b45309",
   },
   {
     name: "Clay",
@@ -38,6 +53,7 @@ export const colors = [
     dark: "bg-gradient-to-br from-orange-400 to-orange-600",
     darkText: "text-orange-50",
     texture: "bg-orange-300/10",
+    hex: "#c2410c",
   },
   {
     name: "Stone",
@@ -48,6 +64,7 @@ export const colors = [
     dark: "bg-gradient-to-br from-blue-500 to-blue-700",
     darkText: "text-blue-50",
     texture: "bg-blue-400/10",
+    hex: "#1e40af",
   },
   {
     name: "Moss",
@@ -58,6 +75,7 @@ export const colors = [
     dark: "bg-gradient-to-br from-lime-500 to-lime-700",
     darkText: "text-lime-50",
     texture: "bg-lime-400/10",
+    hex: "#4d7c0f",
   },
   {
     name: "Slate",
@@ -68,6 +86,7 @@ export const colors = [
     dark: "bg-gradient-to-br from-slate-600 to-slate-800",
     darkText: "text-slate-50",
     texture: "bg-slate-500/10",
+    hex: "#334155",
   },
   {
     name: "Terracotta",
@@ -78,5 +97,6 @@ export const colors = [
     dark: "bg-gradient-to-br from-rose-500 to-rose-700",
     darkText: "text-rose-50",
     texture: "bg-rose-400/10",
+    hex: "#be123c",
   },
 ];

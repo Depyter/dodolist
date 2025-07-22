@@ -28,17 +28,8 @@ import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { useNavigate } from 'react-router-dom'
 import AuthService from '@/services/authService'
 import type { TodoListWithTodos } from '@/lib/types'
-
-interface Color {
-  name: string;
-  value: string;
-  light: string;
-  border: string;
-  text: string;
-  dark: string;
-  darkText: string;
-  texture: string;
-}
+import DodoBirdIcon from "./DodoBirdIcon";
+import type { Color } from "@/lib/colors";
 
 interface UserProfile {
   name: string;
@@ -104,9 +95,9 @@ const ListMenuItem = memo(
           } ${isArchived ? "opacity-70" : ""}`}
         >
           {isArchived ? (
-            <Archive className={`w-3 h-3 ${isActive ? "text-white" : `${activeColor.darkText}`}`} />
+            <Archive className={`w-4 h-4 ${isActive ? "text-white" : `${activeColor.darkText}`}`} />
           ) : list.pinned ? (
-            <Pin className={`w-3 h-3 ${isActive ? "text-white" : `${activeColor.darkText}`}`} />
+            <Pin className={`w-4 h-4 ${isActive ? "text-white" : `${activeColor.darkText}`}`} />
           ) : (
             <div className={`w-3 h-3 rounded-full ${list.color} transition-all duration-300 ${isActive ? "ring-1 ring-white" : ""}`} />
           )}
@@ -222,9 +213,14 @@ const AppSidebar = memo(({
       <div className="absolute inset-0 bg-black/5 z-0" />
 
       {/* Header */}
-      <SidebarHeader className="relative z-10 px-4 pt-6 pb-4 border-b border-white/15">
-        <h1 className={`text-xl font-bold tracking-tight ${activeColor.darkText}`}>DodoList</h1>
-        <p className={`text-xs mt-1 mb-4 ${activeColor.darkText} opacity-70`}>No Dodos were hurt.</p>
+      <SidebarHeader className="relative z-10 px-4 pt-6 pb-4 border-b border-white/15" style={{ background: 'rgba(0,0,0,0.05)' }}>
+        <div className="flex items-center gap-2 mb-4">
+          <DodoBirdIcon className="w-8 h-8" color={activeColor.hex} />
+          <div>
+            <h1 className={`text-xl font-bold tracking-tight ${activeColor.darkText}`}>DodoList</h1>
+            <p className={`text-xs mt-0.5 ${activeColor.darkText} opacity-70`}>No Dodos were hurt.</p>
+          </div>
+        </div>
         {/* New List Creation */}
         {showNewListInput ? (
           <div className="flex gap-2 mt-2">
