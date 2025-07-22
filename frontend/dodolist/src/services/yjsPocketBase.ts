@@ -307,9 +307,24 @@ export class GlobalPocketBaseProvider {
     console.log('[GlobalPocketBaseProvider] Offline: remote sync paused, local persistence active.');
   };
 
-  private handleOnline = () => {
+  private handleOnline = async () => {
     if (this.pb.authStore.isValid) {
       this.isConnected = true;
+      
+      await this.subscribeToCollectionChanges();
+
+      const promises = [];
+      for (const [listId, docInstance] of this.documents.entries()) {
+        const ylist = docInstance.doc.getMap('list');
+        if (ylist.get('deleted') !== true) {
+          promises.push(
+            this.forceReadMergeWrite(listId)
+              .then(() => this.connectDocument(listId))
+          );
+        }
+      }
+      await Promise.all(promises);
+
       this.processAllSyncQueues();
     }
     console.log('[GlobalPocketBaseProvider] Online: remote sync resumed.');
