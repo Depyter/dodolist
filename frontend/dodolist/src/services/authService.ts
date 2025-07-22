@@ -1,17 +1,11 @@
 import PocketBase from 'pocketbase'
 import { PB_URL } from '@/config'
 
-export interface User {
-  id: string
-  email: string
-  username: string
-  verified: boolean
-  avatar?: string
-}
+import type { UserProfile } from '@/lib/types';
 
 export interface AuthData {
   token: string
-  record: User
+  record: UserProfile
 }
 
 export interface RegisterData {
@@ -50,7 +44,7 @@ class AuthService {
   }
 
   // Register new user
-  async register(data: RegisterData): Promise<User> {
+  async register(data: RegisterData): Promise<UserProfile> {
     try {
       const record = await this.pb.collection('users').create(data)
       return {
@@ -105,7 +99,7 @@ class AuthService {
   }
 
   // Get current user
-  getCurrentUser(): User | null {
+  getCurrentUser(): UserProfile | null {
     const model = this.pb.authStore.model
     if (!model) return null
     
@@ -171,14 +165,35 @@ class AuthService {
     }
   }
 
+  // Request email change
+  async requestEmailChange(newEmail: string): Promise<void> {
+    try {
+      await this.pb.collection('users').requestEmailChange(newEmail);
+    } catch (error) {
+      console.error('Request email change error:', error);
+      throw new Error('Request to change email failed.');
+    }
+  }
+
+  // Confirm email change
+  async confirmEmailChange(token: string, newEmail: string): Promise<void> {
+    try {
+      await this.pb.collection('users').confirmEmailChange(token, newEmail);
+    } catch (error) {
+      console.error('Confirm email change error:', error);
+      throw new Error('Failed to confirm email change.');
+    }
+  }
+
   // Update user profile
-  async updateProfile(id: string, data: Partial<User>): Promise<User> {
+  async updateProfile(id: string, data: Partial<{ username: string, name: string }>): Promise<UserProfile> {
     try {
       const record = await this.pb.collection('users').update(id, data)
       return {
         id: record.id,
         email: record.email,
         username: record.username,
+        name: record.name,
         verified: record.verified,
         avatar: record.avatar
       }

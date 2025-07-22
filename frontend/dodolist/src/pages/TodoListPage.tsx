@@ -9,10 +9,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger, // Keep this
   DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-  DropdownMenuPortal,
 } from "@/components/ui/dropdown-menu" // Correct path for DropdownMenu components
 import {
   Archive,
@@ -43,7 +39,7 @@ import {
 import { useTodoLists } from "@/hooks/useTodoLists"
 import { useYjsTodoList } from "@/hooks/useYjsTodoList"
 import AuthService from "@/services/authService"
-import { type Todo, type UserProfile, type TodoListWithTodos } from "@/lib/types"
+import { type Todo, type UserProfile } from "@/lib/types"
 import { colors } from "@/lib/colors"
 import AppSidebar from "@/components/AppSidebar"
 import { SidebarProvider } from "@/components/ui/sidebar"
@@ -53,9 +49,6 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Notification } from "@/components/ui/Notification"
 import SyncStatusIndicator from "@/components/SyncStatusIndicator"
-import { GlobalPocketBaseProvider } from '@/services/yjsPocketBase';
-import * as Y from 'yjs';
-import { uint8ArrayToBase64, getAllLocalYjsTodoLists } from '@/lib/utils';
 
 export default function DodoListApp() {
   const { listId } = useParams()
@@ -144,7 +137,6 @@ export default function DodoListApp() {
     deleteTodo,
     updateTodo: updateTodoItem,
     updateListMetadata, // <-- import the new method
-    isConnected: isPocketBaseConnected,
     syncStatus, // Add this
   } = useYjsTodoList(activeListId)
 
@@ -156,12 +148,15 @@ export default function DodoListApp() {
   const [editingListName, setEditingListName] = useState<string | null>(null); // New state for editing list name
   const [showTaskOptions, setShowTaskOptions] = useState<string | null>(null)
   const [progressAnimating, setProgressAnimating] = useState(false)
-  const [userProfile, setUserProfile] = useState<UserProfile>({
-    name: "Harley Van",
-    email: "john@example.com",
-  })
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [isEditingProfile, setIsEditingProfile] = useState(false)
-  const [tempProfile, setTempProfile] = useState<UserProfile>(userProfile)
+
+  useEffect(() => {
+    const currentUser = authService.getCurrentUser();
+    if (currentUser) {
+      setUserProfile(currentUser);
+    }
+  }, []);
   const [showCompleted, setShowCompleted] = useState(true)
 
   const [isEditingHeader, setIsEditingHeader] = useState(false);
@@ -1035,19 +1030,6 @@ export default function DodoListApp() {
     </div>
   );
 
-  // Remove legacy PocketBase state/props and use Yjs-centric state for sidebar
-  // Build yjsListDataMap from all local Yjs docs (not just those in todoLists), so the sidebar shows all known local lists, even those not yet synced to PocketBase. Pass this map to AppSidebar.
-  const yjsListDataMap = useMemo(() => {
-    // Get all known Yjs docs from the provider
-    const provider = GlobalPocketBaseProvider.getInstance();
-    const map: Record<string, { yjsUpdate: string }> = {};
-    for (const [listId, docInstance] of (provider as any).documents.entries()) {
-      const yjsUpdate = uint8ArrayToBase64(Y.encodeStateAsUpdate(docInstance.doc));
-      map[listId] = { yjsUpdate };
-    }
-    return map;
-  }, [/* optionally, dependencies that would change the set of local docs */]);
-
   const handleColorSelect = (colorValue: string) => {
     if (activeList) {
       updateListMetadata({ color: colorValue });
@@ -1070,9 +1052,10 @@ export default function DodoListApp() {
           isAddingList={isAddingList}
           createNewList={handleCreateNewList}
           colors={colors}
-          userProfile={userProfile}
+          userProfile={userProfile!}
           isEditingProfile={isEditingProfile}
           setIsEditingProfile={setIsEditingProfile}
+          setUserProfile={setUserProfile}
           onLogout={handleLogout}
         />
         <SidebarInset className="h-svh flex flex-col">

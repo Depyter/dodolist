@@ -12,8 +12,11 @@ export interface Todo {
 }
 
 export interface UserProfile {
-  name: string;
+  id: string;
   email: string;
+  username: string;
+  name?: string;
+  verified: boolean;
   avatar?: string;
 }
 

@@ -9,7 +9,6 @@ html, body {
 
 @import "tailwindcss";
 @import "tw-animate-css";
-@import "./components/ui/noise-texture.css";
 
 @custom-variant dark (&:is(.dark *));
 

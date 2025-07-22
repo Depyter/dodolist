@@ -24,18 +24,13 @@ import {
   Palette,
   Trash2,
 } from "lucide-react";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 import { useNavigate } from 'react-router-dom'
 import AuthService from '@/services/authService'
-import type { TodoListWithTodos } from '@/lib/types'
+import type { TodoListWithTodos, UserProfile } from '@/lib/types'
 import DodoBirdIcon from "./DodoBirdIcon";
 import type { Color } from "@/lib/colors";
-
-interface UserProfile {
-  name: string;
-  email: string;
-  avatar?: string;
-}
 
 interface ListMenuItemProps {
   list: TodoListWithTodos;
@@ -129,6 +124,7 @@ interface AppSidebarProps {
   createNewList: () => void;
   colors: Color[];
   userProfile: UserProfile;
+  setUserProfile: (profile: UserProfile) => void;
   isEditingProfile: boolean;
   setIsEditingProfile: (editing: boolean) => void;
   onLogout?: () => void;
@@ -145,12 +141,18 @@ const AppSidebar = memo(({
   createNewList,
   colors,
   userProfile,
+  setUserProfile,
   isEditingProfile,
   setIsEditingProfile,
   onLogout
 }: AppSidebarProps) => {
   const navigate = useNavigate()
   const [authService] = useState(() => new AuthService())
+  const [tempProfile, setTempProfile] = useState<UserProfile | null>(userProfile);
+
+  useEffect(() => {
+    setTempProfile(userProfile);
+  }, [userProfile]);
 
   const handleLogout = () => {
     if (onLogout) {
@@ -160,6 +162,30 @@ const AppSidebar = memo(({
       navigate('/login')
     }
   }
+
+  const handleProfileSave = async () => {
+    if (userProfile && tempProfile) {
+      try {
+        // Update username/name
+        if (tempProfile.username !== userProfile.username || tempProfile.name !== userProfile.name) {
+          await authService.updateProfile(userProfile.id, {
+            username: tempProfile.username,
+            name: tempProfile.name,
+          });
+        }
+        // Request email change if email is different
+        if (tempProfile.email !== userProfile.email) {
+          await authService.requestEmailChange(tempProfile.email);
+          // Optionally, inform the user to check their email to confirm the change.
+        }
+        setUserProfile(tempProfile);
+        setIsEditingProfile(false);
+      } catch (error) {
+        console.error("Failed to update profile:", error);
+        // Handle error (e.g., show a notification to the user)
+      }
+    }
+  };
 
   // Use allYjsLists directly (already decoded)
   const listsWithYjs = allYjsLists;
@@ -329,8 +355,55 @@ const AppSidebar = memo(({
                   <span className={`text-sm ${activeColor.darkText}`}>{userProfile?.name || "User"}</span>
                 </SidebarMenuButton>
               </DialogTrigger>
-              <DialogContent>
-                {/* Profile editing form can go here */}
+              <DialogContent className="bg-white rounded-lg shadow-xl">
+                <DialogHeader>
+                  <DialogTitle>Edit Profile</DialogTitle>
+                  <DialogDescription>
+                    Manage your account settings.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="name" className="text-right">
+                      Name
+                    </Label>
+                    <Input
+                      id="name"
+                      value={tempProfile?.name || ''}
+                      onChange={(e) => setTempProfile(prev => prev ? { ...prev, name: e.target.value } : null)}
+                      className="col-span-3"
+                    />
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="username" className="text-right">
+                      Username
+                    </Label>
+                    <Input
+                      id="username"
+                      value={tempProfile?.username || ''}
+                      onChange={(e) => setTempProfile(prev => prev ? { ...prev, username: e.target.value } : null)}
+                      className="col-span-3"
+                    />
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="email" className="text-right">
+                      Email
+                    </Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={tempProfile?.email || ''}
+                      onChange={(e) => setTempProfile(prev => prev ? { ...prev, email: e.target.value } : null)}
+                      className="col-span-3"
+                    />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button onClick={() => setIsEditingProfile(false)} variant="outline">Cancel</Button>
+                  <Button onClick={handleProfileSave}>
+                    Save changes
+                  </Button>
+                </DialogFooter>
               </DialogContent>
             </Dialog>
           </SidebarMenuItem>
