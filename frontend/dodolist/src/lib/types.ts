@@ -26,6 +26,8 @@ export interface PocketBaseTaskListRecord {
   createdAt: string; // Required
   yjsUpdate?: string; // Optional, plain text value
   yjsClientId?: string; // Optional, plain text value
+  shared_with?: Array<string>
+  collaborators?: Array<string>
 }
 
 export interface TodoList {
@@ -38,6 +40,9 @@ export interface TodoList {
   archived?: boolean;
   yjsUpdate?: string;
   deleted?: boolean;
+  shared_with?: string[];
+  collaborators?: string[];
+  readOnly?: boolean;
 }
 
 export interface TodoListWithTodos extends TodoList {

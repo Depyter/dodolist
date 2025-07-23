@@ -136,7 +136,7 @@ export function useYjsTodoList(listId: string | null) {
             newTodo.set('completed', false);
             newTodo.set('createdAt', new Date().toISOString());
             ytodos.push([newTodo as YTodo]);
-        });
+        }, 'user');
     }, []);
 
     const toggleTodo = useCallback((todoId: string) => {
@@ -149,7 +149,7 @@ export function useYjsTodoList(listId: string | null) {
             providerRef.current.doc.transact(() => {
                 const completed = Boolean(todo.get('completed'));
                 todo.set('completed', !completed);
-            });
+            }, 'user');
         }
     }, []);
 
@@ -170,7 +170,7 @@ export function useYjsTodoList(listId: string | null) {
                         }
                     }
                 }
-            });
+            }, 'user');
         }
     }, []);
 
@@ -183,7 +183,7 @@ export function useYjsTodoList(listId: string | null) {
         if (todoIndex > -1) {
             providerRef.current.doc.transact(() => {
                 ytodos.delete(todoIndex, 1);
-            });
+            }, 'user');
         }
     }, []);
 
@@ -198,7 +198,7 @@ export function useYjsTodoList(listId: string | null) {
             }
             yName.delete(0, yName.length);
             yName.insert(0, newName);
-        });
+        }, 'user');
     }, []);
 
     const updateListColor = useCallback((newColor: string) => {
@@ -212,7 +212,7 @@ export function useYjsTodoList(listId: string | null) {
             }
             yColor.delete(0, yColor.length);
             yColor.insert(0, newColor);
-        });
+        }, 'user');
     }, []);
 
     // Add a generic metadata update method
@@ -233,7 +233,7 @@ export function useYjsTodoList(listId: string | null) {
                     ylist.set(key, value);
                 }
             });
-        });
+        }, 'user');
     }, []);
 
     return {
@@ -247,5 +247,6 @@ export function useYjsTodoList(listId: string | null) {
         updateListMetadata,
         isConnected: syncStatus.isConnected,
         syncStatus,
+        readOnly: providerRef.current?.readOnly ?? false,
     };
 }

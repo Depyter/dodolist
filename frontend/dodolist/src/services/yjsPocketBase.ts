@@ -5,7 +5,7 @@ import { PB_URL } from '@/config';
 import type { PocketBaseTaskListRecord, TodoListWithTodos } from "@/lib/types";
 
 const DB_NAME_PREFIX = 'dodolist-yjs-';
-const KNOWN_LIST_IDS_KEY = 'dodolist-known-list-ids';
+const KNOWN_LIST_IDS_KEY = 'dolist-known-list-ids';
 
 // Helper function to convert a base64 string to a Uint8Array
 function base64ToUint8Array(base64: string): Uint8Array {
@@ -49,6 +49,7 @@ interface DocumentInstance {
   retryCount: number;
   retryTimeout: NodeJS.Timeout | null;
   updateHandler?: (update: Uint8Array, origin: any) => void;
+  readOnlyStatus: boolean; // Add readOnlyStatus here
 }
 
 // Individual document provider interface for external use
@@ -58,6 +59,7 @@ export interface DocumentProvider {
   onStatusChange(listener: (status: SyncStatusInfo) => void): () => void;
   reconnect(): Promise<void>;
   destroy(): void;
+  readOnly: boolean;
 }
 
 /**
@@ -73,7 +75,7 @@ export class GlobalPocketBaseProvider {
   private collectionName = 'task_lists';
   private isConnected = false;
   private maxRetries = 5;
-  private documentListListeners = new Set<(listId?: string) => void>();
+  private documentListListeners = new Set<(listId?: string, readOnlyStatus?: boolean) => void>();
   private collectionUnsubscribe: (() => void) | null = null;
   private isInitialFetchDone = false;
 
@@ -93,20 +95,20 @@ export class GlobalPocketBaseProvider {
     return GlobalPocketBaseProvider.instance;
   }
 
-  public onDocumentListChange(listener: (listId?: string) => void): () => void {
+  public onDocumentListChange(listener: (listId?: string, readOnlyStatus?: boolean) => void): () => void {
     this.documentListListeners.add(listener);
     return () => {
       this.documentListListeners.delete(listener);
     };
   }
 
-  private notifyDocumentListChange(listId?: string) {
+  private notifyDocumentListChange(listId?: string, readOnlyStatus?: boolean) {
     if (listId) {
-      console.log(`[GlobalPocketBaseProvider] Notifying UI of document list change for listId: ${listId}.`);
+      console.log(`[GlobalPocketBaseProvider] Notifying UI of document list change for listId: ${listId}. ReadOnly: ${readOnlyStatus}`);
     } else {
       console.log('[GlobalPocketBaseProvider] Notifying UI of document list change.');
     }
-    this.documentListListeners.forEach(listener => listener(listId));
+    this.documentListListeners.forEach(listener => listener(listId, readOnlyStatus));
   }
 
   private addKnownListId(listId: string) {
@@ -212,9 +214,9 @@ export class GlobalPocketBaseProvider {
     console.log(`[GlobalPocketBaseProvider] Fetching initial lists for user ${userId}...`);
 
     try {
+      // The view rule on PocketBase handles the filtering. We just fetch all lists we can see.
       const records = await this.pb.collection(this.collectionName).getFullList({
-        filter: `user_id = "${userId}"`,
-        requestKey: null
+        requestKey: null // No filter needed, relies on the collection's view rule
       });
 
       console.log(`[GlobalPocketBaseProvider] Found ${records.length} lists on server.`);
@@ -286,12 +288,13 @@ export class GlobalPocketBaseProvider {
           Y.applyUpdate(docProvider.doc, remoteUpdate, 'server-create-event');
           console.log(`[GlobalPocketBaseProvider] Applied initial state from create event for list ${record.id}`);
         }
+        // After creating the document, notify with its readOnly status
+        this.notifyDocumentListChange(record.id, this.documents.get(record.id)?.readOnlyStatus);
       }
-      this.notifyDocumentListChange(record.id);
     } else if (action === 'update') {
       // The per-document subscription in `connectDocument` will handle applying the Yjs update.
       // We just notify the UI that this specific list might have changed.
-      this.notifyDocumentListChange(record.id);
+      this.notifyDocumentListChange(record.id, this.documents.get(record.id)?.readOnlyStatus);
     } else if (action === 'delete') {
       this.destroyDocument(record.id);
     }
@@ -341,7 +344,8 @@ export class GlobalPocketBaseProvider {
       getSyncStatus: () => this.getSyncStatus(listId),
       onStatusChange: (listener: (status: SyncStatusInfo) => void) => this.onStatusChange(listId, listener),
       reconnect: () => this.reconnectDocument(listId),
-      destroy: () => this.destroyDocument(listId)
+      destroy: () => this.destroyDocument(listId),
+      readOnly: docInstance.readOnlyStatus,
     };
   }
 
@@ -439,7 +443,8 @@ export class GlobalPocketBaseProvider {
       lastSyncTime: null,
       statusListeners: new Set(),
       retryCount: 0,
-      retryTimeout: null
+      retryTimeout: null,
+      readOnlyStatus: false
     };
     this.documents.set(listId, docInstance);
     this.setupDocumentHandlers(listId, docInstance);
@@ -456,7 +461,7 @@ export class GlobalPocketBaseProvider {
 
   private setupDocumentHandlers(listId: string, docInstance: DocumentInstance) {
     const handleDocUpdate = (_update: Uint8Array, origin: any) => {
-      if (origin === 'server-init' || origin === 'server-update' || origin === 'server-merge' || origin === 'server-reconnect') {
+      if (origin !== 'user') {
         return;
       }
       console.log(`[GlobalPocketBaseProvider] Local document updated for list ${listId}, origin: ${origin}`);
@@ -505,16 +510,37 @@ export class GlobalPocketBaseProvider {
   private async mergeRemoteState(listId: string) {
     try {
       const docInstance = this.documents.get(listId);
-      if (!docInstance) {
-        console.warn(`[GlobalPocketBaseProvider] Cannot merge remote state, document instance not found for list ${listId}`);
-        return;
-      }
-      const remoteDoc = await this.pb.collection(this.collectionName).getOne(listId, { requestKey: null });
+      if (!docInstance) return;
+      const remoteDoc = await this.pb.collection(this.collectionName).getOne(listId, { requestKey: null, expand: 'collaborators' });
+      const userId = this.pb.authStore.model?.id;
+
       if (remoteDoc.yjsUpdate) {
+        const beforeSV = Y.encodeStateVector(docInstance.doc);
         const remoteUpdate = base64ToUint8Array(remoteDoc.yjsUpdate);
         Y.applyUpdate(docInstance.doc, remoteUpdate, 'server-init');
-        console.log(`[GlobalPocketBaseProvider] Merged remote state for list ${listId}`);
+        const afterSV = Y.encodeStateVector(docInstance.doc);
+        const changed = !areUint8ArraysEqual(beforeSV, afterSV);
+        if (changed) {
+          console.log(`[GlobalPocketBaseProvider] Merged remote state for list ${listId} (local doc changed)`);
+        } else {
+          console.log(`[GlobalPocketBaseProvider] Merged remote state for list ${listId} (no local change)`);
+        }
+        // Only queue sync if changed
+        if (changed) {
+          this.queueSync(listId, () => this.syncDocumentToServer(listId));
+        }
       }
+
+      // After applying the update, set the readOnly status on the Yjs doc itself.
+      if (userId) {
+        const isOwner = remoteDoc.user_id === userId;
+        const isCollaborator = remoteDoc.collaborators?.includes(userId);
+        const readOnly = !isOwner && !isCollaborator;
+        docInstance.readOnlyStatus = readOnly;
+        console.log(`[GlobalPocketBaseProvider] Set readOnly status for list ${listId} to ${readOnly}`);
+        this.notifyDocumentListChange(listId); // Notify to trigger UI update
+      }
+
     } catch (error) {
       console.error(`[GlobalPocketBaseProvider] Failed to merge remote state for list ${listId}:`, error);
     }
@@ -524,13 +550,10 @@ export class GlobalPocketBaseProvider {
     try {
       console.log(`[GlobalPocketBaseProvider] Forcing read-merge-write for list ${listId}`);
       const docInstance = this.documents.get(listId);
-      if (!docInstance) {
-        console.warn(`[GlobalPocketBaseProvider] Cannot force sync, document instance not found for list ${listId}`);
-        return;
-      }
+      if (!docInstance) return;
       let remoteDoc: any = null;
       try {
-        remoteDoc = await this.pb.collection(this.collectionName).getOne(listId, { requestKey: null });
+        remoteDoc = await this.pb.collection(this.collectionName).getOne(listId, { requestKey: null, expand: 'collaborators' });
       } catch (error: any) {
         if (error?.status === 404) {
           const ylist = docInstance.doc.getMap('list');
@@ -564,12 +587,18 @@ export class GlobalPocketBaseProvider {
         }
       }
       if (remoteDoc && remoteDoc.yjsUpdate) {
+        const beforeSV = Y.encodeStateVector(docInstance.doc);
         const remoteUpdate = base64ToUint8Array(remoteDoc.yjsUpdate);
-        Y.applyUpdate(docInstance.doc, remoteUpdate, 'server-reconnect');
-        console.log(`[GlobalPocketBaseProvider] Merged remote state for list ${listId}`);
+        Y.applyUpdate(docInstance.doc, remoteUpdate, 'server-merge');
+        const afterSV = Y.encodeStateVector(docInstance.doc);
+        const changed = !areUint8ArraysEqual(beforeSV, afterSV);
+        if (changed) {
+          console.log(`[GlobalPocketBaseProvider] Queuing sync-to-server after merge for list ${listId}`);
+          this.queueSync(listId, () => this.syncDocumentToServer(listId));
+        } else {
+          console.log(`[GlobalPocketBaseProvider] Merge for list ${listId} resulted in no local change, not queuing sync.`);
+        }
       }
-      console.log(`[GlobalPocketBaseProvider] Queuing sync-to-server after merge for list ${listId}`);
-      this.queueSync(listId, () => this.syncDocumentToServer(listId));
     } catch (error) {
       console.error(`[GlobalPocketBaseProvider] Failed to force read-merge-write for list ${listId}:`, error);
       this.updateDocumentStatus(listId, 'error');
@@ -804,6 +833,10 @@ export class GlobalPocketBaseProvider {
     }
   }
 
+  public getReadOnlyStatus(listId: string): boolean {
+    return this.documents.get(listId)?.readOnlyStatus ?? false;
+  }
+
   public isConnectedToServer(): boolean {
     return this.isConnected && this.pb.authStore.isValid;
   }
@@ -835,9 +868,8 @@ export class PocketBaseProvider implements DocumentProvider {
   private listId: string;
 
   constructor(listId: string) {
-    this.listId = listId;
     this.globalProvider = GlobalPocketBaseProvider.getInstance();
-    this.globalProvider.getDocumentProvider(this.listId);
+    this.listId = listId;
   }
 
   private get documentProvider(): DocumentProvider {
@@ -870,4 +902,17 @@ export class PocketBaseProvider implements DocumentProvider {
   isConnectedToServer(): boolean {
     return this.globalProvider.isConnectedToServer();
   }
+
+  get readOnly(): boolean {
+    return this.globalProvider.getReadOnlyStatus(this.listId);
+  }
+}
+
+// Helper function to compare two Uint8Arrays
+function areUint8ArraysEqual(a: Uint8Array, b: Uint8Array): boolean {
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i++) {
+    if (a[i] !== b[i]) return false;
+  }
+  return true;
 }

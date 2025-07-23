@@ -10,7 +10,13 @@ interface SyncStatusIndicatorProps {
 
 const SyncStatusIndicator: React.FC<SyncStatusIndicatorProps> = ({ syncStatus, activeColor }) => {
   const getStatusConfig = () => {
-    const { status, queueLength, lastSyncTime, hasError } = syncStatus;
+    const { status, queueLength, lastSyncTime } = syncStatus;
+
+    // New: Add more descriptive info about what is being synced
+    let whatIsSyncing = "";
+    if (queueLength > 0) {
+      whatIsSyncing = ` (${queueLength} change${queueLength > 1 ? 's' : ''} to tasks/lists)`;
+    }
 
     switch (status) {
       case 'synced':
@@ -18,8 +24,8 @@ const SyncStatusIndicator: React.FC<SyncStatusIndicatorProps> = ({ syncStatus, a
           icon: <CheckCircle className={`w-4 h-4 ${activeColor.text}`} />,
           label: "Synced",
           message: lastSyncTime 
-            ? `Last synced: ${lastSyncTime.toLocaleTimeString()}`
-            : "Your data is synced with the cloud.",
+            ? `Last synced: ${lastSyncTime.toLocaleTimeString()}${whatIsSyncing}`
+            : `Your data is synced with the cloud.${whatIsSyncing}`,
           className: `${activeColor.light} ${activeColor.border}`,
         };
       
@@ -28,7 +34,7 @@ const SyncStatusIndicator: React.FC<SyncStatusIndicatorProps> = ({ syncStatus, a
           icon: <Loader2 className={`w-4 h-4 animate-spin ${activeColor.text}`} />,
           label: "Syncing...",
           message: queueLength > 0 
-            ? `Syncing ${queueLength} changes...`
+            ? `Syncing ${queueLength} change${queueLength > 1 ? 's' : ''} to tasks/lists...`
             : "Syncing your latest changes.",
           className: `${activeColor.light} ${activeColor.border}`,
         };
@@ -38,7 +44,7 @@ const SyncStatusIndicator: React.FC<SyncStatusIndicatorProps> = ({ syncStatus, a
           icon: <AlertTriangle className="w-4 h-4 text-red-500" />,
           label: "Error",
           message: queueLength > 0
-            ? `Failed to sync ${queueLength} changes. Will retry automatically.`
+            ? `Failed to sync ${queueLength} change${queueLength > 1 ? 's' : ''} to tasks/lists. Will retry automatically.`
             : "Sync error occurred. Will retry automatically.",
           className: "bg-red-50 border-red-200",
         };
@@ -49,7 +55,7 @@ const SyncStatusIndicator: React.FC<SyncStatusIndicatorProps> = ({ syncStatus, a
           icon: <CloudOff className="w-4 h-4 text-slate-500" />,
           label: "Offline",
           message: queueLength > 0
-            ? `You are offline. ${queueLength} changes saved locally.`
+            ? `You are offline. ${queueLength} change${queueLength > 1 ? 's' : ''} to tasks/lists saved locally.`
             : "You are offline. Changes are saved locally.",
           className: "bg-slate-100 border-slate-200",
         };

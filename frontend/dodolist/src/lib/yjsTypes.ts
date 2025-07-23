@@ -10,4 +10,4 @@ export interface YListDoc {
     pinned?: boolean;
     archived?: boolean;
     deleted?: boolean;
-}
+    }

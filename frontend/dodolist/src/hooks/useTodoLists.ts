@@ -12,33 +12,42 @@ export function useTodoLists() {
   useEffect(() => {
     const provider = GlobalPocketBaseProvider.getInstance();
 
+    // Remove readOnlyStatus argument
     const handleListChange = (listId?: string) => {
       console.log(`[useTodoLists] List change detected for listId: ${listId}, updating state.`);
       try {
         if (listId) {
           // Update a single list
-          const updatedList = decodeYjsListDocFromMemory(listId);
-          setTodoLists(prevLists => {
-            const listExists = prevLists.some(l => l.id === listId);
-            if (updatedList && !updatedList.deleted) {
-              // If list exists, update it, otherwise add it
-              return listExists 
-                ? prevLists.map(l => l.id === listId ? updatedList : l)
-                : [...prevLists, updatedList];
-            } else {
-              // If list is deleted or doesn't exist anymore, remove it
-              return prevLists.filter(l => l.id !== listId);
-            }
-          });
+          const baseList = decodeYjsListDocFromMemory(listId);
+          if (baseList) {
+            // Always get readOnly from provider
+            const updatedList = { ...baseList, readOnly: provider.getReadOnlyStatus(listId) };
+            setTodoLists(prevLists => {
+              const listExists = prevLists.some(l => l.id === listId);
+              if (updatedList && !updatedList.deleted) {
+                // If list exists, update it, otherwise add it
+                return listExists 
+                  ? prevLists.map(l => l.id === listId ? updatedList : l)
+                  : [...prevLists, updatedList];
+              } else {
+                // If list is deleted or doesn't exist anymore, remove it
+                return prevLists.filter(l => l.id !== listId);
+              }
+            });
+          }
         } else {
           // Full refresh
           const lists = getAllLocalYjsTodoLists().filter(l => !l.deleted);
-          setTodoLists(lists);
+          // Always get readOnly from provider for all lists
+          const listsWithReadOnly = lists.map(list => {
+            return { ...list, readOnly: provider.getReadOnlyStatus(list.id) };
+          });
+          setTodoLists(listsWithReadOnly);
 
           setActiveListId(prevActiveListId => {
-              const currentActiveList = lists.find(l => l.id === prevActiveListId);
+              const currentActiveList = listsWithReadOnly.find(l => l.id === prevActiveListId);
               if (!prevActiveListId || !currentActiveList) {
-                  const nextList = lists.find(l => !l.archived) || lists[0];
+                  const nextList = listsWithReadOnly.find(l => !l.archived) || listsWithReadOnly[0];
                   return nextList ? nextList.id : null;
               }
               return prevActiveListId;
@@ -55,7 +64,8 @@ export function useTodoLists() {
     // Initial load
     handleListChange();
 
-    const unsubscribe = provider.onDocumentListChange(handleListChange);
+    // Remove readOnlyStatus from listener
+    const unsubscribe = provider.onDocumentListChange((listId) => handleListChange(listId));
     return () => unsubscribe();
   }, []); // No dependency on activeListId, it's handled by functional update
 

@@ -138,6 +138,7 @@ export default function DodoListApp() {
     updateTodo: updateTodoItem,
     updateListMetadata, // <-- import the new method
     syncStatus, // Add this
+    readOnly, // <-- add this
   } = useYjsTodoList(activeListId)
 
   const [inputValue, setInputValue] = useState("")
@@ -199,19 +200,18 @@ export default function DodoListApp() {
   // The active list's data comes directly from the useYjsTodoList hook for reactivity.
   const activeList = useMemo(() => {
     if (!activeListId) return null;
-    // Find the active list from our state, which is kept in sync with the provider
-    const list = todoLists.find(l => l.id === activeListId);
-    if (!list || list.deleted) return null; // Don't show deleted lists
+    // Find the list snapshot from the main list state
+    const listSnapshot = todoLists.find(l => l.id === activeListId);
+    if (!listSnapshot || listSnapshot.deleted) return null; // Don't show deleted lists
 
+    // Always use the readOnly value from the provider/hook
     return {
+      ...listSnapshot,    // Start with snapshot data (like name, color, etc.)
+      ...activeListData,    // Override with live data from Yjs (todos, and latest metadata)
       id: activeListId,
-      ...activeListData, // This ensures we still get the live Yjs data for the active list
-      name: list.name, // But we take metadata from the snapshot
-      color: list.color,
-      pinned: list.pinned,
-      archived: list.archived,
+      readOnly, // <-- ensure this is always the provider's value
     };
-  }, [activeListId, activeListData, todoLists]);
+  }, [activeListId, activeListData, todoLists, readOnly]);
 
   const activeColor = colors.find((color) => color.value === activeList?.color) || colors[0];
 
@@ -240,6 +240,7 @@ export default function DodoListApp() {
     console.log("Todos to use:", todosToUse)
     console.log("Active todos:", activeTodos)
     console.log("Sorted active todos:", sortedActiveTodos)
+    console.log("Readonly Status:", activeList?.readOnly)
   }, [activeListId, activeList, todosToUse, activeTodos, sortedActiveTodos]) // Use isCollaborativeMode dependency
 
   const totalCount = todosToUse.length || 0
@@ -406,7 +407,7 @@ export default function DodoListApp() {
   };
 
   // Update list name (now uses Yjs metadata)
-  const handleUpdateListName = useCallback(async (listId: string, newName: string | null) => {
+  const handleUpdateListName = useCallback(async (newName: string | null) => {
     if (newName && newName.trim() !== "") {
       try {
         updateListMetadata({ name: newName });
@@ -428,7 +429,7 @@ export default function DodoListApp() {
   }, [updateListMetadata, addNotification]);
 
   // Update list color (now uses Yjs metadata)
-  const updateListColor = async (listId: string, newColor: string) => {
+  const updateListColor = async (newColor: string) => {
     try {
       updateListMetadata({ color: newColor });
       addNotification({
@@ -447,7 +448,7 @@ export default function DodoListApp() {
   };
 
   // Toggle pin list (now uses Yjs metadata)
-  const togglePinList = (listId: string) => {
+  const togglePinList = () => {
     try {
       updateListMetadata({ pinned: !activeListData.pinned });
       addNotification({
@@ -466,7 +467,7 @@ export default function DodoListApp() {
   };
 
   // Toggle archive list (now uses Yjs metadata)
-  const toggleArchiveList = (listId: string) => {
+  const toggleArchiveList = () => {
     try {
       updateListMetadata({ archived: !activeListData.archived });
       addNotification({
@@ -543,7 +544,7 @@ export default function DodoListApp() {
     return "text-slate-600"
   }
 
-  const TaskScheduleOverlay = ({ todo }: { todo: Todo }) => {
+  const TaskScheduleOverlay = ({ todo, readOnly = false }: { todo: Todo; readOnly?: boolean }) => {
     const [deadlineHasTime, setDeadlineHasTime] = useState(!!todo.deadline)
     const [reminderHasTime, setReminderHasTime] = useState(!!todo.reminder)
 
@@ -578,6 +579,7 @@ export default function DodoListApp() {
                   value={todo.recurring || "none"}
                   onChange={(e) => handleUpdateTodo(todo.id, { recurring: e.target.value as Todo["recurring"] })}
                   className="w-full p-2 border border-slate-200 rounded-md text-sm"
+                  disabled={readOnly}
                 >
                   <option value="none">Don't repeat</option>
                   <option value="daily">Daily</option>
@@ -621,6 +623,7 @@ export default function DodoListApp() {
                       }
                     }}
                     className="w-full"
+                    disabled={readOnly}
                   />
 
                   {todo.deadline && (
@@ -639,6 +642,7 @@ export default function DodoListApp() {
                             }
                           }}
                           className="rounded"
+                          disabled={readOnly}
                         />
                         <label htmlFor="deadline-time" className="text-sm text-slate-600">
                           Set specific time
@@ -659,6 +663,7 @@ export default function DodoListApp() {
                               }
                             }}
                             className="w-full"
+                            disabled={readOnly}
                           />
 
                           {/* Quick time presets */}
@@ -677,6 +682,7 @@ export default function DodoListApp() {
                                   }
                                 }}
                                 className="text-xs h-6 px-2"
+                                disabled={readOnly}
                               >
                                 {time}
                               </Button>
@@ -735,6 +741,7 @@ export default function DodoListApp() {
                       }
                     }}
                     className="w-full"
+                    disabled={readOnly}
                   />
 
                   {todo.reminder && (
@@ -753,6 +760,7 @@ export default function DodoListApp() {
                             }
                           }}
                           className="rounded"
+                          disabled={readOnly}
                         />
                         <label htmlFor="reminder-time" className="text-sm text-slate-600">
                           Set specific time
@@ -773,8 +781,9 @@ export default function DodoListApp() {
                               }
                             }}
                             className="w-full"
+                            disabled={readOnly}
                           />
-
+                            
                           {/* Quick time presets */}
                           <div className="flex flex-wrap gap-1">
                             {["08:00", "09:00", "12:00", "18:00"].map((time) => (
@@ -791,6 +800,7 @@ export default function DodoListApp() {
                                   }
                                 }}
                                 className="text-xs h-6 px-2"
+                                disabled={readOnly}
                               >
                                 {time}
                               </Button>
@@ -831,6 +841,7 @@ export default function DodoListApp() {
                     setReminderHasTime(false)
                   }}
                   className="flex-1"
+                  disabled={readOnly}
                 >
                   Clear All
                 </Button>
@@ -899,7 +910,7 @@ export default function DodoListApp() {
     )
   }
 
-  const TaskCard = ({ todo, isCompleted = false }: { todo: Todo; isCompleted?: boolean }) => {
+  const TaskCard = ({ todo, isCompleted = false, readOnly = false }: { todo: Todo; isCompleted?: boolean; readOnly?: boolean }) => {
     // Defensive: fallback to a default color if activeList or color is missing
     const colorClass = (activeList && typeof activeList.color === 'string')
       ? activeList.color.replace("bg-", "text-")
@@ -928,6 +939,7 @@ export default function DodoListApp() {
           <button
             onClick={() => todo.id && handleToggleTodo(todo.id)}
             className="mt-0.5 text-slate-400 hover:text-slate-600 transition-colors min-w-[20px]"
+            disabled={readOnly}
           >
             {completed ? (
               <CheckCircle2 className={`w-4 h-4 ${colorClass}`} />
@@ -983,6 +995,7 @@ export default function DodoListApp() {
                 onClick={() => todo.id && setShowTaskOptions(todo.id)}
                 className="h-7 w-7 p-0 text-slate-400 hover:text-slate-600"
                 title="Set deadline and reminder"
+                disabled={readOnly}
               >
                 <Clock className="w-3.5 h-3.5" />
               </Button>
@@ -993,6 +1006,7 @@ export default function DodoListApp() {
               size="sm"
               onClick={() => todo.id && handleDeleteTodo(todo.id)}
               className="text-slate-400 hover:text-red-500 hover:bg-red-50 h-7 w-7 p-0"
+              disabled={readOnly}
             >
               <Trash2 className="w-3.5 h-3.5" />
             </Button>
@@ -1142,6 +1156,7 @@ export default function DodoListApp() {
                 activeTodos.find((t) => t.id === showTaskOptions) ||
                 completedTodos.find((t) => t.id === showTaskOptions)!
               }
+              readOnly={activeList?.readOnly}
             />
           )}
 
@@ -1167,7 +1182,7 @@ export default function DodoListApp() {
                       onChange={(e) => setEditingListName(e.target.value)}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter') {
-                          handleUpdateListName(activeList.id, editingListName);
+                          handleUpdateListName(editingListName);
                           setIsEditingHeader(false);
                         } else if (e.key === 'Escape') {
                           setEditingListName(null);
@@ -1176,7 +1191,7 @@ export default function DodoListApp() {
                         }
                       }}
                       onBlur={() => {
-                        handleUpdateListName(activeList.id, editingListName);
+                        handleUpdateListName(editingListName);
                         setIsEditingHeader(false);
                       }}
                       autoFocus
@@ -1186,6 +1201,7 @@ export default function DodoListApp() {
                     <h2
                       className="text-lg font-semibold text-slate-800 cursor-pointer truncate"
                       onClick={() => {
+                        if (activeList?.readOnly) return;
                         setEditingListName(activeList.name);
                         setIsEditingHeader(true);
                       }}
@@ -1209,8 +1225,9 @@ export default function DodoListApp() {
                 <button
                   onClick={() => setIsShared(!isShared)}
                   className="flex items-center gap-2 px-2 py-1 rounded-md border bg-slate-100 border-slate-200"
+                  disabled={activeList?.readOnly}
                 >
-                  {isShared ? (
+                  {activeList?.readOnly ? (
                     <Users className="w-4 h-4 text-slate-500" />
                   ) : (
                     <UserPlus className="w-4 h-4 text-slate-500" />
@@ -1229,13 +1246,14 @@ export default function DodoListApp() {
                         size="icon"
                         aria-label="List settings"
                         className="h-8 w-8 p-0 text-slate-600 hover:text-slate-800"
+                        disabled={activeList?.readOnly}
                       >
                         <MoreVertical className="w-4 h-4" />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="bg-white/95 backdrop-blur-sm">
                       {/* Pin/Unpin */}
-                      <DropdownMenuItem onClick={() => togglePinList(activeList.id)}>
+                      <DropdownMenuItem onClick={togglePinList}>
                         {activeList.pinned ? (
                           <>
                             <PinOff className="w-4 h-4 mr-2" />
@@ -1270,7 +1288,7 @@ export default function DodoListApp() {
                         </DropdownMenu>
                       <DropdownMenuSeparator />
                       {/* Archive/Unarchive */}
-                      <DropdownMenuItem onClick={() => toggleArchiveList(activeList.id)}>
+                      <DropdownMenuItem onClick={toggleArchiveList}>
                         {activeList.archived ? (
                           <>
                             <ArchiveRestore className="w-4 h-4 mr-2" />
@@ -1310,6 +1328,21 @@ export default function DodoListApp() {
             {activeList && (
               <>
                 {/* Archived Notice */}
+                {activeList.readOnly && (
+                  <div className="mb-6 animate-in fade-in-0 slide-in-from-top-4 duration-500">
+                    <Card className="p-4 bg-blue-50 border-blue-200 border">
+                      <div className="flex items-center gap-3">
+                        <Users className="w-5 h-5 text-blue-600 flex-shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-medium text-blue-800">This is a read-only list.</h3>
+                          <p className="text-sm text-blue-700 truncate">
+                            You can view the tasks, but you cannot edit them.
+                          </p>
+                        </div>
+                      </div>
+                    </Card>
+                  </div>
+                )}
                 {activeList.archived && (
                   <div className="mb-6 animate-in fade-in-0 slide-in-from-top-4 duration-500">
                     <Card className="p-4 bg-amber-50 border-amber-200 border">
@@ -1324,7 +1357,7 @@ export default function DodoListApp() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => toggleArchiveList(activeList.id)}
+                          onClick={() => toggleArchiveList()}
                           className="ml-auto text-amber-700 border-amber-300 hover:bg-amber-100 flex-shrink-0"
                         >
                           <ArchiveRestore className="w-4 h-4 sm:mr-2" />
@@ -1343,7 +1376,7 @@ export default function DodoListApp() {
                       className="animate-in fade-in-0 slide-in-from-top-2 duration-300 fill-mode-both"
                       style={{ animationDelay: `${index * 50}ms`, willChange: "transform, opacity" }}
                     >
-                      <TaskCard todo={todo} />
+                      <TaskCard todo={todo} readOnly={activeList?.readOnly} />
                     </div>
                   ))}
                 </div>
@@ -1389,7 +1422,7 @@ export default function DodoListApp() {
                             className="animate-in fade-in-0 slide-in-from-top-2 duration-300 fill-mode-both"
                             style={{ animationDelay: `${index * 50}ms`, willChange: "transform, opacity" }}
                           >
-                            <TaskCard todo={todo} isCompleted={true} />
+                            <TaskCard todo={todo} isCompleted={true} readOnly={activeList?.readOnly} />
                           </div>
                         ))}
                       </div>
@@ -1405,14 +1438,14 @@ export default function DodoListApp() {
                         value={inputValue}
                         onChange={(e) => setInputValue(e.target.value)}
                         onKeyPress={handleKeyPress}
-                        placeholder={`Add a task to ${activeList?.name}...`}
-                        disabled={activeList?.archived || loading}
+                        placeholder={activeList?.readOnly ? "This list is read-only" : `Add a task to ${activeList?.name}...`}
+                        disabled={activeList?.archived || loading || activeList?.readOnly}
                         className="w-full h-12 pl-4 pr-14 text-base bg-transparent border-0 focus:ring-2 focus:ring-blue-100 outline-none transition-all duration-200 placeholder-slate-400"
                         style={{ boxShadow: 'none' }}
                       />
                       <Button
                         onClick={handleAddTodo}
-                        disabled={!inputValue.trim() || activeList?.archived || isAddingTodo}
+                        disabled={!inputValue.trim() || activeList?.archived || isAddingTodo || activeList?.readOnly}
                         className={`h-12 min-w-[48px] rounded-none rounded-r-2xl ${activeList?.color} hover:opacity-90 text-white flex items-center justify-center shadow-none border-0`}
                         loading={isAddingTodo}
                         tabIndex={-1}

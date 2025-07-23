@@ -187,13 +187,16 @@ const AppSidebar = memo(({
     }
   };
 
-  // Use allYjsLists directly (already decoded)
   const listsWithYjs = allYjsLists;
 
   const activeList = listsWithYjs.find((list) => list.id === activeListId);
   const activeColor = colors.find((color) => color.value === activeList?.color) || colors[0];
-  const activeLists = listsWithYjs.filter((list) => !list.archived);
-  const archivedLists = listsWithYjs.filter((list) => list.archived);
+  
+  const ownedLists = listsWithYjs.filter(list => !list.readOnly);
+  const sharedLists = listsWithYjs.filter(list => list.readOnly);
+
+  const activeLists = ownedLists.filter((list) => !list.archived);
+  const archivedLists = ownedLists.filter((list) => list.archived);
   const pinnedLists = activeLists.filter((list) => list.pinned);
   const unpinnedLists = activeLists.filter((list) => !list.pinned);
 
@@ -328,6 +331,26 @@ const AppSidebar = memo(({
                     list={list}
                     isActive={activeListId === list.id}
                     isArchived={true}
+                    activeColor={activeColor}
+                    onListClick={handleSidebarListClick}
+                  />
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
+        {/* Shared Lists */}
+        {sharedLists.length > 0 && (
+          <SidebarGroup className="mb-2">
+            <SidebarGroupLabel className={`text-xs font-semibold uppercase tracking-wide mb-1 ${activeColor.darkText} opacity-70`}>Shared Lists</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {sharedLists.map(list => (
+                  <ListMenuItem
+                    key={list.id}
+                    list={list}
+                    isActive={activeListId === list.id}
+                    isArchived={list.archived}
                     activeColor={activeColor}
                     onListClick={handleSidebarListClick}
                   />
