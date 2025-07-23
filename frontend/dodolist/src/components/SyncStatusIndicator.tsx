@@ -1,21 +1,22 @@
 import React from "react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { CloudOff, Loader2, CheckCircle, AlertTriangle } from "lucide-react";
+import { CloudOff, Loader2, CheckCircle, AlertTriangle, WifiOff } from "lucide-react";
 import { type SyncStatusInfo } from "@/services/yjsPocketBase";
+import { Button } from "./ui/button";
 
 interface SyncStatusIndicatorProps {
   syncStatus: SyncStatusInfo;
   activeColor: { value: string; light: string; border: string; text: string; dark: string; darkText: string; texture: string; };
+  onRetry?: () => void;
 }
 
-const SyncStatusIndicator: React.FC<SyncStatusIndicatorProps> = ({ syncStatus, activeColor }) => {
+const SyncStatusIndicator: React.FC<SyncStatusIndicatorProps> = ({ syncStatus, activeColor, onRetry }) => {
   const getStatusConfig = () => {
-    const { status, queueLength, lastSyncTime } = syncStatus;
+    const { status, queueLength, lastSyncTime, canRetry } = syncStatus;
 
-    // New: Add more descriptive info about what is being synced
     let whatIsSyncing = "";
     if (queueLength > 0) {
-      whatIsSyncing = ` (${queueLength} change${queueLength > 1 ? 's' : ''} to tasks/lists)`;
+      whatIsSyncing = ` (${queueLength} change${queueLength > 1 ? 's' : ''} pending)`;
     }
 
     switch (status) {
@@ -24,8 +25,8 @@ const SyncStatusIndicator: React.FC<SyncStatusIndicatorProps> = ({ syncStatus, a
           icon: <CheckCircle className={`w-4 h-4 ${activeColor.text}`} />,
           label: "Synced",
           message: lastSyncTime 
-            ? `Last synced: ${lastSyncTime.toLocaleTimeString()}${whatIsSyncing}`
-            : `Your data is synced with the cloud.${whatIsSyncing}`,
+            ? `Last synced: ${lastSyncTime.toLocaleTimeString()}`
+            : `Your data is up-to-date.`,
           className: `${activeColor.light} ${activeColor.border}`,
         };
       
@@ -33,9 +34,7 @@ const SyncStatusIndicator: React.FC<SyncStatusIndicatorProps> = ({ syncStatus, a
         return {
           icon: <Loader2 className={`w-4 h-4 animate-spin ${activeColor.text}`} />,
           label: "Syncing...",
-          message: queueLength > 0 
-            ? `Syncing ${queueLength} change${queueLength > 1 ? 's' : ''} to tasks/lists...`
-            : "Syncing your latest changes.",
+          message: `Syncing your latest changes${whatIsSyncing}...`,
           className: `${activeColor.light} ${activeColor.border}`,
         };
       
@@ -43,20 +42,18 @@ const SyncStatusIndicator: React.FC<SyncStatusIndicatorProps> = ({ syncStatus, a
         return {
           icon: <AlertTriangle className="w-4 h-4 text-red-500" />,
           label: "Error",
-          message: queueLength > 0
-            ? `Failed to sync ${queueLength} change${queueLength > 1 ? 's' : ''} to tasks/lists. Will retry automatically.`
-            : "Sync error occurred. Will retry automatically.",
+          message: canRetry
+            ? `Connection failed. Will retry automatically.`
+            : `Could not connect to the server. Please check your internet connection or try again later.`,
           className: "bg-red-50 border-red-200",
         };
       
       case 'offline':
       default:
         return {
-          icon: <CloudOff className="w-4 h-4 text-slate-500" />,
+          icon: <WifiOff className="w-4 h-4 text-slate-500" />,
           label: "Offline",
-          message: queueLength > 0
-            ? `You are offline. ${queueLength} change${queueLength > 1 ? 's' : ''} to tasks/lists saved locally.`
-            : "You are offline. Changes are saved locally.",
+          message: `You are offline. Changes are saved locally${whatIsSyncing}.`,
           className: "bg-slate-100 border-slate-200",
         };
     }
@@ -78,8 +75,13 @@ const SyncStatusIndicator: React.FC<SyncStatusIndicatorProps> = ({ syncStatus, a
             )}
           </div>
         </TooltipTrigger>
-        <TooltipContent>
+        <TooltipContent className="flex flex-col gap-2">
           <p>{message}</p>
+          {syncStatus.status === 'error' && !syncStatus.canRetry && onRetry && (
+            <Button size="sm" onClick={onRetry} className="w-full">
+              Retry Now
+            </Button>
+          )}
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

@@ -49,6 +49,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Notification } from "@/components/ui/Notification"
 import SyncStatusIndicator from "@/components/SyncStatusIndicator"
+import { ShareDialog } from "@/components/ShareDialog"
+import { ListOptionsDropdown } from "@/components/ListOptionsDropdown"
 
 export default function DodoListApp() {
   const { listId } = useParams()
@@ -163,6 +165,7 @@ export default function DodoListApp() {
   const [isEditingHeader, setIsEditingHeader] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [isShared, setIsShared] = useState(false);
+  const [showShareDialog, setShowShareDialog] = useState(false);
 
   // --- Notification System ---
   type NotificationType = "success" | "error" | "info" | "warning";
@@ -232,16 +235,16 @@ export default function DodoListApp() {
     return a.deadline.getTime() - b.deadline.getTime()
   })
 
-  // --- Debugging ---
-  useEffect(() => {
-    console.log("Active List ID:", activeListId)
-    console.log("Active List:", activeList)
-    console.log("Active List Todos:", activeList?.todos)
-    console.log("Todos to use:", todosToUse)
-    console.log("Active todos:", activeTodos)
-    console.log("Sorted active todos:", sortedActiveTodos)
-    console.log("Readonly Status:", activeList?.readOnly)
-  }, [activeListId, activeList, todosToUse, activeTodos, sortedActiveTodos]) // Use isCollaborativeMode dependency
+  // // --- Debugging ---
+  // useEffect(() => {
+  //   console.log("Active List ID:", activeListId)
+  //   console.log("Active List:", activeList)
+  //   console.log("Active List Todos:", activeList?.todos)
+  //   console.log("Todos to use:", todosToUse)
+  //   console.log("Active todos:", activeTodos)
+  //   console.log("Sorted active todos:", sortedActiveTodos)
+  //   console.log("Readonly Status:", activeList?.readOnly)
+  // }, [activeListId, activeList, todosToUse, activeTodos, sortedActiveTodos]) // Use isCollaborativeMode dependency
 
   const totalCount = todosToUse.length || 0
   const activeCount = activeTodos.length
@@ -858,8 +861,8 @@ export default function DodoListApp() {
 
   const CircularProgress = ({
     percentage,
-    size = 40,
-    strokeWidth = 5,
+    size = 6, 
+    strokeWidth = 10,
     color = "text-blue-500",
   }: {
     percentage: number
@@ -874,9 +877,10 @@ export default function DodoListApp() {
 
     return (
       <div
-        className={`flex items-center gap-2 transition-all duration-1000 ${
+        className={`flex items-center gap-1 transition-all duration-700 ${
           progressAnimating ? "animate-pulse scale-110" : ""
         }`}
+        style={{ minWidth: size, minHeight: size }}
       >
         <div className="relative inline-flex items-center justify-center">
           <svg width={size} height={size} className="transform -rotate-90">
@@ -900,7 +904,7 @@ export default function DodoListApp() {
               strokeDashoffset={strokeDashoffset}
               className={color.replace("bg-", "text-")}
               style={{
-                transition: "stroke-dashoffset 0.3s ease-in-out",
+                transition: "stroke-dashoffset 0.7s cubic-bezier(0.4,0,0.2,1)",
               }}
             />
           </svg>
@@ -1051,10 +1055,20 @@ export default function DodoListApp() {
     setDropdownOpen(false);
   };
 
+  // Generate share URL (example: can be improved to use your backend logic)
+  const shareUrl = `${window.location.origin}/list/${activeListId}?shared=1`;
+
   return (
     <div className={`min-h-screen relative overflow-hidden ${activeColor.light}`}>
       {/* <NotificationPortal notifications={notifications} removeNotification={removeNotification} /> */}
-      
+      {/* Share Dialog */}
+      <ShareDialog
+        open={showShareDialog}
+        onOpenChange={setShowShareDialog}
+        shareUrl={shareUrl}
+        readOnly={activeList?.readOnly}
+        listId={activeListId}
+      />
       <SidebarProvider>
         <AppSidebar
           allYjsLists={todoLists}
@@ -1212,110 +1226,46 @@ export default function DodoListApp() {
                 </div>
 
                 {activeList.archived && <span className="text-sm text-slate-500 ml-2">(Archived)</span>}
-                {activeCount > 0 && (
-                  <CircularProgress
-                  percentage={totalCount > 0 ? ((totalCount - activeCount) / totalCount) * 100 : 0}
-                  size={32}
-                  strokeWidth={4}
-                  color={activeList.color}
-                  />
-                )}
-
-                <SyncStatusIndicator syncStatus={syncStatus} activeColor={activeColor} />
-                <button
-                  onClick={() => setIsShared(!isShared)}
-                  className="flex items-center gap-2 px-2 py-1 rounded-md border bg-slate-100 border-slate-200"
-                  disabled={activeList?.readOnly}
-                >
-                  {activeList?.readOnly ? (
-                    <Users className="w-4 h-4 text-slate-500" />
-                  ) : (
-                    <UserPlus className="w-4 h-4 text-slate-500" />
+                {/* Right-aligned controls */}
+                <div className="flex items-center gap-2 ml-auto">
+                  {activeCount > 0 && (
+                    <CircularProgress
+                      percentage={totalCount > 0 ? ((totalCount - activeCount) / totalCount) * 100 : 0}
+                      size={32}
+                      strokeWidth={4}
+                      color={activeList.color}
+                    />
                   )}
-                  <span className="text-xs font-medium text-slate-700 hidden sm:inline">
-                    {isShared ? "Shared" : "Share"}
-                  </span>
-                </button>
-                
-                {/* List Settings Dropdown */}
-                <div className="ml-auto flex items-center gap-1">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        aria-label="List settings"
-                        className="h-8 w-8 p-0 text-slate-600 hover:text-slate-800"
-                        disabled={activeList?.readOnly}
-                      >
-                        <MoreVertical className="w-4 h-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="bg-white/95 backdrop-blur-sm">
-                      {/* Pin/Unpin */}
-                      <DropdownMenuItem onClick={togglePinList}>
-                        {activeList.pinned ? (
-                          <>
-                            <PinOff className="w-4 h-4 mr-2" />
-                            <span>Unpin List</span>
-                          </>
-                        ) : (
-                          <>
-                            <Pin className="w-4 h-4 mr-2" />
-                            <span>Pin List</span>
-                          </>
-                        )}
-                      </DropdownMenuItem>
-                      {/* Color Palette */}
-                      <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <DropdownMenuItem>
-                              <Palette className="w-4 h-4 mr-2" />
-                              Change Color
-                            </DropdownMenuItem>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent side="right">
-                            <div className="grid grid-cols-4 gap-2 p-2">
-                              {colors.map((color) => (
-                                <button
-                                  key={color.value}
-                                  className={`w-6 h-6 rounded-full ${color.value} hover:scale-110 transition-transform`}
-                                  onClick={() => handleColorSelect(color.value)}
-                                />
-                              ))}
-                            </div>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      <DropdownMenuSeparator />
-                      {/* Archive/Unarchive */}
-                      <DropdownMenuItem onClick={toggleArchiveList}>
-                        {activeList.archived ? (
-                          <>
-                            <ArchiveRestore className="w-4 h-4 mr-2" />
-                            <span>Unarchive List</span>
-                          </>
-                        ) : (
-                          <>
-                            <Archive className="w-4 h-4 mr-2" />
-                            <span>Archive List</span>
-                          </>
-                        )}
-                      </DropdownMenuItem>
-                      {/* Clone */}
-                      <DropdownMenuItem onClick={() => handleCloneList(activeList.id)}>
-                        <Copy className="w-4 h-4 mr-2" />
-                        <span>Clone List</span>
-                      </DropdownMenuItem>
-                      {/* Delete */}
-                      <DropdownMenuItem
-                        onClick={() => handleDeleteList(activeList.id)}
-                        className="text-red-500 hover:!text-red-600 focus:!bg-red-50 focus:!text-red-600"
-                      >
-                        <Trash2 className="w-4 h-4 mr-2" />
-                        <span>Delete List</span>
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  <SyncStatusIndicator syncStatus={syncStatus} activeColor={activeColor} />
+                  <button
+                    onClick={() => setShowShareDialog(true)}
+                    className="flex items-center gap-2 px-2 py-1 rounded-md border bg-slate-100 border-slate-200"
+                    disabled={activeList?.readOnly}
+                  >
+                    {activeList?.readOnly ? (
+                      <Users className="w-4 h-4 text-slate-500" />
+                    ) : (
+                      <UserPlus className="w-4 h-4 text-slate-500" />
+                    )}
+                    <span className="text-xs font-medium text-slate-700 hidden sm:inline">
+                      {isShared ? "Shared" : "Share"}
+                    </span>
+                  </button>
+                  {/* List Settings Dropdown */}
+                  <div className="flex items-center gap-1">
+                    <ListOptionsDropdown
+                      readOnly={activeList?.readOnly}
+                      pinned={activeList.pinned}
+                      archived={activeList.archived}
+                      onPinToggle={togglePinList}
+                      onArchiveToggle={toggleArchiveList}
+                      onClone={() => handleCloneList(activeList.id)}
+                      onDelete={() => handleDeleteList(activeList.id)}
+                      onColorSelect={handleColorSelect}
+                      colors={colors}
+                      currentColor={activeList.color}
+                    />
+                  </div>
                 </div>
               </>
             )}
@@ -1324,144 +1274,141 @@ export default function DodoListApp() {
           {/* Main Content */}
           <div className="flex-1 p-6 overflow-y-auto relative bg-slate-50" key={activeListId}>
             <div className="absolute inset-0 noise-texture-subtle opacity-10"></div>
-            <div className="transition-opacity duration-300 ease-out w-full relative z-10" style={{ transitionDelay: "150ms" }}>
-            {activeList && (
-              <>
-                {/* Archived Notice */}
-                {activeList.readOnly && (
-                  <div className="mb-6 animate-in fade-in-0 slide-in-from-top-4 duration-500">
-                    <Card className="p-4 bg-blue-50 border-blue-200 border">
-                      <div className="flex items-center gap-3">
-                        <Users className="w-5 h-5 text-blue-600 flex-shrink-0" />
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-medium text-blue-800">This is a read-only list.</h3>
-                          <p className="text-sm text-blue-700 truncate">
-                            You can view the tasks, but you cannot edit them.
-                          </p>
+            <div className="flex-1 items-center flex flex-col">
+              <div className="transition-opacity duration-300 ease-out w-full relative z-10 md:max-w-6/10" style={{ transitionDelay: "150ms" }}>
+              {activeList && (
+                <>
+                  {/* Archived Notice */}
+                  {activeList.readOnly && (
+                    <div className="mb-6 animate-in fade-in-0 slide-in-from-top-4 duration-500">
+                      <Card className="p-4 bg-blue-50 border-blue-200 border">
+                        <div className="flex items-center gap-3">
+                          <Users className="w-5 h-5 text-blue-600 flex-shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-medium text-blue-800">This is a read-only list.</h3>
+                            <p className="text-sm text-blue-700 truncate">
+                              You can view the tasks, but you cannot edit them.
+                            </p>
+                          </div>
                         </div>
+                      </Card>
+                    </div>
+                  )}
+                  {activeList.archived && (
+                    <div className="mb-6 animate-in fade-in-0 slide-in-from-top-4 duration-500">
+                      <Card className="p-4 bg-amber-50 border-amber-200 border">
+                        <div className="flex items-center gap-3">
+                          <Archive className="w-5 h-5 text-amber-600 flex-shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-medium text-amber-800">This list is archived</h3>
+                            <p className="text-sm text-amber-700 truncate">
+                              It's hidden from your main workspace.
+                            </p>
+                          </div>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => toggleArchiveList()}
+                            className="ml-auto text-amber-700 border-amber-300 hover:bg-amber-100 flex-shrink-0"
+                          >
+                            <ArchiveRestore className="w-4 h-4 sm:mr-2" />
+                            <span className="hidden sm:inline">Unarchive</span>
+                          </Button>
+                        </div>
+                      </Card>
+                    </div>
+                  )}
+                  {/* Active Todo List */}
+                  <div className="space-y-2 mb-6">
+                    {sortedActiveTodos.map((todo, index) => (
+                      <div
+                        key={todo.id}
+                        className="animate-in fade-in-0 slide-in-from-top-2 duration-300 fill-mode-both"
+                        style={{ animationDelay: `${index * 50}ms`, willChange: "transform, opacity" }}
+                      >
+                        <TaskCard todo={todo} readOnly={activeList?.readOnly} />
                       </div>
-                    </Card>
+                    ))}
                   </div>
-                )}
-                {activeList.archived && (
-                  <div className="mb-6 animate-in fade-in-0 slide-in-from-top-4 duration-500">
-                    <Card className="p-4 bg-amber-50 border-amber-200 border">
-                      <div className="flex items-center gap-3">
-                        <Archive className="w-5 h-5 text-amber-600 flex-shrink-0" />
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-medium text-amber-800">This list is archived</h3>
-                          <p className="text-sm text-amber-700 truncate">
-                            It's hidden from your main workspace.
-                          </p>
+                  {/* Empty State for Active Tasks */}
+                  {activeTodos.length === 0 && (
+                    <div className="flex items-center justify-center mb-6 animate-in fade-in-0 slide-in-from-bottom-4 duration-700">
+                      <Card
+                        className={`p-8 text-center ${activeColor.light} ${activeColor.border} border max-w-md w-full`}
+                      >
+                        <div className="text-slate-400 mb-4">
+                          <CheckCircle2 className="w-12 h-12 mx-auto" />
                         </div>
+                        <h3 className={`text-lg font-medium ${activeColor.text} mb-2`}>
+                          No active tasks in {activeList.name}
+                        </h3>
+                        <p className="text-slate-500 text-sm">
+                          {activeList.archived
+                            ? "This archived list has no active tasks"
+                            : "Add your first task to get started"}
+                        </p>
+                      </Card>
+                    </div>
+                  )}
+                  {/* Completed Tasks Section */}
+                  {completedTodos.length > 0 && (
+                    <div className="mb-6">
+                      <Button
+                        variant="ghost"
+                        onClick={() => setShowCompleted(!showCompleted)}
+                        className="flex items-center gap-2 text-slate-600 hover:text-slate-800 mb-4"
+                      >
+                        {showCompleted ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+                        Completed ({completedTodos.length})
+                      </Button>
+                      {showCompleted && (
+                        <div className="space-y-2">
+                          {completedTodos.map((todo, index) => (
+                            <div
+                              key={todo.id}
+                              className="animate-in fade-in-0 slide-in-from-top-2 duration-300 fill-mode-both"
+                              style={{ animationDelay: `${index * 50}ms`, willChange: "transform, opacity" }}
+                            >
+                              <TaskCard todo={todo} isCompleted={true} readOnly={activeList?.readOnly} />
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  {/* Input Section - Always at the bottom, above all main content */}
+                  <div className="w-full max-w-2xl mx-auto z-20 sticky bottom-0 left-0 right-0 bg-transparent pointer-events-none">
+                    <Card className="border-0 shadow-none bg-transparent pointer-events-auto">
+                      <div className="flex gap-0 items-center rounded-2xl overflow-hidden bg-white/90 border border-slate-200 shadow-sm">
+                        <input
+                          value={inputValue}
+                          onChange={(e) => setInputValue(e.target.value)}
+                          onKeyPress={handleKeyPress}
+                          placeholder={activeList?.readOnly ? "This list is read-only" : `Add a task to ${activeList?.name}...`}
+                          disabled={activeList?.archived || loading || activeList?.readOnly}
+                          className="w-full h-12 pl-4 pr-14 text-base bg-transparent border-0 focus:ring-2 focus:ring-blue-100 outline-none transition-all duration-200 placeholder-slate-400"
+                          style={{ boxShadow: 'none' }}
+                        />
                         <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => toggleArchiveList()}
-                          className="ml-auto text-amber-700 border-amber-300 hover:bg-amber-100 flex-shrink-0"
+                          onClick={handleAddTodo}
+                          disabled={!inputValue.trim() || activeList?.archived || isAddingTodo || activeList?.readOnly}
+                          className={`h-12 min-w-[48px] rounded-none rounded-r-2xl ${activeList?.color} hover:opacity-90 text-white flex items-center justify-center shadow-none border-0`}
+                          loading={isAddingTodo}
+                          tabIndex={-1}
+                          type="button"
+                          style={{ boxShadow: 'none' }}
                         >
-                          <ArchiveRestore className="w-4 h-4 sm:mr-2" />
-                          <span className="hidden sm:inline">Unarchive</span>
+                          <Send className="w-5 h-5" />
                         </Button>
                       </div>
+                      {activeList?.archived && (
+                        <div className="mt-2 text-xs text-amber-600">Cannot add tasks to archived lists</div>
+                      )}
                     </Card>
                   </div>
-                )}
-
-                {/* Active Todo List */}
-                <div className="space-y-2 mb-6">
-                  {sortedActiveTodos.map((todo, index) => (
-                    <div
-                      key={todo.id}
-                      className="animate-in fade-in-0 slide-in-from-top-2 duration-300 fill-mode-both"
-                      style={{ animationDelay: `${index * 50}ms`, willChange: "transform, opacity" }}
-                    >
-                      <TaskCard todo={todo} readOnly={activeList?.readOnly} />
-                    </div>
-                  ))}
-                </div>
-
-                {/* Empty State for Active Tasks */}
-                {activeTodos.length === 0 && (
-                  <div className="flex items-center justify-center mb-6 animate-in fade-in-0 slide-in-from-bottom-4 duration-700">
-                    <Card
-                      className={`p-8 text-center ${activeColor.light} ${activeColor.border} border max-w-md w-full`}
-                    >
-                      <div className="text-slate-400 mb-4">
-                        <CheckCircle2 className="w-12 h-12 mx-auto" />
-                      </div>
-                      <h3 className={`text-lg font-medium ${activeColor.text} mb-2`}>
-                        No active tasks in {activeList.name}
-                      </h3>
-                      <p className="text-slate-500 text-sm">
-                        {activeList.archived
-                          ? "This archived list has no active tasks"
-                          : "Add your first task to get started"}
-                      </p>
-                    </Card>
-                  </div>
-                )}
-
-                {/* Completed Tasks Section */}
-                {completedTodos.length > 0 && (
-                  <div className="mb-6">
-                    <Button
-                      variant="ghost"
-                      onClick={() => setShowCompleted(!showCompleted)}
-                      className="flex items-center gap-2 text-slate-600 hover:text-slate-800 mb-4"
-                    >
-                      {showCompleted ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-                      Completed ({completedTodos.length})
-                    </Button>
-
-                    {showCompleted && (
-                      <div className="space-y-2">
-                        {completedTodos.map((todo, index) => (
-                          <div
-                            key={todo.id}
-                            className="animate-in fade-in-0 slide-in-from-top-2 duration-300 fill-mode-both"
-                            style={{ animationDelay: `${index * 50}ms`, willChange: "transform, opacity" }}
-                          >
-                            <TaskCard todo={todo} isCompleted={true} readOnly={activeList?.readOnly} />
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Input Section - Always at the bottom, above all main content */}
-                <div className="w-full max-w-2xl mx-auto z-20 sticky bottom-0 left-0 right-0 bg-transparent pointer-events-none">
-                  <Card className="border-0 shadow-none bg-transparent pointer-events-auto">
-                    <div className="flex gap-0 items-center rounded-2xl overflow-hidden bg-white/90 border border-slate-200 shadow-sm">
-                      <input
-                        value={inputValue}
-                        onChange={(e) => setInputValue(e.target.value)}
-                        onKeyPress={handleKeyPress}
-                        placeholder={activeList?.readOnly ? "This list is read-only" : `Add a task to ${activeList?.name}...`}
-                        disabled={activeList?.archived || loading || activeList?.readOnly}
-                        className="w-full h-12 pl-4 pr-14 text-base bg-transparent border-0 focus:ring-2 focus:ring-blue-100 outline-none transition-all duration-200 placeholder-slate-400"
-                        style={{ boxShadow: 'none' }}
-                      />
-                      <Button
-                        onClick={handleAddTodo}
-                        disabled={!inputValue.trim() || activeList?.archived || isAddingTodo || activeList?.readOnly}
-                        className={`h-12 min-w-[48px] rounded-none rounded-r-2xl ${activeList?.color} hover:opacity-90 text-white flex items-center justify-center shadow-none border-0`}
-                        loading={isAddingTodo}
-                        tabIndex={-1}
-                        type="button"
-                        style={{ boxShadow: 'none' }}
-                      >
-                        <Send className="w-5 h-5" />
-                      </Button>
-                    </div>
-                    {activeList?.archived && (
-                      <div className="mt-2 text-xs text-amber-600">Cannot add tasks to archived lists</div>
-                    )}
-                  </Card>
-                </div>
-              </>
-            )}
+                </>
+              )}
+              </div>
             </div>
           </div>
 

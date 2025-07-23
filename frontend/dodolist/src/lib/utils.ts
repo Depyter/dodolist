@@ -115,24 +115,13 @@ export function getTodosFromYjsUpdate(yjsUpdate: string): Todo[] {
  */
 export function getAllLocalYjsTodoLists(): TodoListWithTodos[] {
   const provider = GlobalPocketBaseProvider.getInstance();
+  const listIds = provider.getAllDocumentIds();
   const lists: TodoListWithTodos[] = [];
-  for (const [listId, docInstance] of (provider as any).documents.entries()) {
-    // Get the latest Yjs update for this doc
-    const yjsUpdate = uint8ArrayToBase64(Y.encodeStateAsUpdate(docInstance.doc));
-    const meta = decodeYjsListDoc(yjsUpdate);
-    if (meta) {
-      lists.push({
-        id: listId,
-        name: meta.name || '',
-        color: meta.color || '',
-        createdAt: '', // You may want to store this in Yjs or elsewhere
-        pinned: meta.pinned,
-        archived: meta.archived,
-        deleted: meta.deleted,
-        todos: Array.isArray(meta.todos) ? meta.todos : [],
-        yjsUpdate,
-        user_id: '', // Not available from Yjs, can be filled in if needed
-      });
+
+  for (const listId of listIds) {
+    const list = decodeYjsListDocFromMemory(listId);
+    if (list) {
+      lists.push(list);
     }
   }
   return lists;
@@ -151,6 +140,7 @@ export function decodeYjsListDocFromMemory(listId: string): TodoListWithTodos | 
     const deleted = ylist.get("deleted") as boolean || false;
     const ytodos = ylist.get("todos") as Y.Array<Y.Map<any>>;
     const todos = ytodos ? ytodos.toArray().map((t) => t.toJSON() as Todo) : [];
+    const readOnly = provider.getReadOnlyStatus(listId);
 
     return {
         id: listId,
@@ -160,6 +150,7 @@ export function decodeYjsListDocFromMemory(listId: string): TodoListWithTodos | 
         archived,
         deleted,
         todos,
+        readOnly,
         createdAt: '', // This info is not in the Y.Doc
         user_id: '', // This info is not in the Y.Doc
     };

@@ -2,7 +2,7 @@ import PocketBase from 'pocketbase';
 import * as Y from 'yjs';
 import { IndexeddbPersistence } from 'y-indexeddb';
 import { PB_URL } from '@/config';
-import type { PocketBaseTaskListRecord, TodoListWithTodos } from "@/lib/types";
+import type { PocketBaseTaskListRecord } from "@/lib/types";
 
 const DB_NAME_PREFIX = 'dodolist-yjs-';
 const KNOWN_LIST_IDS_KEY = 'dolist-known-list-ids';
@@ -36,6 +36,7 @@ export interface SyncStatusInfo {
   isSyncing: boolean;
   lastSyncTime: Date | null;
   hasError: boolean;
+  canRetry: boolean;
 }
 
 // Interface for document instance
@@ -46,8 +47,6 @@ interface DocumentInstance {
   isSyncing: boolean;
   lastSyncTime: Date | null;
   statusListeners: Set<(status: SyncStatusInfo) => void>;
-  retryCount: number;
-  retryTimeout: NodeJS.Timeout | null;
   updateHandler?: (update: Uint8Array, origin: any) => void;
   readOnlyStatus: boolean; // Add readOnlyStatus here
 }
@@ -73,8 +72,13 @@ export class GlobalPocketBaseProvider {
   private documents = new Map<string, DocumentInstance>();
   private subscriptions = new Map<string, string>(); // listId -> unsubscribeId
   private collectionName = 'task_lists';
-  private isConnected = false;
-  private maxRetries = 5;
+  private maxRetries = 5; // Increased retries
+  private globalRetryCount = 0;
+  private globalRetryTimeout: NodeJS.Timeout | null = null;
+  private _canAccessPocketbase = false;
+  private connectivityListeners = new Set<(isConnected: boolean) => void>();
+  private pinger: NodeJS.Timeout | null = null;
+  private isReconnecting = false;
   private documentListListeners = new Set<(listId?: string, readOnlyStatus?: boolean) => void>();
   private collectionUnsubscribe: (() => void) | null = null;
   private isInitialFetchDone = false;
@@ -83,6 +87,10 @@ export class GlobalPocketBaseProvider {
     this.pb = new PocketBase(PB_URL);
     this.initializeAuth();
     this.setupEventListeners();
+    this.setCanAccessPocketbase(navigator.onLine);
+    if (navigator.onLine) {
+        this.startConnectivityPinger();
+    }
   }
 
   /**
@@ -93,6 +101,67 @@ export class GlobalPocketBaseProvider {
       GlobalPocketBaseProvider.instance = new GlobalPocketBaseProvider();
     }
     return GlobalPocketBaseProvider.instance;
+  }
+
+  public onConnectivityChange(listener: (isConnected: boolean) => void): () => void {
+    this.connectivityListeners.add(listener);
+    listener(this._canAccessPocketbase); // Immediately notify with current state
+    return () => {
+        this.connectivityListeners.delete(listener);
+    };
+  }
+
+  private setCanAccessPocketbase(canAccess: boolean) {
+      if (this._canAccessPocketbase === canAccess) return;
+
+      const wasOffline = !this._canAccessPocketbase;
+      this._canAccessPocketbase = canAccess;
+
+      console.log(`[GlobalPocketBaseProvider] Connectivity status changed to: ${this._canAccessPocketbase ? 'Online' : 'Offline'}`);
+
+      this.connectivityListeners.forEach(listener => listener(this._canAccessPocketbase));
+
+      if (this._canAccessPocketbase) {
+          if (wasOffline) {
+              console.log('[GlobalPocketBaseProvider] Came back online. Re-evaluating connection state and syncing.');
+              this.resetGlobalRetry();
+              this.handleOnline();
+          }
+      } else {
+          this.disconnectAllDocuments();
+          // The pinger keeps running if the browser is online, allowing for automatic reconnection.
+          // For connected to wifi but no internet connection cases or backend is down.
+          // It's only stopped by the 'offline' event listener.
+      }
+  }
+
+  private startConnectivityPinger() {
+      if (this.pinger) return; // Already running
+      console.log('[GlobalPocketBaseProvider] Starting connectivity pinger.');
+      this.pinger = setInterval(async () => {
+          if (navigator.onLine) {
+              try {
+                  await this.pb.health.check();
+                  this.setCanAccessPocketbase(true);
+              } catch (e) {
+                  if (this._canAccessPocketbase) {
+                     this.setCanAccessPocketbase(false);
+                  }
+              }
+          } else {
+              if (this._canAccessPocketbase) {
+                  this.setCanAccessPocketbase(false);
+              }
+          }
+      }, 15000); // Ping every 15 seconds
+  }
+
+  private stopConnectivityPinger() {
+      if (this.pinger) {
+          console.log('[GlobalPocketBaseProvider] Stopping connectivity pinger.');
+          clearInterval(this.pinger);
+          this.pinger = null;
+      }
   }
 
   public onDocumentListChange(listener: (listId?: string, readOnlyStatus?: boolean) => void): () => void {
@@ -182,27 +251,59 @@ export class GlobalPocketBaseProvider {
     const globalAuthStore = (window as any).__pb_auth_store;
     if (globalAuthStore && globalAuthStore.isValid) {
       this.pb.authStore.save(globalAuthStore.token, globalAuthStore.model);
-      this.isConnected = true;
-      this.fetchInitialLists();
+      this.setCanAccessPocketbase(true); // Assume online if authenticated
+      this.loadAndSyncLists();
       this.processAllSyncQueues();
       this.subscribeToCollectionChanges();
     } else {
-      this.isConnected = false;
+      this.setCanAccessPocketbase(false);
     }
 
     this.pb.authStore.onChange(async () => {
       if (this.pb.authStore.isValid) {
-        this.isConnected = true;
-        this.fetchInitialLists();
+        this.setCanAccessPocketbase(true);
+        await this.loadAndSyncLists(true);
         this.processAllSyncQueues();
         this.subscribeToCollectionChanges();
       } else {
-        this.isConnected = false;
+        this.setCanAccessPocketbase(false);
         this.isInitialFetchDone = false;
         this.unsubscribeFromCollectionChanges();
         await this.clearAllLocalData();
       }
     });
+  }
+
+  private async loadAndSyncLists(isLoginEvent = false) {
+    const hasLocal = this.loadLocalDocuments();
+
+    if (isLoginEvent && !hasLocal) {
+      // First login on this device, block to fetch lists.
+      await this.fetchInitialLists();
+    } else {
+      // Subsequent page load, or login with existing local data.
+      // Fetch in background to not block UI.
+      this.fetchInitialLists();
+    }
+  }
+
+  private loadLocalDocuments(): boolean {
+    const knownListIdsJson = localStorage.getItem(KNOWN_LIST_IDS_KEY);
+    if (knownListIdsJson) {
+        try {
+            const knownListIds = JSON.parse(knownListIdsJson);
+            if (Array.isArray(knownListIds) && knownListIds.length > 0) {
+                console.log(`[GlobalPocketBaseProvider] Loading ${knownListIds.length} known lists from local storage.`);
+                for (const listId of knownListIds) {
+                    this.getDocumentProvider(listId);
+                }
+                return true;
+            }
+        } catch (e) {
+            console.error('[GlobalPocketBaseProvider] Failed to parse known list IDs.', e);
+        }
+    }
+    return false;
   }
 
   private async fetchInitialLists() {
@@ -221,7 +322,7 @@ export class GlobalPocketBaseProvider {
 
       console.log(`[GlobalPocketBaseProvider] Found ${records.length} lists on server.`);
 
-      if (records.length === 0) {
+      if (records.length === 0 && this.documents.size === 0) {
         console.log('[GlobalPocketBaseProvider] No lists found, creating a default list.');
         this.createDefaultList();
       } else {
@@ -235,6 +336,7 @@ export class GlobalPocketBaseProvider {
     } catch (e) {
       console.error('[GlobalPocketBaseProvider] Failed to fetch initial lists:', e);
       this.isInitialFetchDone = false; // Allow retry on failure
+      this.handleServerDisconnect();
     }
   }
 
@@ -266,6 +368,7 @@ export class GlobalPocketBaseProvider {
       console.log('[GlobalPocketBaseProvider] Subscribed to collection-wide changes.');
     } catch (e) {
       console.error('[GlobalPocketBaseProvider] Failed to subscribe to collection changes:', e);
+      this.handleServerDisconnect();
     }
   }
 
@@ -282,39 +385,79 @@ export class GlobalPocketBaseProvider {
     if (action === 'create') {
       if (!this.documents.has(record.id)) {
         console.log(`[GlobalPocketBaseProvider] New list detected: ${record.id}. Creating local document.`);
-        const docProvider = this.getDocumentProvider(record.id);
-        if (record.yjsUpdate) {
-          const remoteUpdate = base64ToUint8Array(record.yjsUpdate);
-          Y.applyUpdate(docProvider.doc, remoteUpdate, 'server-create-event');
-          console.log(`[GlobalPocketBaseProvider] Applied initial state from create event for list ${record.id}`);
-        }
-        // After creating the document, notify with its readOnly status
-        this.notifyDocumentListChange(record.id, this.documents.get(record.id)?.readOnlyStatus);
+        this.getDocumentProvider(record.id); // This will create, setup handlers, and notify
       }
     } else if (action === 'update') {
-      // The per-document subscription in `connectDocument` will handle applying the Yjs update.
-      // We just notify the UI that this specific list might have changed.
-      this.notifyDocumentListChange(record.id, this.documents.get(record.id)?.readOnlyStatus);
+      const docInstance = this.documents.get(record.id);
+      if (docInstance && record.yjsUpdate) {
+        // Apply the update from the server. The 'update' handler on the doc will then notify the UI.
+        const remoteUpdate = base64ToUint8Array(record.yjsUpdate);
+        Y.applyUpdate(docInstance.doc, remoteUpdate, 'server-update');
+        console.log(`[GlobalPocketBaseProvider] Applied real-time update for list ${record.id}`);
+      } else if (!docInstance) {
+        // This can happen if a client comes online and receives an update for a list it doesn't have yet.
+        console.log(`[GlobalPocketBaseProvider] Received update for a list not yet in memory: ${record.id}. Creating it now.`);
+        this.getDocumentProvider(record.id);
+      }
     } else if (action === 'delete') {
-      this.destroyDocument(record.id);
+      // This is a hard delete from the server, which we translate to a local soft delete if the doc exists.
+      const docInstance = this.documents.get(record.id);
+      if (docInstance) {
+        console.log(`[GlobalPocketBaseProvider] Server deleted list ${record.id}. Marking as deleted locally.`);
+        // We mark as deleted, but don't destroy the document, to ensure sync consistency.
+        const ylist = docInstance.doc.getMap('list');
+        if (!ylist.get('deleted')) {
+          docInstance.doc.transact(() => {
+            ylist.set('deleted', true);
+          }, 'server-update'); // Use server-update to prevent re-syncing this change
+        }
+      }
     }
   };
 
   private setupEventListeners() {
-    window.addEventListener('offline', this.handleOffline);
-    window.addEventListener('online', this.handleOnline);
+    window.addEventListener('online', this.handleBrowserOnline);
+    window.addEventListener('offline', this.handleBrowserOffline);
   }
 
-  private handleOffline = () => {
-    this.disconnectAllDocuments();
-    console.log('[GlobalPocketBaseProvider] Offline: remote sync paused, local persistence active.');
+  private handleBrowserOffline = () => {
+      console.log('[GlobalPocketBaseProvider] Browser is offline.');
+      this.setCanAccessPocketbase(false);
+  };
+
+  private handleBrowserOnline = () => {
+      console.log('[GlobalPocketBaseProvider] Browser is online. Starting connectivity check.');
+      this.startConnectivityPinger();
+  };
+
+  public attemptGlobalReconnect = async () => {
+    if (this.isReconnecting) return;
+    this.isReconnecting = true;
+    console.log('[GlobalPocketBaseProvider] Attempting to reconnect...');
+    try {
+      // Check for actual internet access by pinging the backend health check
+      await this.pb.health.check();
+      this.setCanAccessPocketbase(true);
+      console.log('[GlobalPocketBaseProvider] Internet connection confirmed.');
+      this.resetGlobalRetry();
+      await this.handleOnline();
+    } catch (error) {
+      this.setCanAccessPocketbase(false);
+      console.error('[GlobalPocketBaseProvider] Internet connection check failed. Still offline.', error);
+      this.scheduleGlobalRetry();
+    } finally {
+      this.isReconnecting = false;
+    }
   };
 
   private handleOnline = async () => {
     if (this.pb.authStore.isValid) {
-      this.isConnected = true;
-      
       await this.subscribeToCollectionChanges();
+
+      if (!this._canAccessPocketbase) {
+        console.log('[GlobalPocketBaseProvider] Aborting online process, connection lost during collection subscription.');
+        return;
+      }
 
       const promises = [];
       for (const [listId, docInstance] of this.documents.entries()) {
@@ -327,11 +470,17 @@ export class GlobalPocketBaseProvider {
         }
       }
       await Promise.all(promises);
-
       this.processAllSyncQueues();
     }
     console.log('[GlobalPocketBaseProvider] Online: remote sync resumed.');
   };
+
+  private handleServerDisconnect() {
+    if (!this._canAccessPocketbase) return;
+    console.warn('[GlobalPocketBaseProvider] Server connection lost. Transitioning to offline mode.');
+    this.setCanAccessPocketbase(false);
+    this.scheduleGlobalRetry();
+  }
 
   public getDocumentProvider(listId: string): DocumentProvider {
     if (!this.documents.has(listId)) {
@@ -442,36 +591,42 @@ export class GlobalPocketBaseProvider {
       isSyncing: false,
       lastSyncTime: null,
       statusListeners: new Set(),
-      retryCount: 0,
-      retryTimeout: null,
       readOnlyStatus: false
     };
     this.documents.set(listId, docInstance);
     this.setupDocumentHandlers(listId, docInstance);
+
     persistence.on('synced', async () => {
       console.log(`[GlobalPocketBaseProvider] Local persistence for list ${listId} is ready`);
+      // Now that the document is loaded from IndexedDB, notify the UI.
+      this.notifyDocumentListChange(listId);
       if (navigator.onLine) {
         await this.mergeRemoteState(listId);
       }
       await this.connectDocument(listId);
       this.processSyncQueue(listId);
     });
-    this.notifyDocumentListChange();
   }
 
   private setupDocumentHandlers(listId: string, docInstance: DocumentInstance) {
     const handleDocUpdate = (_update: Uint8Array, origin: any) => {
-      if (origin !== 'user') {
+      // If the origin is from the server, it's already synced.
+      // We just need to notify the UI that the document has changed.
+      if (origin === 'server-update' || origin === 'server-merge' || origin === 'server-init' || origin === 'server-create-event') {
+        this.notifyDocumentListChange(listId);
         return;
       }
-      console.log(`[GlobalPocketBaseProvider] Local document updated for list ${listId}, origin: ${origin}`);
-      if (this.isConnected) {
+
+      // Any other origin (including 'user' or null) is considered a local change that needs to be synced.
+      console.log(`[GlobalPocketBaseProvider] Local document updated for list ${listId}, origin: ${origin}, queueing sync.`);
+      
+      if (this._canAccessPocketbase) {
         this.updateDocumentStatus(listId, 'syncing');
       }
-      this.queueSync(listId, async () => {
-        await this.syncDocumentToServer(listId);
-      });
-      // Notify UI about local changes to ensure immediate reactivity
+      
+      this.queueSync(listId, () => this.syncDocumentToServer(listId));
+      
+      // Also notify the UI immediately for local changes to get instant feedback.
       this.notifyDocumentListChange(listId);
     };
     docInstance.doc.on('update', handleDocUpdate);
@@ -479,6 +634,10 @@ export class GlobalPocketBaseProvider {
   }
 
   private async connectDocument(listId: string) {
+    if (!this._canAccessPocketbase) {
+        this.disconnectDocument(listId);
+        return;
+    }
     try {
       if (!this.pb.authStore.isValid) {
         console.log(`[GlobalPocketBaseProvider] Not authenticated, skipping connection for list ${listId}`);
@@ -500,10 +659,10 @@ export class GlobalPocketBaseProvider {
       }, { requestKey: null });
       this.subscriptions.set(listId, listId);
       console.log(`[GlobalPocketBaseProvider] Successfully connected to PocketBase for list ${listId}`);
+      this.resetGlobalRetry();
     } catch (error) {
       console.error(`[GlobalPocketBaseProvider] Failed to connect for list ${listId}:`, error);
-      this.updateDocumentStatus(listId, 'error');
-      this.scheduleRetry(listId);
+      this.handleServerDisconnect();
     }
   }
 
@@ -543,6 +702,7 @@ export class GlobalPocketBaseProvider {
 
     } catch (error) {
       console.error(`[GlobalPocketBaseProvider] Failed to merge remote state for list ${listId}:`, error);
+      this.handleServerDisconnect();
     }
   }
 
@@ -602,14 +762,43 @@ export class GlobalPocketBaseProvider {
     } catch (error) {
       console.error(`[GlobalPocketBaseProvider] Failed to force read-merge-write for list ${listId}:`, error);
       this.updateDocumentStatus(listId, 'error');
+      this.handleServerDisconnect();
     }
+  }
+
+  private scheduleGlobalRetry() {
+    if (this.globalRetryTimeout) return; // Already scheduled
+
+    if (this.globalRetryCount >= this.maxRetries) {
+      console.error('[GlobalPocketBaseProvider] Max global retries reached. Halting automatic reconnection.');
+      this.documents.forEach((_, listId) => this.updateDocumentStatus(listId, 'error'));
+      return;
+    }
+
+    const retryDelay = Math.min(1000 * Math.pow(2, this.globalRetryCount), 30000);
+    this.globalRetryCount++;
+
+    console.log(`[GlobalPocketBaseProvider] Scheduling global reconnection attempt ${this.globalRetryCount} in ${retryDelay}ms`);
+
+    this.globalRetryTimeout = setTimeout(() => {
+      this.globalRetryTimeout = null;
+      console.log('[GlobalPocketBaseProvider] Retrying all connections...');
+      this.attemptGlobalReconnect();
+    }, retryDelay);
+  }
+
+  private resetGlobalRetry() {
+    if (this.globalRetryTimeout) {
+      clearTimeout(this.globalRetryTimeout);
+      this.globalRetryTimeout = null;
+    }
+    this.globalRetryCount = 0;
   }
 
   private disconnectAllDocuments() {
     for (const listId of this.subscriptions.keys()) {
       this.disconnectDocument(listId);
     }
-    this.isConnected = false;
   }
 
   private disconnectDocument(listId: string) {
@@ -624,10 +813,6 @@ export class GlobalPocketBaseProvider {
     }
     const docInstance = this.documents.get(listId);
     if (docInstance) {
-        if (docInstance.retryTimeout) {
-            clearTimeout(docInstance.retryTimeout);
-            docInstance.retryTimeout = null;
-        }
         this.updateDocumentStatus(listId, 'offline');
     }
   }
@@ -645,12 +830,14 @@ export class GlobalPocketBaseProvider {
   private async processSyncQueue(listId: string) {
     const docInstance = this.documents.get(listId);
     if (!docInstance || docInstance.isSyncing || docInstance.syncQueue.length === 0) return;
+    
     console.log(`[GlobalPocketBaseProvider] Processing sync queue for list ${listId}, ${docInstance.syncQueue.length} operations pending`);
     docInstance.isSyncing = true;
     this.updateDocumentStatus(listId, 'syncing');
+    
     let processedCount = 0;
     let failedCount = 0;
-    let consecutiveFailures = 0;
+
     while (docInstance.syncQueue.length > 0 && this.isConnectedToServer()) {
       const operation = docInstance.syncQueue[0];
       if (operation) {
@@ -658,24 +845,24 @@ export class GlobalPocketBaseProvider {
           await operation();
           docInstance.syncQueue.shift();
           processedCount++;
-          consecutiveFailures = 0;
-        } catch (error) {
+        } catch (error: any) {
           failedCount++;
-          consecutiveFailures++;
           console.error(`[GlobalPocketBaseProvider] Sync operation failed for list ${listId}:`, error);
-          if (consecutiveFailures > 3) break;
+          
+          const isNetworkError = error?.isAbort === true || error?.response?.status === 0;
+          if (isNetworkError) {
+              this.handleServerDisconnect();
+          }
+          
           break;
         }
       } else {
         docInstance.syncQueue.shift();
       }
     }
+    
     docInstance.isSyncing = false;
-    if (this.isConnected) {
-      this.updateDocumentStatus(listId, docInstance.syncQueue.length === 0 ? 'synced' : 'syncing');
-    } else {
-      this.updateDocumentStatus(listId, 'offline');
-    }
+    this.updateDocumentStatus(listId, this.getSyncStatus(listId).status);
     console.log(`[GlobalPocketBaseProvider] Finished processing sync queue for list ${listId}. Processed: ${processedCount}, Failed: ${failedCount}, Remaining: ${docInstance.syncQueue.length}`);
   }
 
@@ -686,72 +873,71 @@ export class GlobalPocketBaseProvider {
   }
 
   private async syncDocumentToServer(listId: string) {
-    try {
-      const docInstance = this.documents.get(listId);
-      if (!docInstance) {
-        console.warn(`[GlobalPocketBaseProvider] Cannot sync, document instance not found for list ${listId}`);
-        return;
-      }
-      let currentDoc: PocketBaseTaskListRecord | null = null;
-      try {
-        currentDoc = await this.pb.collection(this.collectionName).getOne(listId, { requestKey: null });
-      } catch (error: any) {
-        if (error?.status === 404) {
-          const createdAt = new Date().toISOString();
-          const userId = (window as any)?.__pb_auth_store?.model?.id || null;
-          const latestState = Y.encodeStateAsUpdate(docInstance.doc);
-          const base64Update = uint8ArrayToBase64(latestState);
-          const data: PocketBaseTaskListRecord = {
-            id: listId,
-            user_id: userId,
-            createdAt,
-            yjsUpdate: base64Update,
-            yjsClientId: docInstance.doc.clientID.toString(),
-          };
-          await this.pb.collection(this.collectionName).create(data, { requestKey: null });
-          currentDoc = null;
-          console.log(`[GlobalPocketBaseProvider] Created missing PocketBase record for list ${listId}`);
-        } else {
-          throw error;
-        }
-      }
-      if (currentDoc && currentDoc.yjsUpdate) {
-        const remoteUpdate = base64ToUint8Array(currentDoc.yjsUpdate);
-        Y.applyUpdate(docInstance.doc, remoteUpdate, 'server-merge');
-      }
-      const latestState = Y.encodeStateAsUpdate(docInstance.doc);
-      const base64Update = uint8ArrayToBase64(latestState);
-      const metadataUpdate: Partial<PocketBaseTaskListRecord> = {
-        yjsUpdate: base64Update,
-        yjsClientId: docInstance.doc.clientID.toString(),
-      };
-      await this.pb.collection(this.collectionName).update(listId, metadataUpdate, { requestKey: null });
-      docInstance.lastSyncTime = new Date();
-      console.log(`[GlobalPocketBaseProvider] Successfully synced document for list ${listId}`);
-    } catch (error) {
-      console.error(`[GlobalPocketBaseProvider] Failed to sync document for list ${listId}:`, error);
-      throw error;
-    }
-  }
-
-  private scheduleRetry(listId: string) {
     const docInstance = this.documents.get(listId);
-    if (!docInstance) return;
-    if (docInstance.retryCount >= this.maxRetries) {
-      console.error(`[GlobalPocketBaseProvider] Max retries reached for list ${listId}`);
-      this.updateDocumentStatus(listId, 'error');
+    if (!docInstance) {
+      console.warn(`[GlobalPocketBaseProvider] Cannot sync, document instance not found for list ${listId}`);
       return;
     }
-    const retryDelay = Math.min(1000 * Math.pow(2, docInstance.retryCount), 30000);
-    docInstance.retryCount++;
-    docInstance.retryTimeout = setTimeout(async () => {
-      console.log(`[GlobalPocketBaseProvider] Retrying connection for list ${listId} (attempt ${docInstance.retryCount})`);
-      await this.connectDocument(listId);
-    }, retryDelay);
+
+    const ylist = docInstance.doc.getMap('list');
+    const isDeleted = ylist.get('deleted') === true;
+    const latestState = Y.encodeStateAsUpdate(docInstance.doc);
+    const base64Update = uint8ArrayToBase64(latestState);
+    const userId = this.pb.authStore.model?.id;
+
+    if (!userId) {
+      console.error(`[GlobalPocketBaseProvider] Cannot sync, user is not authenticated.`);
+      throw new Error('User not authenticated');
+    }
+
+    try {
+      // Use a single transaction for create/update/delete logic
+      const existingRecord = await this.pb.collection(this.collectionName).getOne(listId).catch(e => e.status === 404 ? null : Promise.reject(e));
+
+      if (isDeleted) {
+        if (existingRecord) {
+          console.log(`[GlobalPocketBaseProvider] Deleting list on server: ${listId}`);
+          await this.pb.collection(this.collectionName).delete(listId);
+        }
+        // If it doesn't exist on the server, no action is needed.
+        // We can now safely destroy the local representation.
+        this.destroyDocument(listId);
+      } else if (existingRecord) {
+        // Update existing record
+        const metadataUpdate: Partial<PocketBaseTaskListRecord> = {
+          yjsUpdate: base64Update,
+          yjsClientId: docInstance.doc.clientID.toString(),
+        };
+        await this.pb.collection(this.collectionName).update(listId, metadataUpdate, { requestKey: null });
+        console.log(`[GlobalPocketBaseProvider] Successfully synced document update for list ${listId}`);
+      } else {
+        // Create new record
+        const data: PocketBaseTaskListRecord = {
+          id: listId,
+          user_id: userId,
+          createdAt: new Date().toISOString(),
+          yjsUpdate: base64Update,
+          yjsClientId: docInstance.doc.clientID.toString(),
+        };
+        await this.pb.collection(this.collectionName).create(data, { requestKey: null });
+        console.log(`[GlobalPocketBaseProvider] Successfully created and synced new list ${listId}`);
+      }
+
+      docInstance.lastSyncTime = new Date();
+      this.updateDocumentStatus(listId, 'synced');
+
+    } catch (error) {
+      console.error(`[GlobalPocketBaseProvider] Failed to sync document for list ${listId}:`, error);
+      this.updateDocumentStatus(listId, 'error');
+      this.handleServerDisconnect(); // This will trigger retry logic
+      throw error; // Re-throw to stop the current sync queue processing
+    }
   }
 
   private getSyncStatus(listId: string): SyncStatusInfo {
     const docInstance = this.documents.get(listId);
+    const canRetry = this.globalRetryCount < this.maxRetries;
+
     if (!docInstance) {
       return {
         status: 'offline',
@@ -759,24 +945,28 @@ export class GlobalPocketBaseProvider {
         queueLength: 0,
         isSyncing: false,
         lastSyncTime: null,
-        hasError: false
+        hasError: false,
+        canRetry: canRetry,
       };
     }
+    
     let status: 'synced' | 'syncing' | 'offline' | 'error' = 'offline';
-    if (docInstance.retryCount >= this.maxRetries) {
+    if (!canRetry) {
       status = 'error';
-    } else if (this.isConnected) {
+    } else if (this._canAccessPocketbase) {
       status = (docInstance.isSyncing || docInstance.syncQueue.length > 0 ? 'syncing' : 'synced');
     } else {
       status = 'offline';
     }
+
     return {
       status,
-      isConnected: this.isConnected,
+      isConnected: this._canAccessPocketbase,
       queueLength: docInstance.syncQueue.length,
       isSyncing: docInstance.isSyncing,
       lastSyncTime: docInstance.lastSyncTime,
-      hasError: status === 'error'
+      hasError: status === 'error',
+      canRetry: canRetry,
     };
   }
 
@@ -789,7 +979,8 @@ export class GlobalPocketBaseProvider {
         queueLength: 0,
         isSyncing: false,
         lastSyncTime: null,
-        hasError: false
+        hasError: false,
+        canRetry: this.globalRetryCount < this.maxRetries,
       });
       return () => {};
     }
@@ -838,17 +1029,22 @@ export class GlobalPocketBaseProvider {
   }
 
   public isConnectedToServer(): boolean {
-    return this.isConnected && this.pb.authStore.isValid;
+    return this.pb.authStore.isValid && this._canAccessPocketbase;
   }
 
   public getDocument(listId: string): Y.Doc | null {
     return this.documents.get(listId)?.doc || null;
   }
 
+  public getAllDocumentIds(): string[] {
+    return Array.from(this.documents.keys());
+  }
+
   public destroy() {
     console.log('[GlobalPocketBaseProvider] Destroying global provider');
-    window.removeEventListener('offline', this.handleOffline);
-    window.removeEventListener('online', this.handleOnline);
+    window.removeEventListener('offline', this.handleBrowserOffline);
+    window.removeEventListener('online', this.handleBrowserOnline);
+    this.stopConnectivityPinger();
     this.unsubscribeFromCollectionChanges();
     for (const listId of Array.from(this.documents.keys())) {
       this.destroyDocument(listId);
@@ -893,6 +1089,10 @@ export class PocketBaseProvider implements DocumentProvider {
   }
 
   destroy(): void {}
+
+  triggerGlobalReconnect(): Promise<void> {
+    return this.globalProvider.attemptGlobalReconnect();
+  }
 
   get persistence() {
     const docInstance = (this.globalProvider as any).documents.get(this.listId);

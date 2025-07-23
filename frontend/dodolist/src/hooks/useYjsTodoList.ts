@@ -18,7 +18,8 @@ export function useYjsTodoList(listId: string | null) {
         queueLength: 0,
         isSyncing: false,
         lastSyncTime: null,
-        hasError: false
+        hasError: false,
+        canRetry: false,
     });
     
     const providerRef = useRef<PocketBaseProvider | null>(null);
@@ -56,7 +57,8 @@ export function useYjsTodoList(listId: string | null) {
                 queueLength: 0,
                 isSyncing: false,
                 lastSyncTime: null,
-                hasError: false
+                hasError: false,
+                canRetry: false,
             });
             return;
         }
@@ -119,6 +121,12 @@ export function useYjsTodoList(listId: string | null) {
             cleanup();
         };
     }, [listId]);
+
+    const retryConnection = useCallback(() => {
+        if (providerRef.current) {
+            providerRef.current.triggerGlobalReconnect();
+        }
+    }, []);
     
     // --- Todo CRUD ---
     const addTodo = useCallback((text: string) => {
@@ -248,5 +256,6 @@ export function useYjsTodoList(listId: string | null) {
         isConnected: syncStatus.isConnected,
         syncStatus,
         readOnly: providerRef.current?.readOnly ?? false,
+        retryConnection,
     };
 }
