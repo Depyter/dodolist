@@ -1068,6 +1068,7 @@ export default function DodoListApp() {
         shareUrl={shareUrl}
         readOnly={activeList?.readOnly}
         listId={activeListId}
+        activeColor={activeColor}
       />
       <SidebarProvider>
         <AppSidebar
@@ -1275,7 +1276,7 @@ export default function DodoListApp() {
           <div className="flex-1 p-6 overflow-y-auto relative bg-slate-50" key={activeListId}>
             <div className="absolute inset-0 noise-texture-subtle opacity-10"></div>
             <div className="flex-1 items-center flex flex-col">
-              <div className="transition-opacity duration-300 ease-out w-full relative z-10 md:max-w-6/10" style={{ transitionDelay: "150ms" }}>
+              <div className="transition-opacity duration-300 ease-out w-full relative z-10 sm:max-w-8/10 lg:max-w-5/10" style={{ transitionDelay: "150ms" }}>
               {activeList && (
                 <>
                   {/* Archived Notice */}

@@ -533,7 +533,10 @@ export class GlobalPocketBaseProvider {
     }
     console.log(`[GlobalPocketBaseProvider] Soft deleting list ${listId}`);
     const ylist = docInstance.doc.getMap('list');
-    ylist.set('deleted', true);
+    // Use a Yjs transaction with origin 'user' so it is queued for sync
+    docInstance.doc.transact(() => {
+      ylist.set('deleted', true);
+    }, 'user');
     // The doc 'update' event will handle the rest (syncing and notifying listeners)
     this.notifyDocumentListChange(listId);
   }

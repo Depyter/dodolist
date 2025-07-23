@@ -1,10 +1,12 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Copy, Globe, UserPlus, Users, ChevronDown } from "lucide-react";
-import { useState } from "react";
+import { Copy, Globe, UserPlus, Users, ChevronDown, QrCode } from "lucide-react";
+import { useState, useRef, useCallback } from "react";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { useShareOptions } from "@/hooks/useShareAndExport";
+import QRCodeStyling from "qr-code-styling";
+import { colors, type Color } from "@/lib/colors";
 
 interface ShareDialogProps {
   open: boolean;
@@ -13,8 +15,10 @@ interface ShareDialogProps {
   readOnly?: boolean;
 }
 
-export function ShareDialog({ open, onOpenChange, shareUrl, readOnly, listId }: ShareDialogProps & { listId: string | null }) {
+export function ShareDialog({ open, onOpenChange, shareUrl, readOnly, listId }: ShareDialogProps & { listId: string | null, activeColor?: Color }) {
   const [copied, setCopied] = useState(false);
+  const [showQr, setShowQr] = useState(false);
+  const qrCode = useRef<any>(null);
   const {
     people,
     inviteEmail,
@@ -28,6 +32,23 @@ export function ShareDialog({ open, onOpenChange, shareUrl, readOnly, listId }: 
     togglePublic,
   } = useShareOptions(listId);
 
+  // Get the active color from the list color (if available)
+  let activeColor: Color = colors[1];
+  if (typeof window !== 'undefined') {
+    // Try to extract the color from the URL/listId if possible
+    // (This fallback is for when ShareDialog is used outside TodoListPage)
+    const urlParams = new URLSearchParams(window.location.search);
+    const colorParam = urlParams.get('color');
+    if (colorParam) {
+      const found = colors.find(c => c.value === colorParam);
+      if (found) activeColor = found;
+    }
+  }
+  // If passed as prop (from TodoListPage), use that
+  if (arguments.length > 0 && typeof arguments[0] === 'object' && arguments[0].activeColor) {
+    activeColor = arguments[0].activeColor;
+  }
+
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(shareUrl);
@@ -35,6 +56,58 @@ export function ShareDialog({ open, onOpenChange, shareUrl, readOnly, listId }: 
       setTimeout(() => setCopied(false), 1500);
     } catch {
       setCopied(false);
+    }
+  };
+
+  const handleQrRef = useCallback((node: HTMLDivElement | null) => {
+    if (node && showQr) {
+      node.innerHTML = "";
+      const styledOptions = {
+        type: "canvas" as const,
+        width: 280,
+        height: 280,
+        margin: 0,
+        data: "https://tinyurl.com/5apxy622",
+        qrOptions: {
+          typeNumber: 0 as const,
+          mode: "Byte" as const,
+          errorCorrectionLevel: "Q" as const
+        },
+        imageOptions: {
+          saveAsBlob: true,
+          hideBackgroundDots: true,
+          imageSize: 0.5,
+          crossOrigin: undefined,
+          margin: 8,
+        },
+        dotsOptions: {
+          type: "rounded" as const,
+          color: activeColor.hex,
+          roundSize: true
+        },
+        cornersSquareOptions: {
+          type: "extra-rounded" as const,
+          color: activeColor.hex
+        },
+        cornersDotOptions: {
+          type: "dot" as const,
+          color: activeColor.hex
+        },
+        backgroundOptions: {
+          round: 0,
+          color: "#ffffff"
+        },
+        image: "/dodobird.svg"
+      };
+      const qr = new QRCodeStyling(styledOptions);
+      qr.append(node);
+      qrCode.current = qr;
+    }
+  }, [showQr, shareUrl, activeColor]);
+
+  const handleQrDownload = () => {
+    if (qrCode.current) {
+      qrCode.current.download({ extension: "png" });
     }
   };
 
@@ -54,8 +127,20 @@ export function ShareDialog({ open, onOpenChange, shareUrl, readOnly, listId }: 
           <Button variant="outline" size="icon" onClick={handleCopy} aria-label="Copy link">
             <Copy className="w-4 h-4" />
           </Button>
+          <Button variant="outline" size="icon" aria-label="Show QR code" onClick={() => setShowQr(true)}>
+            <QrCode className="w-4 h-4" />
+          </Button>
         </div>
         {copied && <div className="text-xs text-green-600 mt-2">Link copied!</div>}
+        {/* QR Code Dialog */}
+        {showQr && (
+          <Dialog open={showQr} onOpenChange={setShowQr}>
+            <DialogContent className="w-auto max-w-fit flex flex-col items-center p-5" style={{ minWidth: 0, gap: 0}}>
+              <div ref={handleQrRef} className="flex justify-center pb-0" />
+              <Button onClick={handleQrDownload}>Download</Button>
+            </DialogContent>
+          </Dialog>
+        )}
         <div className="mt-6">
           <div className="flex items-center gap-2 mb-2">
             <Globe className="w-4 h-4 text-blue-500" />
