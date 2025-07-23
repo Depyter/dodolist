@@ -610,24 +610,17 @@ export class GlobalPocketBaseProvider {
 
   private setupDocumentHandlers(listId: string, docInstance: DocumentInstance) {
     const handleDocUpdate = (_update: Uint8Array, origin: any) => {
-      // If the origin is from the server, it's already synced.
-      // We just need to notify the UI that the document has changed.
-      if (origin === 'server-update' || origin === 'server-merge' || origin === 'server-init' || origin === 'server-create-event') {
+      // Only queue a sync if the origin is 'user' (explicit user action)
+      if (origin === 'user') {
+        console.log(`[GlobalPocketBaseProvider] Local document updated for list ${listId}, origin: ${origin}, queueing sync.`);
+        if (this._canAccessPocketbase) {
+          this.updateDocumentStatus(listId, 'syncing');
+        }
+        this.queueSync(listId, () => this.syncDocumentToServer(listId));
+      } else {
+        // For all other origins, just notify the UI
         this.notifyDocumentListChange(listId);
-        return;
       }
-
-      // Any other origin (including 'user' or null) is considered a local change that needs to be synced.
-      console.log(`[GlobalPocketBaseProvider] Local document updated for list ${listId}, origin: ${origin}, queueing sync.`);
-      
-      if (this._canAccessPocketbase) {
-        this.updateDocumentStatus(listId, 'syncing');
-      }
-      
-      this.queueSync(listId, () => this.syncDocumentToServer(listId));
-      
-      // Also notify the UI immediately for local changes to get instant feedback.
-      this.notifyDocumentListChange(listId);
     };
     docInstance.doc.on('update', handleDocUpdate);
     docInstance.updateHandler = handleDocUpdate;
@@ -820,6 +813,10 @@ export class GlobalPocketBaseProvider {
   private queueSync(listId: string, operation: () => Promise<void>) {
     const docInstance = this.documents.get(listId);
     if (!docInstance) return;
+    if (docInstance.readOnlyStatus) {
+      console.log(`[GlobalPocketBaseProvider] Not queuing sync for readonly list ${listId}`);
+      return;
+    }
     docInstance.syncQueue.push(operation);
     console.log(`[GlobalPocketBaseProvider] Queued sync operation for list ${listId}, queue length: ${docInstance.syncQueue.length}`);
     if (!docInstance.isSyncing && this.isConnectedToServer()) {
@@ -830,7 +827,10 @@ export class GlobalPocketBaseProvider {
   private async processSyncQueue(listId: string) {
     const docInstance = this.documents.get(listId);
     if (!docInstance || docInstance.isSyncing || docInstance.syncQueue.length === 0) return;
-    
+    if (docInstance.readOnlyStatus) {
+      console.log(`[GlobalPocketBaseProvider] Not processing sync queue for readonly list ${listId}`);
+      return;
+    }
     console.log(`[GlobalPocketBaseProvider] Processing sync queue for list ${listId}, ${docInstance.syncQueue.length} operations pending`);
     docInstance.isSyncing = true;
     this.updateDocumentStatus(listId, 'syncing');
