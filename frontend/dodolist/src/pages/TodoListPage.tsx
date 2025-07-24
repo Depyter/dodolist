@@ -1069,6 +1069,7 @@ export default function DodoListApp() {
         readOnly={activeList?.readOnly}
         listId={activeListId}
         activeColor={activeColor}
+        listData={activeListData}
       />
       <SidebarProvider>
         <AppSidebar

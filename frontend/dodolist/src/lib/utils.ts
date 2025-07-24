@@ -155,3 +155,73 @@ export function decodeYjsListDocFromMemory(listId: string): TodoListWithTodos | 
         user_id: '', // This info is not in the Y.Doc
     };
 }
+
+/**
+ * Imports a todo list from a share link. Returns the new listId if successful, or null if failed.
+ * The link should contain a ?data=... param with base64-encoded JSON.
+ */
+export async function importListFromLink(link: string): Promise<string | null> {
+  try {
+    const url = new URL(link, window.location.origin);
+    const dataParam = url.searchParams.get('data');
+    if (!dataParam) return null;
+    const json = atob(decodeURIComponent(dataParam));
+    const imported = JSON.parse(json);
+    // Validate imported object (should have name, color, todos)
+    if (!imported || typeof imported !== 'object' || !imported.name || !imported.color) return null;
+    const provider = GlobalPocketBaseProvider.getInstance();
+    // Create a new list (as if user created it)
+    const newListId = provider.createNewList(imported.name, imported.color);
+    // Add todos to the new list's Yjs doc
+    const doc = provider.getDocument(newListId);
+    if (doc) {
+      const ylist = doc.getMap('list');
+      let ytodos = ylist.get('todos');
+      if (!(ytodos instanceof Y.Array)) {
+        ytodos = new Y.Array();
+        ylist.set('todos', ytodos);
+      }
+      const todosArray = ytodos as Y.Array<Y.Map<any>>;
+      // Add each todo (assign new ids, set listId)
+      imported.todos?.forEach((todo: any) => {
+        const newTodo = new Y.Map();
+        newTodo.set('id', crypto.randomUUID());
+        newTodo.set('text', todo.text || '');
+        newTodo.set('completed', !!todo.completed);
+        newTodo.set('createdAt', new Date().toISOString());
+        newTodo.set('listId', newListId);
+        if (todo.description) newTodo.set('description', todo.description);
+        if (todo.deadline) newTodo.set('deadline', todo.deadline);
+        if (todo.reminder) newTodo.set('reminder', todo.reminder);
+        if (todo.recurring) newTodo.set('recurring', todo.recurring);
+        todosArray.push([newTodo]);
+      });
+    }
+    return newListId;
+  } catch (e) {
+    console.error('[importListFromLink] Failed to import:', e);
+    return null;
+  }
+}
+
+/**
+ * Exports a todo list as a shareable link. Only includes name, color, and todos fields.
+ * The link can be imported using importListFromLink.
+ */
+export function exportListToLink(list: { name: string; color: string; todos: any[] }): string {
+  const exportObj = {
+    name: list.name,
+    color: list.color,
+    todos: Array.isArray(list.todos) ? list.todos.map(todo => ({
+      text: todo.text,
+      description: todo.description,
+      completed: !!todo.completed,
+      deadline: todo.deadline,
+      reminder: todo.reminder,
+      recurring: todo.recurring,
+    })) : [],
+  };
+  const json = JSON.stringify(exportObj);
+  const encoded = encodeURIComponent(btoa(json));
+  return `${window.location.origin}/import?data=${encoded}`;
+}

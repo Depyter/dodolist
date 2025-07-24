@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import TodoListPage from './pages/TodoListPage'
 import AuthPage from './pages/AuthPage'
 import ProtectedRoute from './components/ProtectedRoute'
+import ImportListPrompt from './components/ImportListPrompt'
 
 function App() {
   return (
@@ -10,7 +11,8 @@ function App() {
         {/* Public routes */}
         <Route path="/login" element={<AuthPage />} />
         <Route path="/register" element={<AuthPage />} />
-        
+        {/* Import route for todo list import links */}
+        <Route path="/import" element={<ImportListPrompt />} />
         {/* Protected dynamic list route */}
         <Route 
           path="/list/:listId" 

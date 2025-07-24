@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import { GlobalPocketBaseProvider } from "@/services/yjsPocketBase";
 import type { TodoListWithTodos } from "@/lib/types";
+import * as Y from 'yjs';
 
 export type SharePerson = { email: string; permission: "edit" | "view" };
 
@@ -50,25 +51,68 @@ export function useShareOptions(listId: string | null) {
 export function useListExportImport() {
   // Export a list as JSON
   const exportList = useCallback((list: TodoListWithTodos) => {
-    // TODO: Optionally, allow exporting as .json, .csv, etc.
-    const dataStr = JSON.stringify(list, null, 2);
-    const blob = new Blob([dataStr], { type: "application/json" });
+    // Only export name, color, todos (not id, user_id, createdAt, etc)
+    const exportObj = {
+      name: list.name,
+      color: list.color,
+      todos: Array.isArray(list.todos)
+        ? list.todos.map(todo => ({
+            text: todo.text,
+            description: todo.description,
+            completed: !!todo.completed,
+            deadline: todo.deadline,
+            reminder: todo.reminder,
+            recurring: todo.recurring,
+          }))
+        : [],
+    };
+    const dataStr = JSON.stringify(exportObj, null, 2);
+    const blob = new Blob([dataStr], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     return url;
   }, []);
 
-  // Import a list from JSON
+  // Import a list from JSON file and add to Yjs backend
   const importList = useCallback(async (file: File) => {
-    // TODO: Validate and parse the file, then add to Yjs/DB
     const text = await file.text();
+    let data;
     try {
-      const data = JSON.parse(text);
-      // TODO: Integrate with provider to add the imported list
-      // e.g., GlobalPocketBaseProvider.getInstance().importList(data)
-      return data;
+      data = JSON.parse(text);
     } catch (e) {
-      throw new Error("Invalid file format");
+      throw new Error('Invalid file format');
     }
+    // Validate minimal fields
+    if (!data || typeof data !== 'object' || !data.name || !data.color) {
+      throw new Error('Missing required fields in imported list');
+    }
+    // Create a new list in Yjs backend
+    const provider = GlobalPocketBaseProvider.getInstance();
+    const newListId = provider.createNewList(data.name, data.color);
+    const doc = provider.getDocument(newListId);
+    if (doc) {
+      const ylist = doc.getMap('list');
+      let ytodos = ylist.get('todos');
+      if (!(ytodos instanceof Y.Array)) {
+        ytodos = new Y.Array();
+        ylist.set('todos', ytodos);
+      }
+      const todosArray = ytodos as Y.Array<Y.Map<any>>;
+      // Add each todo (assign new ids, set listId)
+      (data.todos || []).forEach((todo: any) => {
+        const newTodo = new Y.Map();
+        newTodo.set('id', crypto.randomUUID());
+        newTodo.set('text', todo.text || '');
+        newTodo.set('completed', !!todo.completed);
+        newTodo.set('createdAt', new Date().toISOString());
+        newTodo.set('listId', newListId);
+        if (todo.description) newTodo.set('description', todo.description);
+        if (todo.deadline) newTodo.set('deadline', todo.deadline);
+        if (todo.reminder) newTodo.set('reminder', todo.reminder);
+        if (todo.recurring) newTodo.set('recurring', todo.recurring);
+        todosArray.push([newTodo]);
+      });
+    }
+    return newListId;
   }, []);
 
   return { exportList, importList };
