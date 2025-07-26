@@ -199,6 +199,27 @@ export class GlobalPocketBaseProvider {
     }
   }
 
+  private removeKnownListId(listId: string) {
+    const knownListIdsJson = localStorage.getItem(KNOWN_LIST_IDS_KEY);
+    if (!knownListIdsJson) return;
+    let knownListIds: string[] = [];
+    try {
+      const parsed = JSON.parse(knownListIdsJson);
+      if (Array.isArray(parsed)) {
+        knownListIds = parsed;
+      }
+    } catch (e) {
+      knownListIds = [];
+      return;
+    }
+    const index = knownListIds.indexOf(listId);
+    if (index > -1) {
+      knownListIds.splice(index, 1);
+      localStorage.setItem(KNOWN_LIST_IDS_KEY, JSON.stringify(knownListIds));
+      console.log(`[GlobalPocketBaseProvider] Removed listId ${listId} from known lists.`);
+    }
+  }
+
   public async clearAllLocalData() {
     console.log('[GlobalPocketBaseProvider] Clearing all local data.');
     // 1. Disconnect and destroy all in-memory documents
@@ -222,7 +243,7 @@ export class GlobalPocketBaseProvider {
                     return new Promise<void>((resolve, reject) => {
                         const request = indexedDB.deleteDatabase(dbName);
                         request.onsuccess = () => resolve();
-                        request.onerror = (e) => {
+                        request.onerror = () => {
                             console.error(`[GlobalPocketBaseProvider] Error deleting DB ${dbName}`, request.error);
                             reject(request.error);
                         };
@@ -317,6 +338,7 @@ export class GlobalPocketBaseProvider {
     try {
       // The view rule on PocketBase handles the filtering. We just fetch all lists we can see.
       const records = await this.pb.collection(this.collectionName).getFullList({
+        filter: 'deleted = false',
         requestKey: null // No filter needed, relies on the collection's view rule
       });
 
@@ -327,6 +349,10 @@ export class GlobalPocketBaseProvider {
         this.createDefaultList();
       } else {
         for (const record of records) {
+          if (record.deleted) {
+            this.destroyDocument(record.id);
+            continue;
+          }
           if (!this.documents.has(record.id)) {
             this.getDocumentProvider(record.id);
           }
@@ -380,7 +406,7 @@ export class GlobalPocketBaseProvider {
     }
   }
 
-  private handleCollectionChange = ({ action, record }: { action: string, record: any }) => {
+  private handleCollectionChange = async ({ action, record }: { action: string, record: any }) => {
     console.log(`[GlobalPocketBaseProvider] Collection change received: ${action} on record ${record.id}`);
     if (action === 'create') {
       if (!this.documents.has(record.id)) {
@@ -389,12 +415,24 @@ export class GlobalPocketBaseProvider {
       }
     } else if (action === 'update') {
       const docInstance = this.documents.get(record.id);
-      if (docInstance && record.yjsUpdate) {
-        // Apply the update from the server. The 'update' handler on the doc will then notify the UI.
-        const remoteUpdate = base64ToUint8Array(record.yjsUpdate);
-        Y.applyUpdate(docInstance.doc, remoteUpdate, 'server-update');
-        console.log(`[GlobalPocketBaseProvider] Applied real-time update for list ${record.id}`);
-      } else if (!docInstance) {
+      if (docInstance) {
+        // Compare previous Yjs doc value for 'deleted' with new record.deleted
+        const ylist = docInstance.doc.getMap('list');
+        const prevDeleted = ylist.get('deleted') === true;
+        const newDeleted = record.deleted === true;
+        if (!prevDeleted && newDeleted) {
+          console.log(`[GlobalPocketBaseProvider] Detected 'deleted' field changed to true for list ${record.id}. Destroying local persistence.`);
+          this.destroyDocument(record.id);
+          this.notifyDocumentListChange(record.id, true);
+          return;
+        }
+        // If not deleted, apply yjsUpdate if present
+        if (record.yjsUpdate) {
+          const remoteUpdate = base64ToUint8Array(record.yjsUpdate);
+          Y.applyUpdate(docInstance.doc, remoteUpdate, 'server-update');
+          console.log(`[GlobalPocketBaseProvider] Applied real-time update for list ${record.id}`);
+        }
+      } else {
         // This can happen if a client comes online and receives an update for a list it doesn't have yet.
         console.log(`[GlobalPocketBaseProvider] Received update for a list not yet in memory: ${record.id}. Creating it now.`);
         this.getDocumentProvider(record.id);
@@ -404,13 +442,13 @@ export class GlobalPocketBaseProvider {
       const docInstance = this.documents.get(record.id);
       if (docInstance) {
         console.log(`[GlobalPocketBaseProvider] Server deleted list ${record.id}. Marking as deleted locally.`);
-        // We mark as deleted, but don't destroy the document, to ensure sync consistency.
         const ylist = docInstance.doc.getMap('list');
         if (!ylist.get('deleted')) {
           docInstance.doc.transact(() => {
             ylist.set('deleted', true);
-          }, 'server-update'); // Use server-update to prevent re-syncing this change
+          }, 'server-update');
         }
+        this.notifyDocumentListChange(record.id, true);
       }
     }
   };
@@ -538,7 +576,7 @@ export class GlobalPocketBaseProvider {
       ylist.set('deleted', true);
     }, 'user');
     // The doc 'update' event will handle the rest (syncing and notifying listeners)
-    this.notifyDocumentListChange(listId);
+    this.notifyDocumentListChange(listId, true);
   }
 
   public cloneList(listId: string): string {
@@ -668,6 +706,11 @@ export class GlobalPocketBaseProvider {
       if (!docInstance) return;
       const remoteDoc = await this.pb.collection(this.collectionName).getOne(listId, { requestKey: null, expand: 'collaborators' });
       const userId = this.pb.authStore.model?.id;
+
+      if (remoteDoc.deleted) {
+        this.destroyDocument(listId);
+        return;
+      }
 
       if (remoteDoc.yjsUpdate) {
         const beforeSV = Y.encodeStateVector(docInstance.doc);
@@ -894,18 +937,21 @@ export class GlobalPocketBaseProvider {
     }
 
     try {
-      // Use a single transaction for create/update/delete logic
-      const existingRecord = await this.pb.collection(this.collectionName).getOne(listId).catch(e => e.status === 404 ? null : Promise.reject(e));
+      const existingRecord = await this.pb.collection(this.collectionName).getOne(listId, { requestKey: null }).catch(e => {
+        if (e.status === 404) return null;
+        throw e;
+      });
 
       if (isDeleted) {
         if (existingRecord) {
-          console.log(`[GlobalPocketBaseProvider] Deleting list on server: ${listId}`);
-          await this.pb.collection(this.collectionName).delete(listId);
+          console.log(`[GlobalPocketBaseProvider] Soft deleting list on server: ${listId}`);
+          await this.pb.collection(this.collectionName).update(listId, { deleted: true }, { requestKey: null });
         }
-        // If it doesn't exist on the server, no action is needed.
-        // We can now safely destroy the local representation.
         this.destroyDocument(listId);
-      } else if (existingRecord) {
+        return; // Stop further processing
+      }
+
+      if (existingRecord) {
         // Update existing record
         const metadataUpdate: Partial<PocketBaseTaskListRecord> = {
           yjsUpdate: base64Update,
@@ -1013,15 +1059,36 @@ export class GlobalPocketBaseProvider {
     console.log(`[GlobalPocketBaseProvider] Destroying document for list ${listId}`);
     const docInstance = this.documents.get(listId);
     if (!docInstance) return;
+
     this.disconnectDocument(listId);
+
     if (docInstance.updateHandler) {
       docInstance.doc.off('update', docInstance.updateHandler);
     }
-    if (docInstance.persistence) {
-      docInstance.persistence.destroy();
-    }
+
+    // ydoc.destroy() will trigger the persistence layer to destroy itself and clear the IndexedDB.
     docInstance.doc.destroy();
+
+    // Fully delete the IndexedDB database for this list
+    const dbName = `${DB_NAME_PREFIX}${listId}`;
+    try {
+      const request = indexedDB.deleteDatabase(dbName);
+      request.onsuccess = () => {
+        console.log(`[GlobalPocketBaseProvider] Successfully deleted IndexedDB: ${dbName}`);
+      };
+      request.onerror = () => {
+        console.error(`[GlobalPocketBaseProvider] Error deleting DB ${dbName}`, request.error);
+      };
+      request.onblocked = () => {
+        console.warn(`[GlobalPocketBaseProvider] Deletion of ${dbName} is blocked.`);
+      };
+    } catch (e) {
+      console.error(`[GlobalPocketBaseProvider] Exception while deleting IndexedDB: ${dbName}`, e);
+    }
+
     this.documents.delete(listId);
+    this.removeKnownListId(listId);
+
     if (options.notify) {
       this.notifyDocumentListChange(listId);
     }

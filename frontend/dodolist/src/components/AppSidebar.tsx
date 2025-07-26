@@ -319,26 +319,6 @@ const AppSidebar = memo(({
             </SidebarGroupContent>
           </SidebarGroup>
         )}
-        {/* Archived Lists */}
-        {archivedLists.length > 0 && (
-          <SidebarGroup className="mb-2">
-            <SidebarGroupLabel className={`text-xs font-semibold uppercase tracking-wide mb-1 ${activeColor.darkText} opacity-70`}>Archived</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {archivedLists.map(list => (
-                  <ListMenuItem
-                    key={list.id}
-                    list={list}
-                    isActive={activeListId === list.id}
-                    isArchived={true}
-                    activeColor={activeColor}
-                    onListClick={handleSidebarListClick}
-                  />
-                ))}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        )}
         {/* Shared Lists */}
         {sharedLists.length > 0 && (
           <SidebarGroup className="mb-2">
@@ -351,6 +331,26 @@ const AppSidebar = memo(({
                     list={list}
                     isActive={activeListId === list.id}
                     isArchived={list.archived}
+                    activeColor={activeColor}
+                    onListClick={handleSidebarListClick}
+                  />
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
+        {/* Archived Lists */}
+        {archivedLists.length > 0 && (
+          <SidebarGroup className="mb-2">
+            <SidebarGroupLabel className={`text-xs font-semibold uppercase tracking-wide mb-1 ${activeColor.darkText} opacity-70`}>Archived</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {archivedLists.map(list => (
+                  <ListMenuItem
+                    key={list.id}
+                    list={list}
+                    isActive={activeListId === list.id}
+                    isArchived={true}
                     activeColor={activeColor}
                     onListClick={handleSidebarListClick}
                   />

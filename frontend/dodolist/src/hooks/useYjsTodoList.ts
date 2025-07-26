@@ -40,12 +40,9 @@ export function useYjsTodoList(listId: string | null) {
             if (doc && updateState) {
                 doc.off('update', updateState);
             }
-            if (providerRef.current) {
-                // The global provider will manage the actual document lifecycle.
-                // This just signals that this hook instance is no longer using it.
-                providerRef.current.destroy();
-                providerRef.current = null;
-            }
+            // This hook no longer needs the provider, but we don't destroy it here.
+            // The global provider instance manages the lifecycle.
+            providerRef.current = null;
         };
 
         if (!listId) {

@@ -42,20 +42,20 @@ export function useTodoLists() {
           // Update a single list
           const baseList = decodeYjsListDocFromMemory(listId);
           if (baseList) {
-            // Always get readOnly from provider
-            const updatedList = { ...baseList, readOnly: provider.getReadOnlyStatus(listId) };
-            setTodoLists(prevLists => {
-              const listExists = prevLists.some(l => l.id === listId);
-              if (updatedList && !updatedList.deleted) {
-                // If list exists, update it, otherwise add it
-                return listExists 
-                  ? prevLists.map(l => l.id === listId ? updatedList : l)
-                  : [...prevLists, updatedList];
-              } else {
-                // If list is deleted or doesn't exist anymore, remove it
-                return prevLists.filter(l => l.id !== listId);
-              }
-            });
+            if (baseList.deleted) {
+              setTodoLists(prevLists => prevLists.filter(l => l.id !== listId));
+            } else {
+              // Always get readOnly from provider
+              const updatedList = { ...baseList, readOnly: provider.getReadOnlyStatus(listId) };
+              setTodoLists(prevLists => {
+                const listExists = prevLists.some(l => l.id === listId);
+                if (listExists) {
+                  return prevLists.map(l => l.id === listId ? updatedList : l);
+                } else {
+                  return [...prevLists, updatedList];
+                }
+              });
+            }
             // Subscribe to Yjs updates for this list
             const listsNow = getAllLocalYjsTodoLists().filter(l => !l.deleted);
             subscribeToAllYjsDocs(listsNow);
