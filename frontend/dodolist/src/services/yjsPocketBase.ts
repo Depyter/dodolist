@@ -422,8 +422,14 @@ export class GlobalPocketBaseProvider {
         const newDeleted = record.deleted === true;
         if (!prevDeleted && newDeleted) {
           console.log(`[GlobalPocketBaseProvider] Detected 'deleted' field changed to true for list ${record.id}. Destroying local persistence.`);
-          this.destroyDocument(record.id);
+          // Set the in-memory Yjs doc's 'deleted' field to true before destroying
+          if (!ylist.get('deleted')) {
+            docInstance.doc.transact(() => {
+              ylist.set('deleted', true);
+            }, 'server-update');
+          }
           this.notifyDocumentListChange(record.id, true);
+          this.destroyDocument(record.id);
           return;
         }
         // If not deleted, apply yjsUpdate if present
@@ -448,7 +454,6 @@ export class GlobalPocketBaseProvider {
             ylist.set('deleted', true);
           }, 'server-update');
         }
-        this.notifyDocumentListChange(record.id, true);
       }
     }
   };
