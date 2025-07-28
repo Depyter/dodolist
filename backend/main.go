@@ -11,6 +11,9 @@ import (
 
 	// Import migrations
 	_ "dodolist-backend/migrations"
+
+	// Import custom API routes
+	"dodolist-backend/apis"
 )
 
 func main() {
@@ -32,6 +35,9 @@ func main() {
 		// Development: you can still use localhost or bind to all
 		app.RootCmd.SetArgs([]string{"serve", "--http=0.0.0.0:8080"})
 	}
+
+	// Register custom API endpoints
+	apis.RegisterApiRoutes(app)
 
 	if err := app.Start(); err != nil {
 		log.Fatal(err)

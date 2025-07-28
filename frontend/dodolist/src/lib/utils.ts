@@ -2,7 +2,7 @@ import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { v4 as uuidv4 } from "uuid";
 import * as Y from "yjs";
-import type { Todo, TodoListWithTodos } from './types';
+import type { Todo, TodoList, TodoListWithTodos, PocketBasePermissionsRecord } from './types';
 import { GlobalPocketBaseProvider } from '@/services/yjsPocketBase';
 
 export function cn(...inputs: ClassValue[]) {
@@ -224,4 +224,42 @@ export function exportListToLink(list: { name: string; color: string; todos: any
   const json = JSON.stringify(exportObj);
   const encoded = encodeURIComponent(btoa(json));
   return `${window.location.origin}/import?data=${encoded}`;
+}
+
+/**
+ * Returns true if the current user is the owner of the list.
+ */
+export function isListOwner(list: TodoList | TodoListWithTodos, currentUserId: string): boolean {
+  return list.user_id === currentUserId;
+}
+
+/**
+ * Returns the permissions record for the current user for a given list, or null if not found.
+ * Only returns a record if the user is a collaborator (not the owner).
+ */
+export function getCollaboratorPermission(
+  listId: string,
+  permissions: PocketBasePermissionsRecord[],
+  currentUserId: string
+): PocketBasePermissionsRecord | null {
+  return permissions.find(
+    (perm) => perm.task_list === listId && perm.user_id === currentUserId && perm.status === 'active'
+  ) || null;
+}
+
+/**
+ * Returns the permission level ("owner", "edit", "view", or null) for the current user for a given list.
+ * - "owner" if the user is the list owner
+ * - "edit"/"view" if the user is a collaborator
+ * - null if no access
+ */
+export function getListPermissionLevel(
+  list: TodoList | TodoListWithTodos,
+  permissions: PocketBasePermissionsRecord[],
+  currentUserId: string
+): 'owner' | 'edit' | 'view' | null {
+  if (isListOwner(list, currentUserId)) return 'owner';
+  const perm = getCollaboratorPermission(list.id, permissions, currentUserId);
+  if (perm) return perm.permission === 'edit' ? 'edit' : 'view';
+  return null;
 }

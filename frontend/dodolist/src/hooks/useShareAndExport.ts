@@ -2,10 +2,11 @@ import { useState, useCallback } from "react";
 import { GlobalPocketBaseProvider } from "@/services/yjsPocketBase";
 import type { TodoListWithTodos } from "@/lib/types";
 import * as Y from 'yjs';
+import { PermissionsService } from '@/services/permissionsService';
 
 export type SharePerson = { email: string; permission: "edit" | "view" };
 
-export function useShareOptions(listId: string | null) {
+export function useShareOptions(listId: string | null, addNotification?: (n: { message: string; type: "error" | "success" | "info" | "warning"; duration?: number }) => void) {
   // In a real app, fetch these from backend or Yjs doc metadata
   const [people, setPeople] = useState<SharePerson[]>([]);
   const [inviteEmail, setInviteEmail] = useState("");
@@ -13,13 +14,57 @@ export function useShareOptions(listId: string | null) {
   const [isPublic, setIsPublic] = useState(false);
 
   // TODO: Integrate with Yjs doc or backend for real sharing logic
-  const addPerson = useCallback((email: string, permission: "edit" | "view") => {
-    if (email && !people.some((p) => p.email === email)) {
+  const addPerson = useCallback(async (email: string, permission: "edit" | "view") => {
+    if (!email || people.some((p) => p.email === email)) {
+      setInviteEmail("");
+      setInvitePermission("edit");
+      return;
+    }
+    let userId: string | null = null;
+    try {
+      userId = await PermissionsService.getUserIdByEmail(email);
+      if (!userId) throw new Error('User not found');
+    } catch (e) {
+      if (addNotification) {
+        addNotification({
+          message: "No user found with that email.",
+          type: "error",
+          duration: 2000,
+        });
+      }
+      setInviteEmail("");
+      setInvitePermission("edit");
+      return;
+    }
+    if (!listId || typeof listId !== 'string' || !userId || typeof userId !== 'string') {
+      setInviteEmail("");
+      setInvitePermission("edit");
+      return;
+    }
+    const invitedBy = (window as any).__pb_auth_store?.model?.id || '';
+    // Get the current user's email for inviter_email
+    const inviterEmail = (window as any).__pb_auth_store?.model?.email || '';
+    try {
+      await PermissionsService.inviteUserToList({
+        listId: listId as string,
+        userId: userId as string,
+        invitedBy,
+        inviterEmail,
+        permission
+      });
       setPeople([...people, { email, permission }]);
+    } catch (err) {
+      if (addNotification) {
+        addNotification({
+          message: 'Failed to invite user: ' + (err as Error).message,
+          type: 'error',
+          duration: 3000,
+        });
+      }
     }
     setInviteEmail("");
     setInvitePermission("edit");
-  }, [people]);
+  }, [people, listId, addNotification]);
 
   const removePerson = useCallback((email: string) => {
     setPeople(people.filter((p) => p.email !== email));

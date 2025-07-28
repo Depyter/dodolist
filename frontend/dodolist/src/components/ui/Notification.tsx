@@ -9,10 +9,10 @@ export interface NotificationProps {
 }
 
 const typeStyles = {
-  success: "bg-green-50 border-green-200 text-green-800",
-  error: "bg-rose-50 border-rose-200 text-rose-800",
-  info: "bg-blue-50 border-blue-200 text-blue-800",
-  warning: "bg-amber-50 border-amber-200 text-amber-800",
+  success: "bg-white/90 border-green-200 text-green-800 shadow-md",
+  error: "bg-white/90 border-rose-200 text-rose-800 shadow-md",
+  info: "bg-white/90 border-blue-200 text-blue-800 shadow-md",
+  warning: "bg-white/90 border-amber-200 text-amber-800 shadow-md",
 };
 
 export const Notification: React.FC<NotificationProps> = ({
@@ -30,17 +30,18 @@ export const Notification: React.FC<NotificationProps> = ({
 
   return (
     <div
-      className={`shadow-lg border rounded-lg px-4 py-3 mb-3 flex flex-col min-w-[260px] max-w-xs ${typeStyles[type]} animate-in fade-in-0 slide-in-from-top-4 duration-300`}
-      style={{ pointerEvents: "auto" }}
+      className={`relative border rounded-xl px-5 py-3 mb-3 flex flex-col min-w-[260px] max-w-xs ${typeStyles[type]} animate-in fade-in-0 slide-in-from-top-4 duration-300`}
+      style={{ pointerEvents: "auto", boxShadow: "0 2px 8px rgba(0,0,0,0.10)" }}
       role="alert"
     >
-      <div className="font-medium truncate">{message}</div>
+      <div className="font-semibold truncate text-base tracking-tight">{message}</div>
       {description && <div className="text-sm mt-1 text-opacity-80 truncate">{description}</div>}
       {onClose && (
         <button
           className="absolute top-2 right-2 text-slate-400 hover:text-slate-600"
           onClick={onClose}
           aria-label="Close notification"
+          style={{ zIndex: 2 }}
         >
           ×
         </button>

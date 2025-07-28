@@ -1,4 +1,5 @@
-import PocketBase from 'pocketbase'
+import pb from './pbClient';
+
 import { PB_URL } from '@/config'
 
 import type { UserProfile } from '@/lib/types';
@@ -23,12 +24,11 @@ export interface LoginData {
 const LOGOUT_CHANNEL = 'dodolist-logout';
 
 class AuthService {
-  private pb: PocketBase
+  private pb = pb;
   private logoutChannel: BroadcastChannel;
 
   constructor() {
-    this.pb = new PocketBase(PB_URL)
-    // Store the auth store globally for sharing with other PocketBase instances
+    // No need to create a new PocketBase instance, use the singleton
     ;(window as any).__pb_auth_store = this.pb.authStore
     this.logoutChannel = new BroadcastChannel(LOGOUT_CHANNEL);
     this.setupLogoutListener();

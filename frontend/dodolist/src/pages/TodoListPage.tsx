@@ -4,37 +4,16 @@ import { Card } from "@/components/ui/card"
 import { useState, useEffect, useMemo, useCallback } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import {
-  DropdownMenu, // Import DropdownMenu components
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger, // Keep this
-  DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu" // Correct path for DropdownMenu components
-import {
   Archive,
   ArchiveRestore,
-  Bell,
-  Calendar,
   CheckCircle2,
   ChevronDown,
   ChevronRight,
-  Circle,
-  Clock,
   Pin,
-  Repeat,
   Send,
-  Trash2,
-  X,
-  Loader2,
-  AlertCircle,
-  Database,
-  AlertTriangle,
-  MoreVertical, // Import MoreVertical icon
-  PinOff, // Import PinOff icon
-  Copy, // Import Copy icon
-  Palette, // Import Palette icon
   UserPlus,
   Users,
+  Loader2,
 } from "lucide-react"
 import { useTodoLists } from "@/hooks/useTodoLists"
 import { useYjsTodoList } from "@/hooks/useYjsTodoList"
@@ -47,10 +26,16 @@ import { SidebarInset } from "@/components/ui/sidebar"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Notification } from "@/components/ui/Notification"
 import SyncStatusIndicator from "@/components/SyncStatusIndicator"
 import { ShareDialog } from "@/components/ShareDialog"
 import { ListOptionsDropdown } from "@/components/ListOptionsDropdown"
+import { TaskScheduleOverlay } from "@/components/TaskScheduleOverlay"
+import { useNotification } from "@/hooks/useNotification";
+import { Notification } from "@/components/ui/Notification";
+import { TaskCard } from "@/components/TaskCard"
+import { ErrorMessage } from "@/components/ErrorMessage";
+import { PersistenceWarning } from "@/components/PersistenceWarning";
+import { StorageTypeIndicator } from "@/components/StorageTypeIndicator";
 
 export default function DodoListApp() {
   const { listId } = useParams()
@@ -163,33 +148,7 @@ export default function DodoListApp() {
   const [showCompleted, setShowCompleted] = useState(true)
 
   const [isEditingHeader, setIsEditingHeader] = useState(false);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [isShared, setIsShared] = useState(false);
   const [showShareDialog, setShowShareDialog] = useState(false);
-
-  // --- Notification System ---
-  type NotificationType = "success" | "error" | "info" | "warning";
-  interface NotificationState {
-    id: number;
-    message: string;
-    type: NotificationType;
-    duration?: number;
-  }
-
-  function useNotification() {
-    const [notifications, setNotifications] = useState<NotificationState[]>([]);
-
-    const addNotification = useCallback((notification: Omit<NotificationState, 'id'>) => {
-      const id = Date.now();
-      setNotifications(prev => [...prev, { ...notification, id }]);
-    }, []);
-
-    const removeNotification = useCallback((id: number) => {
-      setNotifications(prev => prev.filter(n => n.id !== id));
-    }, []);
-
-    return { notifications, addNotification, removeNotification };
-  }
 
   const { notifications, addNotification, removeNotification } = useNotification();
 
@@ -234,18 +193,7 @@ export default function DodoListApp() {
     if (!isValidDate(b.deadline)) return -1
     return a.deadline.getTime() - b.deadline.getTime()
   })
-
-  // // --- Debugging ---
-  // useEffect(() => {
-  //   console.log("Active List ID:", activeListId)
-  //   console.log("Active List:", activeList)
-  //   console.log("Active List Todos:", activeList?.todos)
-  //   console.log("Todos to use:", todosToUse)
-  //   console.log("Active todos:", activeTodos)
-  //   console.log("Sorted active todos:", sortedActiveTodos)
-  //   console.log("Readonly Status:", activeList?.readOnly)
-  // }, [activeListId, activeList, todosToUse, activeTodos, sortedActiveTodos]) // Use isCollaborativeMode dependency
-
+  
   const totalCount = todosToUse.length || 0
   const activeCount = activeTodos.length
 
@@ -264,18 +212,8 @@ export default function DodoListApp() {
     try {
       await addTodo(inputValue)
       setInputValue("")
-      addNotification({
-        message: "Task added successfully!",
-        type: "success",
-        duration: 3000,
-      });
     } catch (error) {
       console.error("Failed to add todo:", error)
-      addNotification({
-        message: "Failed to add task.",
-        type: "error",
-        duration: 3000,
-      });
     } finally {
       setIsAddingTodo(false)
     }
@@ -285,21 +223,8 @@ export default function DodoListApp() {
   const handleToggleTodo = async (todoId: string) => {
     try {
       await toggleTodo(todoId);
-      const todo = todosToUse.find(t => t.id === todoId);
-      if (todo && !todo.completed) {
-        addNotification({
-          message: "Task marked as complete!",
-          type: "success",
-          duration: 3000,
-        });
-      }
     } catch (error) {
       console.error("Failed to toggle todo:", error);
-      addNotification({
-        message: "Failed to update task.",
-        type: "error",
-        duration: 3000,
-      });
     }
   };
 
@@ -307,18 +232,8 @@ export default function DodoListApp() {
   const handleDeleteTodo = async (todoId: string) => {
     try {
       await deleteTodo(todoId);
-      addNotification({
-        message: "Task deleted.",
-        type: "info",
-        duration: 3000,
-      });
     } catch (error) {
       console.error("Failed to delete todo:", error);
-      addNotification({
-        message: "Failed to delete task.",
-        type: "error",
-        duration: 3000,
-      });
     }
   };
 
@@ -326,18 +241,8 @@ export default function DodoListApp() {
   const handleUpdateTodo = async (todoId: string, updates: Partial<Todo>) => {
     try {
       await updateTodoItem(todoId, updates);
-      addNotification({
-        message: "Task updated.",
-        type: "success",
-        duration: 3000,
-      });
     } catch (error) {
       console.error("Failed to update todo:", error);
-      addNotification({
-        message: "Failed to update task.",
-        type: "error",
-        duration: 3000,
-      });
     }
   };
 
@@ -414,58 +319,19 @@ export default function DodoListApp() {
     if (newName && newName.trim() !== "") {
       try {
         updateListMetadata({ name: newName });
-        addNotification({
-          message: "List name updated.",
-          type: "success",
-          duration: 3000,
-        });
       } catch (error) {
         console.error("Failed to update list name:", error);
-        addNotification({
-          message: "Failed to update list name.",
-          type: "error",
-          duration: 3000,
-        });
       }
     }
     setIsEditingHeader(false);
   }, [updateListMetadata, addNotification]);
 
-  // Update list color (now uses Yjs metadata)
-  const updateListColor = async (newColor: string) => {
-    try {
-      updateListMetadata({ color: newColor });
-      addNotification({
-        message: "List color updated.",
-        type: "success",
-        duration: 3000,
-      });
-    } catch (error) {
-      console.error("Failed to update list color:", error);
-      addNotification({
-        message: "Failed to update list color.",
-        type: "error",
-        duration: 3000,
-      });
-    }
-  };
-
   // Toggle pin list (now uses Yjs metadata)
   const togglePinList = () => {
     try {
       updateListMetadata({ pinned: !activeListData.pinned });
-      addNotification({
-        message: activeListData.pinned ? "List unpinned." : "List pinned.",
-        type: "success",
-        duration: 3000,
-      });
     } catch (error) {
       console.error("Failed to toggle pin:", error);
-      addNotification({
-        message: "Failed to update pin status.",
-        type: "error",
-        duration: 3000,
-      });
     }
   };
 
@@ -473,18 +339,8 @@ export default function DodoListApp() {
   const toggleArchiveList = () => {
     try {
       updateListMetadata({ archived: !activeListData.archived });
-      addNotification({
-        message: activeListData.archived ? "List unarchived." : "List archived.",
-        type: "success",
-        duration: 3000,
-      });
     } catch (error) {
       console.error("Failed to toggle archive:", error);
-      addNotification({
-        message: "Failed to update archive status.",
-        type: "error",
-        duration: 3000,
-      });
     }
   };
 
@@ -547,318 +403,6 @@ export default function DodoListApp() {
     return "text-slate-600"
   }
 
-  const TaskScheduleOverlay = ({ todo, readOnly = false }: { todo: Todo; readOnly?: boolean }) => {
-    const [deadlineHasTime, setDeadlineHasTime] = useState(!!todo.deadline)
-    const [reminderHasTime, setReminderHasTime] = useState(!!todo.reminder)
-
-    return (
-      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 font-sans-serif antialiased">
-        <div className="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
-          <div className="p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
-                <Clock className="w-5 h-5" />
-                Schedule Task
-              </h3>
-              <Button variant="ghost" size="sm" onClick={() => setShowTaskOptions(null)}>
-                <X className="w-4 h-4" />
-              </Button>
-            </div>
-
-            <div className="space-y-6">
-              {/* Task Preview */}
-              <div className="p-3 bg-slate-50 rounded-lg">
-                <p className="text-sm text-slate-700 font-medium">{todo.text}</p>
-              </div>
-
-              {/* Recurring Section */}
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <Repeat className="w-4 h-4 text-slate-600" />
-                  <h4 className="font-medium text-slate-800">Repeat</h4>
-                </div>
-
-                <select
-                  value={todo.recurring || "none"}
-                  onChange={(e) => handleUpdateTodo(todo.id, { recurring: e.target.value as Todo["recurring"] })}
-                  className="w-full p-2 border border-slate-200 rounded-md text-sm"
-                  disabled={readOnly}
-                >
-                  <option value="none">Don't repeat</option>
-                  <option value="daily">Daily</option>
-                  <option value="weekly">Weekly</option>
-                  <option value="monthly">Monthly</option>
-                </select>
-
-                {todo.recurring && todo.recurring !== "none" && (
-                  <div className="p-3 bg-green-50 rounded-lg border border-green-200">
-                    <div className="flex items-center gap-2">
-                      <Repeat className="w-4 h-4 text-green-600" />
-                      <span className="text-sm font-medium text-green-700">This task will repeat {todo.recurring}</span>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Deadline Section */}
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-slate-600" />
-                  <h4 className="font-medium text-slate-800">Deadline</h4>
-                </div>
-
-                <div className="space-y-3">
-                  <Input
-                    type="date"
-                    value={isValidDate(todo.deadline) && todo.deadline.toISOString() !== 'Invalid Date' ? todo.deadline.toISOString().split("T")[0] : ""}
-                    onChange={(e) => {
-                      if (e.target.value) {
-                        const newDate = new Date(e.target.value)
-                        if (deadlineHasTime && isValidDate(todo.deadline)) {
-                          newDate.setHours(todo.deadline.getHours(), todo.deadline.getMinutes())
-                        } else {
-                          newDate.setHours(9, 0) // Default to 9 AM if time is enabled
-                        }
-                        handleUpdateTodo(todo.id, { deadline: newDate })
-                      } else {
-                        handleUpdateTodo(todo.id, { deadline: undefined })
-                        setDeadlineHasTime(false)
-                      }
-                    }}
-                    className="w-full"
-                    disabled={readOnly}
-                  />
-
-                  {todo.deadline && (
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="checkbox"
-                          id="deadline-time"
-                          checked={deadlineHasTime}
-                          onChange={(e) => {
-                            setDeadlineHasTime(e.target.checked)
-                            if (e.target.checked && todo.deadline) {
-                              const newDeadline = new Date(todo.deadline)
-                              newDeadline.setHours(9, 0) // Default to 9 AM
-                              handleUpdateTodo(todo.id, { deadline: newDeadline })
-                            }
-                          }}
-                          className="rounded"
-                          disabled={readOnly}
-                        />
-                        <label htmlFor="deadline-time" className="text-sm text-slate-600">
-                          Set specific time
-                        </label>
-                      </div>
-
-                      {deadlineHasTime && (
-                        <div className="space-y-2">
-                          <Input
-                            type="time"
-                            value={todo.deadline ? todo.deadline.toTimeString().slice(0, 5) : "09:00"}
-                            onChange={(e) => {
-                              if (todo.deadline && e.target.value) {
-                                const newDeadline = new Date(todo.deadline)
-                                const [hours, minutes] = e.target.value.split(":")
-                                newDeadline.setHours(Number.parseInt(hours), Number.parseInt(minutes))
-                                handleUpdateTodo(todo.id, { deadline: newDeadline })
-                              }
-                            }}
-                            className="w-full"
-                            disabled={readOnly}
-                          />
-
-                          {/* Quick time presets */}
-                          <div className="flex flex-wrap gap-1">
-                            {["09:00", "12:00", "17:00", "20:00"].map((time) => (
-                              <Button
-                                key={time}
-                                variant="outline"
-                                size="sm"
-                                onClick={() => {
-                                  if (todo.deadline) {
-                                    const newDeadline = new Date(todo.deadline)
-                                    const [hours, minutes] = time.split(":")
-                                    newDeadline.setHours(Number.parseInt(hours), Number.parseInt(minutes))
-                                    handleUpdateTodo(todo.id, { deadline: newDeadline })
-                                  }
-                                }}
-                                className="text-xs h-6 px-2"
-                                disabled={readOnly}
-                              >
-                                {time}
-                              </Button>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {todo.deadline && (
-                    <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
-                      <div className="flex items-center gap-2">
-                        <Calendar className="w-4 h-4 text-blue-600" />
-                        <span className={`text-sm font-medium ${getDeadlineColor(todo.deadline)}`}>
-                          Due{" "}
-                          {deadlineHasTime
-                            ? formatDateTime(todo.deadline)
-                            : todo.deadline.toLocaleDateString("en-US", {
-                                weekday: "short",
-                                month: "long",
-                                day: "numeric",
-                              })}
-                          {isOverdue(todo.deadline) && " (Overdue)"}
-                          {isDueToday(todo.deadline) && " (Today)"}
-                        </span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Reminder Section */}
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <Bell className="w-4 h-4 text-slate-600" />
-                  <h4 className="font-medium text-slate-800">Reminder</h4>
-                </div>
-
-                <div className="space-y-3">
-                  <Input
-                    type="date"
-                    value={isValidDate(todo.reminder) && todo.reminder.toISOString() !== 'Invalid Date' ? todo.reminder.toISOString().split("T")[0] : ""}
-                    onChange={(e) => {
-                      if (e.target.value) {
-                        const newDate = new Date(e.target.value)
-                        if (reminderHasTime && isValidDate(todo.reminder)) {
-                          newDate.setHours(todo.reminder.getHours(), todo.reminder.getMinutes())
-                        } else {
-                          newDate.setHours(8, 0) // Default to 8 AM if time is enabled
-                        }
-                        handleUpdateTodo(todo.id, { reminder: newDate })
-                      } else {
-                        handleUpdateTodo(todo.id, { reminder: undefined })
-                        setReminderHasTime(false)
-                      }
-                    }}
-                    className="w-full"
-                    disabled={readOnly}
-                  />
-
-                  {todo.reminder && (
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="checkbox"
-                          id="reminder-time"
-                          checked={reminderHasTime}
-                          onChange={(e) => {
-                            setReminderHasTime(e.target.checked)
-                            if (e.target.checked && todo.reminder) {
-                              const newReminder = new Date(todo.reminder)
-                              newReminder.setHours(8, 0) // Default to 8 AM
-                              handleUpdateTodo(todo.id, { reminder: newReminder })
-                            }
-                          }}
-                          className="rounded"
-                          disabled={readOnly}
-                        />
-                        <label htmlFor="reminder-time" className="text-sm text-slate-600">
-                          Set specific time
-                        </label>
-                      </div>
-
-                      {reminderHasTime && (
-                        <div className="space-y-2">
-                          <Input
-                            type="time"
-                            value={todo.reminder ? todo.reminder.toTimeString().slice(0, 5) : "08:00"}
-                            onChange={(e) => {
-                              if (todo.reminder && e.target.value) {
-                                const newReminder = new Date(todo.reminder)
-                                const [hours, minutes] = e.target.value.split(":")
-                                newReminder.setHours(Number.parseInt(hours), Number.parseInt(minutes))
-                                handleUpdateTodo(todo.id, { reminder: newReminder })
-                              }
-                            }}
-                            className="w-full"
-                            disabled={readOnly}
-                          />
-                            
-                          {/* Quick time presets */}
-                          <div className="flex flex-wrap gap-1">
-                            {["08:00", "09:00", "12:00", "18:00"].map((time) => (
-                              <Button
-                                key={time}
-                                variant="outline"
-                                size="sm"
-                                onClick={() => {
-                                  if (todo.reminder) {
-                                    const newReminder = new Date(todo.reminder)
-                                    const [hours, minutes] = time.split(":")
-                                    newReminder.setHours(Number.parseInt(hours), Number.parseInt(minutes))
-                                    handleUpdateTodo(todo.id, { reminder: newReminder })
-                                  }
-                                }}
-                                className="text-xs h-6 px-2"
-                                disabled={readOnly}
-                              >
-                                {time}
-                              </Button>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {todo.reminder && (
-                    <div className="p-3 bg-purple-50 rounded-lg border border-purple-200">
-                      <div className="flex items-center gap-2">
-                        <Bell className="w-4 h-4 text-purple-600" />
-                        <span className="text-sm font-medium text-purple-700">
-                          Remind{" "}
-                          {reminderHasTime
-                            ? formatDateTime(todo.reminder)
-                            : todo.reminder.toLocaleDateString("en-US", {
-                                weekday: "short",
-                                month: "long",
-                                day: "numeric",
-                              })}
-                        </span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex gap-3 pt-4 border-t">
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    handleUpdateTodo(todo.id, { deadline: undefined, reminder: undefined, recurring: "none" })
-                    setDeadlineHasTime(false)
-                    setReminderHasTime(false)
-                  }}
-                  className="flex-1"
-                  disabled={readOnly}
-                >
-                  Clear All
-                </Button>
-                <Button onClick={() => setShowTaskOptions(null)} className={`flex-1 ${activeList?.color} text-white`}>
-                  Done
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
   const CircularProgress = ({
     percentage,
     size = 6, 
@@ -914,114 +458,6 @@ export default function DodoListApp() {
     )
   }
 
-  const TaskCard = ({ todo, isCompleted = false, readOnly = false }: { todo: Todo; isCompleted?: boolean; readOnly?: boolean }) => {
-    // Defensive: fallback to a default color if activeList or color is missing
-    const colorClass = (activeList && typeof activeList.color === 'string')
-      ? activeList.color.replace("bg-", "text-")
-      : "text-blue-500";
-    const borderClass = (activeColor && typeof activeColor.border === 'string') ? activeColor.border : "border-slate-200";
-    const lightClass = (activeColor && typeof activeColor.light === 'string') ? activeColor.light : "bg-slate-50";
-
-    // Defensive: ensure todo fields are present and of correct type
-    const todoText = typeof todo.text === 'string' ? todo.text : '';
-    const recurring = typeof todo.recurring === 'string' ? todo.recurring : undefined;
-    const completed = Boolean(todo.completed);
-    const deadline = todo.deadline instanceof Date && !isNaN(todo.deadline.getTime()) ? todo.deadline : undefined;
-    const reminder = todo.reminder instanceof Date && !isNaN(todo.reminder.getTime()) ? todo.reminder : undefined;
-    const isDueTodayTask = !!deadline && isDueToday(deadline);
-
-    return (
-      <Card
-        key={todo.id}
-        className={`p-3 transition-all duration-300 hover:shadow-md will-change-transform 
-          ${isCompleted
-            ? `${lightClass} ${borderClass} border opacity-60`
-            : `${lightClass} ${borderClass} border backdrop-blur-sm`}
-          ${isDueTodayTask && !isCompleted ? "border-red-500 border-2" : ""}`}
-      >
-        <div className="flex items-start gap-3">
-          <button
-            onClick={() => todo.id && handleToggleTodo(todo.id)}
-            className="mt-0.5 text-slate-400 hover:text-slate-600 transition-colors min-w-[20px]"
-            disabled={readOnly}
-          >
-            {completed ? (
-              <CheckCircle2 className={`w-4 h-4 ${colorClass}`} />
-            ) : (
-              <Circle className="w-4 h-4" />
-            )}
-          </button>
-
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2">
-              <p className={`text-slate-800 leading-snug ${completed ? "line-through text-slate-400" : ""}`}>
-                {todoText}
-              </p>
-              {recurring && recurring !== "none" && (
-                <span
-                  className="text-xs px-1.5 py-0.5 bg-slate-100 text-slate-600 rounded-full"
-                  title={`Repeats ${recurring}`}
-                >
-                  {recurring}
-                </span>
-              )}
-            </div>
-
-            {(deadline || (reminder && !completed)) && (
-              <div className="flex flex-wrap gap-3 mt-1.5 text-xs">
-                {deadline && (
-                  <span className={`font-medium ${getDeadlineColor(deadline)}`}>
-                    Due{" "}
-                    {deadline.getHours && deadline.getMinutes && deadline.getHours() === 0 && deadline.getMinutes() === 0
-                      ? formatDateTime(deadline, false)
-                      : formatDateTime(deadline, true)}
-                    {isOverdue(deadline) && " (Overdue)"}
-                    {isDueToday(deadline) && " (Today)"}
-                  </span>
-                )}
-                {reminder && !completed && (
-                  <span className="text-slate-500">
-                    Remind{" "}
-                    {reminder.getHours && reminder.getMinutes && reminder.getHours() === 0 && reminder.getMinutes() === 0
-                      ? formatDateTime(reminder, false)
-                      : formatDateTime(reminder, true)}
-                  </span>
-                )}
-              </div>
-            )}
-          </div>
-
-          <div className="flex items-center gap-1">
-            {!isCompleted && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => todo.id && setShowTaskOptions(todo.id)}
-                className="h-7 w-7 p-0 text-slate-400 hover:text-slate-600"
-                title="Set deadline and reminder"
-                disabled={readOnly}
-              >
-                <Clock className="w-3.5 h-3.5" />
-              </Button>
-            )}
-
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => todo.id && handleDeleteTodo(todo.id)}
-              className="text-slate-400 hover:text-red-500 hover:bg-red-50 h-7 w-7 p-0"
-              disabled={readOnly}
-            >
-              <Trash2 className="w-3.5 h-3.5" />
-            </Button>
-          </div>
-        </div>
-      </Card>
-    )
-  }
-
-  
-
   // Only redirect to the first available list if there is no listId in the URL (on initial mount)
   useEffect(() => {
     if (!listId && todoLists.length > 0 && activeListId) {
@@ -1032,27 +468,11 @@ export default function DodoListApp() {
     }
   }, [listId, todoLists.length, navigate, activeListId]);
 
-  // --- Notification System ---
-  const NotificationPortal: React.FC<{
-    notifications: NotificationState[];
-    removeNotification: (id: number) => void;
-  }> = ({ notifications, removeNotification }) => (
-    <div className="fixed top-4 right-4 z-[100] w-80 space-y-2">
-      {notifications.map((notification) => (
-        <Notification
-          key={notification.id}
-          {...notification}
-          onClose={() => removeNotification(notification.id)}
-        />
-      ))}
-    </div>
-  );
-
   const handleColorSelect = (colorValue: string) => {
     if (activeList) {
       updateListMetadata({ color: colorValue });
     }
-    setDropdownOpen(false);
+    setShowShareDialog(false);
   };
 
   // Generate share URL (example: can be improved to use your backend logic)
@@ -1060,7 +480,20 @@ export default function DodoListApp() {
 
   return (
     <div className={`min-h-screen relative overflow-hidden ${activeColor.light}`}>
-      {/* <NotificationPortal notifications={notifications} removeNotification={removeNotification} /> */}
+      {/* Render notifications at the top right of the app */}
+      {!showShareDialog && (
+        <div className="fixed top-4 right-4 z-50">
+          {notifications.map(n => (
+            <Notification
+              key={n.id}
+              message={n.message}
+              type={n.type}
+              duration={n.duration}
+              onClose={() => removeNotification(n.id)}
+            />
+          ))}
+        </div>
+      )}
       {/* Share Dialog */}
       <ShareDialog
         open={showShareDialog}
@@ -1100,70 +533,21 @@ export default function DodoListApp() {
           )}
 
           {/* Error message */}
-          {error && (
-            <div className="fixed inset-0 flex items-center justify-center bg-white/50 z-50">
-              <div className="bg-white p-6 rounded-lg shadow-lg max-w-md">
-                <div className="flex items-center gap-3 text-red-500 mb-4">
-                  <AlertCircle className="w-6 h-6" />
-                  <h3 className="text-lg font-semibold">Error Loading Data</h3>
-                </div>
-                <p className="text-slate-600 mb-4">{error.message || "Failed to load your tasks. Please try refreshing the page."}</p>
-                <Button
-                  onClick={() => window.location.reload()}
-                  className="w-full"
-                >
-                  Refresh Page
-                </Button>
-              </div>
-            </div>
-          )}
+          <ErrorMessage error={error} onReload={() => window.location.reload()} />
 
           {/* Persistence Warning */}
-          {showPersistenceWarning && (
-            <div className="px-4 py-2 bg-amber-50 border-b border-amber-200">
-              <div className="flex items-start gap-2">
-                <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-amber-800">Your data is not being saved permanently</p>
-                  <p className="text-xs text-amber-700 mt-0.5">
-                    {persistenceError ?
-                      `Database error: ${persistenceError}` :
-                      "Your browser doesn't support persistent storage. Your tasks will be lost when you close this tab or refresh the page."}
-                  </p>
-                  {persistenceType === 'memory' && !persistenceError && (
-                    <div className="mt-1 text-xs text-amber-700">
-                      <p>For persistent storage, try:</p>
-                      <ul className="list-disc list-inside mt-0.5">
-                        <li>Using a modern browser like Chrome or Firefox</li>
-                        <li>Enable third-party cookies in your browser settings</li>
-                        <li>Try using a private/incognito window if storage is restricted</li>
-                      </ul>
-                    </div>
-                  )}
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowPersistenceWarning(false)}
-                  className="h-6 w-6 p-0 text-amber-600"
-                >
-                  <X className="w-4 h-4" />
-                </Button>
-              </div>
-            </div>
-          )}
+          <PersistenceWarning
+            show={showPersistenceWarning}
+            persistenceType={persistenceType}
+            persistenceError={persistenceError}
+            onClose={() => setShowPersistenceWarning(false)}
+          />
 
           {/* Storage Type Indicator */}
-          {persistenceType && !showPersistenceWarning && (
-            <div className="px-4 py-1 bg-slate-50 border-b border-slate-200 flex items-center gap-2">
-              <Database className="w-4 h-4 text-slate-500" />
-              <span className="text-xs text-slate-600">
-                {persistenceType === 'opfs' ? 'Using Origin Private File System for storage' :
-                 persistenceType === 'indexeddb' ? 'Using IndexedDB for storage' :
-                 'Using in-memory storage (data will be lost when page is closed)'}
-              </span>
-            </div>
-          )}
+          <StorageTypeIndicator
+            persistenceType={persistenceType}
+            showPersistenceWarning={showPersistenceWarning}
+          />
 
           {/* Task Schedule Overlay */}
           {showTaskOptions && (
@@ -1173,6 +557,14 @@ export default function DodoListApp() {
                 completedTodos.find((t) => t.id === showTaskOptions)!
               }
               readOnly={activeList?.readOnly}
+              handleUpdateTodo={handleUpdateTodo}
+              setShowTaskOptions={setShowTaskOptions}
+              activeList={activeList}
+              getDeadlineColor={getDeadlineColor}
+              formatDateTime={formatDateTime}
+              isValidDate={isValidDate}
+              isOverdue={isOverdue}
+              isDueToday={isDueToday}
             />
           )}
 
@@ -1250,7 +642,7 @@ export default function DodoListApp() {
                       <UserPlus className="w-4 h-4 text-slate-500" />
                     )}
                     <span className="text-xs font-medium text-slate-700 hidden sm:inline">
-                      {isShared ? "Shared" : "Share"}
+                      {activeList?.readOnly ? "Shared" : "Share"}
                     </span>
                   </button>
                   {/* List Settings Dropdown */}
@@ -1322,14 +714,22 @@ export default function DodoListApp() {
                   )}
                   {/* Active Todo List */}
                   <div className="space-y-2 mb-6">
-                    {sortedActiveTodos.map((todo, index) => (
-                      <div
+                    {sortedActiveTodos.map((todo) => (
+                      <TaskCard
                         key={todo.id}
-                        className="animate-in fade-in-0 slide-in-from-top-2 duration-300 fill-mode-both"
-                        style={{ animationDelay: `${index * 50}ms`, willChange: "transform, opacity" }}
-                      >
-                        <TaskCard todo={todo} readOnly={activeList?.readOnly} />
-                      </div>
+                        todo={todo}
+                        isCompleted={todo.completed}
+                        readOnly={activeList?.readOnly}
+                        activeList={activeList}
+                        activeColor={activeColor}
+                        setShowTaskOptions={setShowTaskOptions}
+                        handleToggleTodo={handleToggleTodo}
+                        handleDeleteTodo={handleDeleteTodo}
+                        getDeadlineColor={getDeadlineColor}
+                        formatDateTime={formatDateTime}
+                        isOverdue={isOverdue}
+                        isDueToday={isDueToday}
+                      />
                     ))}
                   </div>
                   {/* Empty State for Active Tasks */}
@@ -1371,7 +771,20 @@ export default function DodoListApp() {
                               className="animate-in fade-in-0 slide-in-from-top-2 duration-300 fill-mode-both"
                               style={{ animationDelay: `${index * 50}ms`, willChange: "transform, opacity" }}
                             >
-                              <TaskCard todo={todo} isCompleted={true} readOnly={activeList?.readOnly} />
+                              <TaskCard
+                                todo={todo}
+                                isCompleted={true}
+                                readOnly={activeList?.readOnly}
+                                activeList={activeList}
+                                activeColor={activeColor}
+                                setShowTaskOptions={setShowTaskOptions}
+                                handleToggleTodo={handleToggleTodo}
+                                handleDeleteTodo={handleDeleteTodo}
+                                getDeadlineColor={getDeadlineColor}
+                                formatDateTime={formatDateTime}
+                                isOverdue={isOverdue}
+                                isDueToday={isDueToday}
+                              />
                             </div>
                           ))}
                         </div>

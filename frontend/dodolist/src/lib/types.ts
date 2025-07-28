@@ -26,9 +26,17 @@ export interface PocketBaseTaskListRecord {
   createdAt: string; // Required
   yjsUpdate?: string; // Optional, plain text value
   yjsClientId?: string; // Optional, plain text value
-  shared_with?: Array<string>;
-  collaborators?: Array<string>;
   deleted?: boolean;
+}
+
+export interface PocketBasePermissionsRecord {
+  id?: string; // Optional 
+  task_list: string; // Relation record id
+  user_id: string;  // Relation record id
+  invited_by: string; // Relation record id
+  status: string; // invited | active | rejected
+  permission: string; // edit | view
+  inviter_email: string; // Email of user that created the invite
 }
 
 export interface TodoList {
@@ -41,8 +49,6 @@ export interface TodoList {
   archived?: boolean;
   yjsUpdate?: string;
   deleted?: boolean;
-  shared_with?: string[];
-  collaborators?: string[];
   readOnly?: boolean;
 }
 

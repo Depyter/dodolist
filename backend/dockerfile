@@ -20,7 +20,8 @@ COPY ./migrations /pb/migrations
 COPY ./main.go /pb/
 COPY ./go.mod /pb/
 COPY ./go.sum /pb/
-
+COPY ./apis /pb/apis
+COPY ./daos /pub/daos
 # Build custom PocketBase with migrations
 WORKDIR /pb
 RUN apk add go

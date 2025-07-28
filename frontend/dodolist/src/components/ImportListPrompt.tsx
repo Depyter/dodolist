@@ -3,6 +3,8 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { importListFromLink } from '@/lib/utils';
+import { ListPreviewCard } from "@/components/ListPreviewCard";
+import { colors } from "@/lib/colors";
 
 export default function ImportListPrompt() {
   const navigate = useNavigate();
@@ -66,10 +68,12 @@ export default function ImportListPrompt() {
             <DialogDescription>
               Do you want to add the following todo list to your account?
             </DialogDescription>
-            <div className="my-4 p-3 rounded bg-slate-100">
-              <div className="font-semibold">{importData.name}</div>
-              <div className="text-xs text-slate-500 mb-2">Color: {importData.color}</div>
-              <div className="text-sm">{importData.todos?.length || 0} tasks</div>
+            <div className="my-4 flex justify-center">
+              <ListPreviewCard
+                name={importData.name}
+                color={colors.find(c => c.name === importData.color) || colors[1]}
+                todos={importData.todos || []}
+              />
             </div>
           </>
         ) : (

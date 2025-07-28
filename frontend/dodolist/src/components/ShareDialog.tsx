@@ -5,6 +5,8 @@ import { Copy, Globe, UserPlus, Users, ChevronDown, QrCode } from "lucide-react"
 import { useState, useRef, useCallback } from "react";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { useShareOptions } from "@/hooks/useShareAndExport";
+import { useNotification } from "@/hooks/useNotification";
+import { Notification } from "@/components/ui/Notification";
 import QRCodeStyling from "qr-code-styling";
 import { colors, type Color } from "@/lib/colors";
 import { exportListToLink } from '@/lib/utils';
@@ -77,6 +79,7 @@ export function ShareDialog({ open, onOpenChange, shareUrl, readOnly, listId, ac
   const [showExport, setShowExport] = useState(false); // Toggle between share/export
   const qrCode = useRef<any>(null);
   const exportQrCode = useRef<any>(null);
+  const { notifications, addNotification, removeNotification } = useNotification();
   const {
     people,
     inviteEmail,
@@ -88,7 +91,7 @@ export function ShareDialog({ open, onOpenChange, shareUrl, readOnly, listId, ac
     changePermission,
     isPublic,
     togglePublic,
-  } = useShareOptions(listId);
+  } = useShareOptions(listId, addNotification);
 
   // Use activeColor from props, fallback to colors[1] if not provided
   const resolvedActiveColor = activeColor || colors[1];
@@ -195,6 +198,22 @@ export function ShareDialog({ open, onOpenChange, shareUrl, readOnly, listId, ac
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md gap-4">
+        {/* Render notifications directly above dialog content when open */}
+        {open && (
+          <div className="absolute bottom-full left-0 right-0 flex flex-col items-center pointer-events-none">
+              <div className="pointer-events-auto">
+                  {notifications.map(n => (
+                      <Notification
+                      key={n.id}
+                      message={n.message}
+                      type={n.type}
+                      duration={n.duration}
+                      onClose={() => removeNotification(n.id)}
+                      />
+                  ))}
+              </div>
+          </div>
+        )}
         <DialogHeader>
           <DialogTitle>Share this list</DialogTitle>
           <div className="flex gap-2 mt-2">

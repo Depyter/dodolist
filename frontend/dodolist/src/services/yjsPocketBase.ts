@@ -1,7 +1,6 @@
-import PocketBase from 'pocketbase';
+import pb from './pbClient';
 import * as Y from 'yjs';
 import { IndexeddbPersistence } from 'y-indexeddb';
-import { PB_URL } from '@/config';
 import type { PocketBaseTaskListRecord } from "@/lib/types";
 
 const DB_NAME_PREFIX = 'dodolist-yjs-';
@@ -68,7 +67,7 @@ export interface DocumentProvider {
 export class GlobalPocketBaseProvider {
   private static instance: GlobalPocketBaseProvider | null = null;
   
-  private pb: PocketBase;
+  private pb: typeof pb;
   private documents = new Map<string, DocumentInstance>();
   private subscriptions = new Map<string, string>(); // listId -> unsubscribeId
   private collectionName = 'task_lists';
@@ -84,7 +83,7 @@ export class GlobalPocketBaseProvider {
   private isInitialFetchDone = false;
 
   private constructor() {
-    this.pb = new PocketBase(PB_URL);
+    this.pb = pb;
     this.initializeAuth();
     this.setupEventListeners();
     this.setCanAccessPocketbase(navigator.onLine);

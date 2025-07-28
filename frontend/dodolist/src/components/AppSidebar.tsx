@@ -31,6 +31,7 @@ import AuthService from '@/services/authService'
 import type { TodoListWithTodos, UserProfile } from '@/lib/types'
 import DodoBirdIcon from "./DodoBirdIcon";
 import type { Color } from "@/lib/colors";
+import { PendingInvitesSection } from "@/components/PendingInvitesSection";
 
 interface ListMenuItemProps {
   list: TodoListWithTodos;
@@ -363,9 +364,11 @@ const AppSidebar = memo(({
 
       {/* Footer */}
       <SidebarFooter className="relative z-10 border-t border-white/15 px-4 py-3 bg-white/5">
-        {/* Debug: Clear Local Data Button */}
-        <div className="mb-2 flex justify-center">
-        </div>
+        {/* Pending Invites Section */}
+        <PendingInvitesSection
+          onAccept={inviteId => {/* TODO: Accept invite logic */}}
+          onDecline={inviteId => {/* TODO: Decline invite logic */}}
+        />
         <SidebarMenu>
           <SidebarMenuItem>
             <Dialog open={isEditingProfile} onOpenChange={setIsEditingProfile}>
