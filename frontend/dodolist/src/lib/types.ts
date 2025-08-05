@@ -37,6 +37,20 @@ export interface PocketBasePermissionsRecord {
   status: string; // invited | active | rejected
   permission: string; // edit | view
   inviter_email: string; // Email of user that created the invite
+  expand?: {
+    invited_by?: {
+      id: string;
+      email: string;
+      username?: string;
+      name?: string;
+    };
+    user_id?: {
+      id: string;
+      email: string;
+      username?: string;
+      name?: string;
+    };
+  };
 }
 
 export interface TodoList {

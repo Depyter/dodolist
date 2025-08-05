@@ -4,9 +4,6 @@ import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -15,23 +12,20 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-  MoreHorizontal,
   Plus,
   Pin,
-  PinOff,
   Archive,
-  ArchiveRestore,
-  Palette,
-  Trash2,
 } from "lucide-react";
 import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { useNavigate } from 'react-router-dom'
 import AuthService from '@/services/authService'
+import { PermissionsService } from '@/services/permissionsService';
 import type { TodoListWithTodos, UserProfile } from '@/lib/types'
 import DodoBirdIcon from "./DodoBirdIcon";
 import type { Color } from "@/lib/colors";
 import { PendingInvitesSection } from "@/components/PendingInvitesSection";
+import { CollapsibleSection } from "@/components/CollapsibleSection";
 
 interface ListMenuItemProps {
   list: TodoListWithTodos;
@@ -150,6 +144,23 @@ const AppSidebar = memo(({
   const navigate = useNavigate()
   const [authService] = useState(() => new AuthService())
   const [tempProfile, setTempProfile] = useState<UserProfile | null>(userProfile);
+  const [invitesKey, setInvitesKey] = useState(0);
+
+  const [sharedListIds, setSharedListIds] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    const fetchSharedLists = async () => {
+      try {
+        const permissions = await PermissionsService.getActivePermissionsForCurrentUser();
+        const listIds = new Set(permissions.map(p => p.task_list));
+        setSharedListIds(listIds);
+      } catch (error) {
+        console.error("Failed to fetch shared lists:", error);
+      }
+    };
+
+    fetchSharedLists();
+  }, [invitesKey]); // Refreshes when an invite is accepted
 
   useEffect(() => {
     setTempProfile(userProfile);
@@ -193,13 +204,14 @@ const AppSidebar = memo(({
   const activeList = listsWithYjs.find((list) => list.id === activeListId);
   const activeColor = colors.find((color) => color.value === activeList?.color) || colors[0];
   
-  const ownedLists = listsWithYjs.filter(list => !list.readOnly);
-  const sharedLists = listsWithYjs.filter(list => list.readOnly);
+  const ownedLists = listsWithYjs.filter(list => !sharedListIds.has(list.id));
+  const sharedLists = listsWithYjs.filter(list => sharedListIds.has(list.id));
 
-  const activeLists = ownedLists.filter((list) => !list.archived);
-  const archivedLists = ownedLists.filter((list) => list.archived);
-  const pinnedLists = activeLists.filter((list) => list.pinned);
-  const unpinnedLists = activeLists.filter((list) => !list.pinned);
+  const activeOwnedLists = ownedLists.filter((list) => !list.archived);
+  const archivedOwnedLists = ownedLists.filter((list) => list.archived);
+
+  const pinnedOwnedLists = activeOwnedLists.filter((list) => list.pinned);
+  const unpinnedOwnedLists = activeOwnedLists.filter((list) => !list.pinned);
 
   // Memoized sidebar navigation handler with guards
   const handleSidebarListClick = useCallback((listId: string) => {
@@ -234,6 +246,25 @@ const AppSidebar = memo(({
     style.innerHTML = customScrollbarStyle;
     document.head.appendChild(style);
   }
+
+  const handleAcceptInvite = async (inviteId: string) => {
+    try {
+      await PermissionsService.acceptInvite(inviteId);
+      setInvitesKey(k => k + 1); // force PendingInvitesSection to reload
+    } catch (e) {
+      // Optionally show notification
+      // console.error(e);
+    }
+  };
+  const handleDeclineInvite = async (inviteId: string) => {
+    try {
+      await PermissionsService.rejectInvite(inviteId);
+      setInvitesKey(k => k + 1);
+    } catch (e) {
+      // Optionally show notification
+      // console.error(e);
+    }
+  };
 
   return (
     <Sidebar className="border-r-0 overflow-hidden min-h-screen flex flex-col relative bg-white/90">
@@ -280,94 +311,79 @@ const AppSidebar = memo(({
 
       {/* Lists */}
       <SidebarContent className="custom-scrollbar relative z-10 flex-1 overflow-y-auto px-2 py-4">
-        {/* Pinned Lists */}
-        {pinnedLists.length > 0 && (
-          <SidebarGroup className="mb-2">
-            <SidebarGroupLabel className={`text-xs font-semibold uppercase tracking-wide mb-1 ${activeColor.darkText} opacity-70`}>Pinned</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {pinnedLists.map(list => (
-                  <ListMenuItem
-                    key={list.id}
-                    list={list}
-                    isActive={activeListId === list.id}
-                    isArchived={false}
-                    activeColor={activeColor}
-                    onListClick={handleSidebarListClick}
-                  />
-                ))}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
+        {pinnedOwnedLists.length > 0 && (
+          <CollapsibleSection title="Pinned" activeColor={activeColor}>
+            <SidebarMenu>
+              {pinnedOwnedLists.map(list => (
+                <ListMenuItem
+                  key={list.id}
+                  list={list}
+                  isActive={activeListId === list.id}
+                  isArchived={false}
+                  activeColor={activeColor}
+                  onListClick={handleSidebarListClick}
+                />
+              ))}
+            </SidebarMenu>
+          </CollapsibleSection>
         )}
-        {/* Active Lists */}
-        {unpinnedLists.length > 0 && (
-          <SidebarGroup className="mb-2">
-            <SidebarGroupLabel className={`text-xs font-semibold uppercase tracking-wide mb-1 ${activeColor.darkText} opacity-70`}>{pinnedLists.length > 0 ? "All Lists" : "Task Lists"}</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {unpinnedLists.map(list => (
-                  <ListMenuItem
-                    key={list.id}
-                    list={list}
-                    isActive={activeListId === list.id}
-                    isArchived={false}
-                    activeColor={activeColor}
-                    onListClick={handleSidebarListClick}
-                  />
-                ))}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        )}
-        {/* Shared Lists */}
+        <CollapsibleSection title="Task Lists" activeColor={activeColor}>
+          <SidebarMenu>
+            {unpinnedOwnedLists.map(list => (
+              <ListMenuItem
+                key={list.id}
+                list={list}
+                isActive={activeListId === list.id}
+                isArchived={false}
+                activeColor={activeColor}
+                onListClick={handleSidebarListClick}
+              />
+            ))}
+          </SidebarMenu>
+        </CollapsibleSection>
+
         {sharedLists.length > 0 && (
-          <SidebarGroup className="mb-2">
-            <SidebarGroupLabel className={`text-xs font-semibold uppercase tracking-wide mb-1 ${activeColor.darkText} opacity-70`}>Shared Lists</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {sharedLists.map(list => (
-                  <ListMenuItem
-                    key={list.id}
-                    list={list}
-                    isActive={activeListId === list.id}
-                    isArchived={list.archived}
-                    activeColor={activeColor}
-                    onListClick={handleSidebarListClick}
-                  />
-                ))}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
+          <CollapsibleSection title="Shared Lists" activeColor={activeColor}>
+            <SidebarMenu>
+              {sharedLists.map(list => (
+                <ListMenuItem
+                  key={list.id}
+                  list={list}
+                  isActive={activeListId === list.id}
+                  isArchived={list.archived}
+                  activeColor={activeColor}
+                  onListClick={handleSidebarListClick}
+                />
+              ))}
+            </SidebarMenu>
+          </CollapsibleSection>
         )}
-        {/* Archived Lists */}
-        {archivedLists.length > 0 && (
-          <SidebarGroup className="mb-2">
-            <SidebarGroupLabel className={`text-xs font-semibold uppercase tracking-wide mb-1 ${activeColor.darkText} opacity-70`}>Archived</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {archivedLists.map(list => (
-                  <ListMenuItem
-                    key={list.id}
-                    list={list}
-                    isActive={activeListId === list.id}
-                    isArchived={true}
-                    activeColor={activeColor}
-                    onListClick={handleSidebarListClick}
-                  />
-                ))}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
+
+        {archivedOwnedLists.length > 0 && (
+          <CollapsibleSection title="Archived" activeColor={activeColor}>
+            <SidebarMenu>
+              {archivedOwnedLists.map(list => (
+                <ListMenuItem
+                  key={list.id}
+                  list={list}
+                  isActive={activeListId === list.id}
+                  isArchived={true}
+                  activeColor={activeColor}
+                  onListClick={handleSidebarListClick}
+                />
+              ))}
+            </SidebarMenu>
+          </CollapsibleSection>
         )}
       </SidebarContent>
 
       {/* Footer */}
-      <SidebarFooter className="relative z-10 border-t border-white/15 px-4 py-3 bg-white/5">
+      <SidebarFooter className="relative z-10 px-4 py-4 border-t border-white/15" style={{ background: 'rgba(0,0,0,0.05)' }}>
         {/* Pending Invites Section */}
         <PendingInvitesSection
-          onAccept={inviteId => {/* TODO: Accept invite logic */}}
-          onDecline={inviteId => {/* TODO: Decline invite logic */}}
+          key={invitesKey}
+          onAccept={handleAcceptInvite}
+          onDecline={handleDeclineInvite}
         />
         <SidebarMenu>
           <SidebarMenuItem>

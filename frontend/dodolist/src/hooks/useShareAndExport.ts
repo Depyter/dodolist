@@ -3,6 +3,7 @@ import { GlobalPocketBaseProvider } from "@/services/yjsPocketBase";
 import type { TodoListWithTodos } from "@/lib/types";
 import * as Y from 'yjs';
 import { PermissionsService } from '@/services/permissionsService';
+import AuthService from "@/services/authService";
 
 export type SharePerson = { email: string; permission: "edit" | "view" };
 
@@ -36,20 +37,20 @@ export function useShareOptions(listId: string | null, addNotification?: (n: { m
       setInvitePermission("edit");
       return;
     }
-    if (!listId || typeof listId !== 'string' || !userId || typeof userId !== 'string') {
+    const authService = new AuthService();
+    const invitedBy = authService.getUserId();
+    const inviterEmail = authService.getUserEmail();
+    if (!listId || typeof listId !== 'string' || !userId || typeof userId !== 'string' || !invitedBy) {
       setInviteEmail("");
       setInvitePermission("edit");
       return;
     }
-    const invitedBy = (window as any).__pb_auth_store?.model?.id || '';
-    // Get the current user's email for inviter_email
-    const inviterEmail = (window as any).__pb_auth_store?.model?.email || '';
     try {
       await PermissionsService.inviteUserToList({
         listId: listId as string,
-        userId: userId as string,
+        userId: userId as string, 
         invitedBy,
-        inviterEmail,
+        inviterEmail: inviterEmail ?? "",
         permission
       });
       setPeople([...people, { email, permission }]);

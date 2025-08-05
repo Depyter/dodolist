@@ -1,7 +1,9 @@
 import pb from './pbClient';
 import * as Y from 'yjs';
 import { IndexeddbPersistence } from 'y-indexeddb';
-import type { PocketBaseTaskListRecord } from "@/lib/types";
+import type { PocketBaseTaskListRecord, PocketBasePermissionsRecord} from "@/lib/types";
+import { PermissionsService } from './permissionsService';
+import { getListPermissionLevel } from '@/lib/utils';
 
 const DB_NAME_PREFIX = 'dodolist-yjs-';
 const KNOWN_LIST_IDS_KEY = 'dolist-known-list-ids';
@@ -335,19 +337,34 @@ export class GlobalPocketBaseProvider {
     console.log(`[GlobalPocketBaseProvider] Fetching initial lists for user ${userId}...`);
 
     try {
-      // The view rule on PocketBase handles the filtering. We just fetch all lists we can see.
-      const records = await this.pb.collection(this.collectionName).getFullList({
-        filter: 'deleted = false',
-        requestKey: null // No filter needed, relies on the collection's view rule
+      // Only fetch lists the user owns - shared lists should only be loaded after acceptance
+      const ownedRecords = await this.pb.collection(this.collectionName).getFullList({
+        filter: `user_id = '${userId}' && deleted = false`,
+        requestKey: null
       });
 
-      console.log(`[GlobalPocketBaseProvider] Found ${records.length} lists on server.`);
+      // Also fetch shared lists that have been explicitly accepted (status = 'active')
+      const activePermissions = await PermissionsService.getActivePermissionsForCurrentUser();
+      const sharedListIds = activePermissions.map(p => p.task_list);
+      
+      let sharedRecords: any[] = [];
+      if (sharedListIds.length > 0) {
+        const sharedListFilter = sharedListIds.map(id => `id = '${id}'`).join(' || ');
+        sharedRecords = await this.pb.collection(this.collectionName).getFullList({
+          filter: `(${sharedListFilter}) && deleted = false`,
+          requestKey: null
+        });
+      }
 
-      if (records.length === 0 && this.documents.size === 0) {
+      const allRecords = [...ownedRecords, ...sharedRecords];
+      
+      console.log(`[GlobalPocketBaseProvider] Found ${ownedRecords.length} owned and ${sharedRecords.length} shared lists on server.`);
+
+      if (allRecords.length === 0 && this.documents.size === 0) {
         console.log('[GlobalPocketBaseProvider] No lists found, creating a default list.');
         this.createDefaultList();
       } else {
-        for (const record of records) {
+        for (const record of allRecords) {
           if (record.deleted) {
             this.destroyDocument(record.id);
             continue;
@@ -708,7 +725,7 @@ export class GlobalPocketBaseProvider {
     try {
       const docInstance = this.documents.get(listId);
       if (!docInstance) return;
-      const remoteDoc = await this.pb.collection(this.collectionName).getOne(listId, { requestKey: null, expand: 'collaborators' });
+      const remoteDoc = await this.pb.collection(this.collectionName).getOne(listId, { requestKey: null });
       const userId = this.pb.authStore.model?.id;
 
       if (remoteDoc.deleted) {
@@ -733,16 +750,17 @@ export class GlobalPocketBaseProvider {
         }
       }
 
-      // After applying the update, set the readOnly status on the Yjs doc itself.
       if (userId) {
-        const isOwner = remoteDoc.user_id === userId;
-        const isCollaborator = remoteDoc.collaborators?.includes(userId);
-        const readOnly = !isOwner && !isCollaborator;
+        // Fetch all permissions for this list
+        const permissions: PocketBasePermissionsRecord[] = await PermissionsService.getPermissionsForList(listId);
+        // Compose a minimal list object for utils
+        const listObj = { id: listId, user_id: remoteDoc.user_id };
+        const permLevel = getListPermissionLevel(listObj as any, permissions, userId);
+        const readOnly = !(permLevel === 'owner' || permLevel === 'edit');
         docInstance.readOnlyStatus = readOnly;
-        console.log(`[GlobalPocketBaseProvider] Set readOnly status for list ${listId} to ${readOnly}`);
-        this.notifyDocumentListChange(listId); // Notify to trigger UI update
+        console.log(`[GlobalPocketBaseProvider] Set readOnly status for list ${listId} to ${readOnly} (permLevel: ${permLevel})`);
+        this.notifyDocumentListChange(listId);
       }
-
     } catch (error) {
       console.error(`[GlobalPocketBaseProvider] Failed to merge remote state for list ${listId}:`, error);
       this.handleServerDisconnect();
@@ -756,7 +774,7 @@ export class GlobalPocketBaseProvider {
       if (!docInstance) return;
       let remoteDoc: any = null;
       try {
-        remoteDoc = await this.pb.collection(this.collectionName).getOne(listId, { requestKey: null, expand: 'collaborators' });
+        remoteDoc = await this.pb.collection(this.collectionName).getOne(listId, { requestKey: null });
       } catch (error: any) {
         if (error?.status === 404) {
           const ylist = docInstance.doc.getMap('list');

@@ -2,18 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ListPreviewCard } from "@/components/ListPreviewCard";
-import { type Color, colors } from "@/lib/colors";
-import { type TodoListWithTodos } from "@/lib/types";
-import { PermissionsService } from "@/services/permissionsService";
-import pb from "@/services/pbClient";
-import { decodeYjsListDoc } from "@/lib/utils";
-
-interface PendingInvite {
-  id: string;
-  list: TodoListWithTodos;
-  color: Color;
-  invitedBy: string;
-}
+import { fetchInvites, type PendingInvite } from "@/lib/utils";
 
 interface PendingInvitesSectionProps {
   onAccept: (inviteId: string) => void;
@@ -26,38 +15,11 @@ export const PendingInvitesSection: React.FC<PendingInvitesSectionProps> = ({ on
   const [invites, setInvites] = useState<PendingInvite[]>([]);
 
   useEffect(() => {
-    async function fetchInvites() {
-      try {
-        const records = await PermissionsService.getPermissionsForCurrentUser();
-        const mappedInvites = await Promise.all(records.map(async record => {
-          // Fetch the actual list record using the task_list id
-          const listRecord = await pb.collection("task_lists").getOne(record.task_list);
-          const meta = decodeYjsListDoc(listRecord.yjsUpdate);
-          const colorObj = colors.find(c => c.value === meta.color) || colors[1];
-          return {
-            id: record.id!,
-            list: {
-              id: listRecord.id,
-              name: meta.name || "Untitled List",
-              color: meta.color || colors[1].value,
-              createdAt: listRecord.createdAt,
-              user_id: listRecord.user_id,
-              pinned: meta.pinned,
-              archived: meta.archived,
-              deleted: meta.deleted,
-              todos: Array.isArray(meta.todos) ? meta.todos : [],
-              readOnly: true,
-            },
-            color: colorObj,
-            invitedBy: record.inviter_email || record.invited_by,
-          };
-        }));
-        setInvites(mappedInvites);
-      } catch (e) {
-        setInvites([]);
-      }
+    async function loadInvites() {
+      const result = await fetchInvites();
+      setInvites(result);
     }
-    fetchInvites();
+    loadInvites();
   }, []);
 
   return (

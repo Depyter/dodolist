@@ -672,7 +672,7 @@ export default function DodoListApp() {
               <div className="transition-opacity duration-300 ease-out w-full relative z-10 sm:max-w-8/10 lg:max-w-5/10" style={{ transitionDelay: "150ms" }}>
               {activeList && (
                 <>
-                  {/* Archived Notice */}
+                  {/* Readonly Notice */}
                   {activeList.readOnly && (
                     <div className="mb-6 animate-in fade-in-0 slide-in-from-top-4 duration-500">
                       <Card className="p-4 bg-blue-50 border-blue-200 border">
@@ -688,6 +688,7 @@ export default function DodoListApp() {
                       </Card>
                     </div>
                   )}
+                  {/* Archived Notice */}
                   {activeList.archived && (
                     <div className="mb-6 animate-in fade-in-0 slide-in-from-top-4 duration-500">
                       <Card className="p-4 bg-amber-50 border-amber-200 border">

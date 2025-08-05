@@ -98,18 +98,31 @@ class AuthService {
     return this.pb.authStore.isValid
   }
 
+  // Get current user ID
+  getUserId(): string | undefined {
+    return this.pb.authStore.model?.id;
+  }
+
+  // Get current user email
+  getUserEmail(): string | undefined {
+    return this.pb.authStore.model?.email;
+  }
+
   // Get current user
   getCurrentUser(): UserProfile | null {
-    const model = this.pb.authStore.model
-    if (!model) return null
+    if (this.isAuthenticated() && this.pb.authStore.model) {
+      const model = this.pb.authStore.model
     
-    return {
-      id: model.id,
-      email: model.email,
-      username: model.username,
-      verified: model.verified,
-      avatar: model.avatar
+      return {
+        id: model.id,
+        email: model.email,
+        username: model.username,
+        verified: model.verified,
+        avatar: model.avatar
+      }
     }
+    
+    return null
   }
 
   // Get auth token

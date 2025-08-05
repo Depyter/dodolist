@@ -2,7 +2,10 @@ import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { v4 as uuidv4 } from "uuid";
 import * as Y from "yjs";
-import type { Todo, TodoList, TodoListWithTodos, PocketBasePermissionsRecord } from './types';
+import { type Todo, type TodoList, type TodoListWithTodos, type PocketBasePermissionsRecord } from './types';
+import { type Color, colors } from './colors';
+import { PermissionsService } from '@/services/permissionsService';
+import pb from '@/services/pbClient';
 import { GlobalPocketBaseProvider } from '@/services/yjsPocketBase';
 
 export function cn(...inputs: ClassValue[]) {
@@ -238,13 +241,12 @@ export function isListOwner(list: TodoList | TodoListWithTodos, currentUserId: s
  * Only returns a record if the user is a collaborator (not the owner).
  */
 export function getCollaboratorPermission(
-  listId: string,
   permissions: PocketBasePermissionsRecord[],
   currentUserId: string
 ): PocketBasePermissionsRecord | null {
-  return permissions.find(
-    (perm) => perm.task_list === listId && perm.user_id === currentUserId && perm.status === 'active'
-  ) || null;
+  // The `permissions` array from `PermissionsService.getPermissionsForList` is already
+  // filtered by listId and status='active'. We just need to find the current user's record.
+  return permissions.find((perm) => perm.user_id === currentUserId) || null;
 }
 
 /**
@@ -259,7 +261,58 @@ export function getListPermissionLevel(
   currentUserId: string
 ): 'owner' | 'edit' | 'view' | null {
   if (isListOwner(list, currentUserId)) return 'owner';
-  const perm = getCollaboratorPermission(list.id, permissions, currentUserId);
-  if (perm) return perm.permission === 'edit' ? 'edit' : 'view';
+  const perm = getCollaboratorPermission(permissions, currentUserId);
+  if (perm) {
+    return perm.permission === 'read-write' ? 'edit' : 'view';
+  }
   return null;
+}
+
+export interface PendingInvite {
+  id: string;
+  list: TodoListWithTodos;
+  color: Color;
+  invitedBy: string;
+}
+
+/**
+ * Fetches pending invites for the current user and returns an array of PendingInvite objects.
+ */
+export async function fetchInvites(): Promise<PendingInvite[]> {
+  try {
+    const records = await PermissionsService.getPermissionsForCurrentUser();
+    if (records.length === 0) {
+      return [];
+    }
+    const mappedInvites = await Promise.all(records.map(async (record: any) => {
+      try {
+        const listRecord = await pb.collection("task_lists").getOne(record.task_list);
+        const meta = decodeYjsListDoc(listRecord.yjsUpdate);
+        const colorObj = colors.find(c => c.value === meta.color) || colors[1];
+        const inviterName = record.inviter_email || 'Unknown';
+        return {
+          id: record.id!,
+          list: {
+            id: listRecord.id,
+            name: meta.name || "Untitled List",
+            color: meta.color || colors[1].value,
+            createdAt: listRecord.createdAt,
+            user_id: listRecord.user_id,
+            pinned: meta.pinned,
+            archived: meta.archived,
+            deleted: meta.deleted,
+            todos: Array.isArray(meta.todos) ? meta.todos : [],
+            readOnly: true,
+          },
+          color: colorObj,
+          invitedBy: inviterName,
+        };
+      } catch (recordError) {
+        return null;
+      }
+    }));
+    return mappedInvites.filter((invite: any) => invite !== null) as PendingInvite[];
+  } catch (e) {
+    return [];
+  }
 }
