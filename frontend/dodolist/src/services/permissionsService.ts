@@ -13,7 +13,8 @@ export class PermissionsService {
   static async getPermissionsForList(listId: string): Promise<PocketBasePermissionsRecord[]> {
     const result = await pb.collection(PermissionsService.collection).getFullList({
       filter: `task_list = '${listId}' && status = 'active'`,
-      expand: 'user_id,invited_by'
+      expand: 'user_id,invited_by',
+      requestKey: null
     });
     console.log('[PermissionsService.getPermissionsForList] Raw result:', result);
 
@@ -42,7 +43,8 @@ export class PermissionsService {
   static async getAllPermissionsForList(listId: string): Promise<PocketBasePermissionsRecord[]> {
     const result = await pb.collection(PermissionsService.collection).getFullList({
       filter: `task_list = '${listId}'`,
-      expand: 'user_id,invited_by'
+      expand: 'user_id,invited_by',
+      requestKey: null
     });
 
     if (!Array.isArray(result)) {

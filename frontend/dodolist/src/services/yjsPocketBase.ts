@@ -428,53 +428,69 @@ export class GlobalPocketBaseProvider {
 
   private handleCollectionChange = async ({ action, record }: { action: string, record: any }) => {
     console.log(`[GlobalPocketBaseProvider] Collection change received: ${action} on record ${record.id}`);
-    if (action === 'create') {
-      if (!this.documents.has(record.id)) {
-        console.log(`[GlobalPocketBaseProvider] New list detected: ${record.id}. Creating local document.`);
-        this.getDocumentProvider(record.id); // This will create, setup handlers, and notify
-      }
-    } else if (action === 'update') {
-      const docInstance = this.documents.get(record.id);
-      if (docInstance) {
-        // Compare previous Yjs doc value for 'deleted' with new record.deleted
-        const ylist = docInstance.doc.getMap('list');
-        const prevDeleted = ylist.get('deleted') === true;
-        const newDeleted = record.deleted === true;
-        if (!prevDeleted && newDeleted) {
-          console.log(`[GlobalPocketBaseProvider] Detected 'deleted' field changed to true for list ${record.id}. Destroying local persistence.`);
-          // Set the in-memory Yjs doc's 'deleted' field to true before destroying
-          if (!ylist.get('deleted')) {
-            docInstance.doc.transact(() => {
-              ylist.set('deleted', true);
-            }, 'server-update');
-          }
-          this.notifyDocumentListChange(record.id, true);
-          this.destroyDocument(record.id);
-          return;
+    const userId = this.pb.authStore.model?.id;
+    if (!userId) return;
+
+    const docInstance = this.documents.get(record.id);
+
+    // If document already exists, process update/delete
+    if (docInstance) {
+        if (action === 'update') {
+            const ylist = docInstance.doc.getMap('list');
+            const prevDeleted = ylist.get('deleted') === true;
+            const newDeleted = record.deleted === true;
+            if (!prevDeleted && newDeleted) {
+                console.log(`[GlobalPocketBaseProvider] Detected 'deleted' field changed to true for list ${record.id}. Destroying local persistence.`);
+                if (!ylist.get('deleted')) {
+                    docInstance.doc.transact(() => {
+                        ylist.set('deleted', true);
+                    }, 'server-update');
+                }
+                this.notifyDocumentListChange(record.id, true);
+                this.destroyDocument(record.id);
+                return;
+            }
+            if (record.yjsUpdate) {
+                const remoteUpdate = base64ToUint8Array(record.yjsUpdate);
+                Y.applyUpdate(docInstance.doc, remoteUpdate, 'server-update');
+                console.log(`[GlobalPocketBaseProvider] Applied real-time update for list ${record.id}`);
+            }
+        } else if (action === 'delete') {
+            console.log(`[GlobalPocketBaseProvider] Server deleted list ${record.id}. Marking as deleted locally.`);
+            const ylist = docInstance.doc.getMap('list');
+            if (!ylist.get('deleted')) {
+                docInstance.doc.transact(() => {
+                    ylist.set('deleted', true);
+                }, 'server-update');
+            }
         }
-        // If not deleted, apply yjsUpdate if present
-        if (record.yjsUpdate) {
-          const remoteUpdate = base64ToUint8Array(record.yjsUpdate);
-          Y.applyUpdate(docInstance.doc, remoteUpdate, 'server-update');
-          console.log(`[GlobalPocketBaseProvider] Applied real-time update for list ${record.id}`);
+        return;
+    }
+
+    // Document does not exist locally. Decide whether to create it.
+    // We should only create it for 'create' or 'update' actions.
+    if (action === 'create' || action === 'update') {
+        const isOwner = record.user_id === userId;
+        if (isOwner) {
+            console.log(`[GlobalPocketBaseProvider] New owned list detected: ${record.id}. Creating local document.`);
+            this.getDocumentProvider(record.id);
+            return;
         }
-      } else {
-        // This can happen if a client comes online and receives an update for a list it doesn't have yet.
-        console.log(`[GlobalPocketBaseProvider] Received update for a list not yet in memory: ${record.id}. Creating it now.`);
-        this.getDocumentProvider(record.id);
-      }
-    } else if (action === 'delete') {
-      // This is a hard delete from the server, which we translate to a local soft delete if the doc exists.
-      const docInstance = this.documents.get(record.id);
-      if (docInstance) {
-        console.log(`[GlobalPocketBaseProvider] Server deleted list ${record.id}. Marking as deleted locally.`);
-        const ylist = docInstance.doc.getMap('list');
-        if (!ylist.get('deleted')) {
-          docInstance.doc.transact(() => {
-            ylist.set('deleted', true);
-          }, 'server-update');
+
+        // For shared lists, check for active permission.
+        try {
+            const permissions = await PermissionsService.getPermissionsForList(record.id);
+            const userPermission = permissions.find(p => p.user_id === userId);
+
+            if (userPermission && userPermission.status === 'active') {
+                console.log(`[GlobalPocketBaseProvider] New active shared list detected: ${record.id}. Creating local document.`);
+                this.getDocumentProvider(record.id);
+            } else {
+                console.log(`[GlobalPocketBaseProvider] Ignoring event for list with pending or no permissions: ${record.id}`);
+            }
+        } catch (error) {
+            console.error(`[GlobalPocketBaseProvider] Error checking permissions for list ${record.id}:`, error);
         }
-      }
     }
   };
 
@@ -928,6 +944,7 @@ export class GlobalPocketBaseProvider {
           await operation();
           docInstance.syncQueue.shift();
           processedCount++;
+          this.updateDocumentStatus(listId, 'syncing');
         } catch (error: any) {
           failedCount++;
           console.error(`[GlobalPocketBaseProvider] Sync operation failed for list ${listId}:`, error);
@@ -1010,7 +1027,6 @@ export class GlobalPocketBaseProvider {
       }
 
       docInstance.lastSyncTime = new Date();
-      this.updateDocumentStatus(listId, 'synced');
 
     } catch (error) {
       console.error(`[GlobalPocketBaseProvider] Failed to sync document for list ${listId}:`, error);
