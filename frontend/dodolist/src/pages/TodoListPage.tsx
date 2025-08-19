@@ -36,6 +36,8 @@ import { TaskCard } from "@/components/TaskCard"
 import { ErrorMessage } from "@/components/ErrorMessage";
 import { PersistenceWarning } from "@/components/PersistenceWarning";
 import { StorageTypeIndicator } from "@/components/StorageTypeIndicator";
+import { permissionLevelToReadOnly } from "@/lib/utils";
+import { InvitesProvider } from "@/state/InvitesContext";
 
 export default function DodoListApp() {
   const { listId } = useParams()
@@ -128,6 +130,9 @@ export default function DodoListApp() {
     readOnly, // <-- add this
   } = useYjsTodoList(activeListId)
 
+  // The `readOnly` value from the hook is the source of truth.
+  const isReadOnly = readOnly;
+
   const [inputValue, setInputValue] = useState("")
   const [newListName, setNewListName] = useState("")
   const [showNewListInput, setShowNewListInput] = useState(false)
@@ -166,14 +171,14 @@ export default function DodoListApp() {
     const listSnapshot = todoLists.find(l => l.id === activeListId);
     if (!listSnapshot || listSnapshot.deleted) return null; // Don't show deleted lists
 
-    // Always use the readOnly value from the provider/hook
+    // Always use the centralized readOnly value
     return {
       ...listSnapshot,    // Start with snapshot data (like name, color, etc.)
       ...activeListData,    // Override with live data from Yjs (todos, and latest metadata)
       id: activeListId,
-      readOnly, // <-- ensure this is always the provider's value
+      readOnly: isReadOnly,
     };
-  }, [activeListId, activeListData, todoLists, readOnly]);
+  }, [activeListId, activeListData, todoLists, isReadOnly]);
 
   const activeColor = colors.find((color) => color.value === activeList?.color) || colors[0];
 
@@ -479,6 +484,7 @@ export default function DodoListApp() {
   const shareUrl = `${window.location.origin}/list/${activeListId}?shared=1`;
 
   return (
+    <InvitesProvider>
     <div className={`min-h-screen relative overflow-hidden ${activeColor.light}`}>
       {/* Render notifications at the top right of the app */}
       {!showShareDialog && (
@@ -499,12 +505,12 @@ export default function DodoListApp() {
         open={showShareDialog}
         onOpenChange={setShowShareDialog}
         shareUrl={shareUrl}
-        readOnly={activeList?.readOnly}
+        readOnly={isReadOnly}
         listId={activeListId}
         activeColor={activeColor}
         listData={activeListData}
       />
-      <SidebarProvider>
+  <SidebarProvider>
         <AppSidebar
           allYjsLists={todoLists}
           activeListId={activeListId}
@@ -609,7 +615,7 @@ export default function DodoListApp() {
                     <h2
                       className="text-lg font-semibold text-slate-800 cursor-pointer truncate"
                       onClick={() => {
-                        if (activeList?.readOnly) return;
+                        if (isReadOnly) return;
                         setEditingListName(activeList.name);
                         setIsEditingHeader(true);
                       }}
@@ -634,21 +640,21 @@ export default function DodoListApp() {
                   <button
                     onClick={() => setShowShareDialog(true)}
                     className="flex items-center gap-2 px-2 py-1 rounded-md border bg-slate-100 border-slate-200"
-                    disabled={activeList?.readOnly}
+                    disabled={isReadOnly}
                   >
-                    {activeList?.readOnly ? (
+                    {isReadOnly ? (
                       <Users className="w-4 h-4 text-slate-500" />
                     ) : (
                       <UserPlus className="w-4 h-4 text-slate-500" />
                     )}
                     <span className="text-xs font-medium text-slate-700 hidden sm:inline">
-                      {activeList?.readOnly ? "Shared" : "Share"}
+                      {isReadOnly ? "Shared" : "Share"}
                     </span>
                   </button>
                   {/* List Settings Dropdown */}
                   <div className="flex items-center gap-1">
                     <ListOptionsDropdown
-                      readOnly={activeList?.readOnly}
+                      readOnly={isReadOnly}
                       pinned={activeList.pinned}
                       archived={activeList.archived}
                       onPinToggle={togglePinList}
@@ -673,7 +679,7 @@ export default function DodoListApp() {
               {activeList && (
                 <>
                   {/* Readonly Notice */}
-                  {activeList.readOnly && (
+                  {isReadOnly && (
                     <div className="mb-6 animate-in fade-in-0 slide-in-from-top-4 duration-500">
                       <Card className="p-4 bg-blue-50 border-blue-200 border">
                         <div className="flex items-center gap-3">
@@ -720,7 +726,7 @@ export default function DodoListApp() {
                         key={todo.id}
                         todo={todo}
                         isCompleted={todo.completed}
-                        readOnly={activeList?.readOnly}
+                        readOnly={isReadOnly}
                         activeList={activeList}
                         activeColor={activeColor}
                         setShowTaskOptions={setShowTaskOptions}
@@ -775,7 +781,7 @@ export default function DodoListApp() {
                               <TaskCard
                                 todo={todo}
                                 isCompleted={true}
-                                readOnly={activeList?.readOnly}
+                                readOnly={isReadOnly}
                                 activeList={activeList}
                                 activeColor={activeColor}
                                 setShowTaskOptions={setShowTaskOptions}
@@ -800,14 +806,14 @@ export default function DodoListApp() {
                           value={inputValue}
                           onChange={(e) => setInputValue(e.target.value)}
                           onKeyPress={handleKeyPress}
-                          placeholder={activeList?.readOnly ? "This list is read-only" : `Add a task to ${activeList?.name}...`}
-                          disabled={activeList?.archived || loading || activeList?.readOnly}
+                          placeholder={isReadOnly ? "This list is read-only" : `Add a task to ${activeList?.name}...`}
+                          disabled={activeList?.archived || loading || isReadOnly}
                           className="w-full h-12 pl-4 pr-14 text-base bg-transparent border-0 focus:ring-2 focus:ring-blue-100 outline-none transition-all duration-200 placeholder-slate-400"
                           style={{ boxShadow: 'none' }}
                         />
                         <Button
                           onClick={handleAddTodo}
-                          disabled={!inputValue.trim() || activeList?.archived || isAddingTodo || activeList?.readOnly}
+                          disabled={!inputValue.trim() || activeList?.archived || isAddingTodo || isReadOnly}
                           className={`h-12 min-w-[48px] rounded-none rounded-r-2xl ${activeList?.color} hover:opacity-90 text-white flex items-center justify-center shadow-none border-0`}
                           loading={isAddingTodo}
                           tabIndex={-1}
@@ -833,5 +839,6 @@ export default function DodoListApp() {
         </SidebarInset>
       </SidebarProvider>
     </div>
+    </InvitesProvider>
   )
 }

@@ -1,86 +1,139 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { GlobalPocketBaseProvider } from "@/services/yjsPocketBase";
-import type { TodoListWithTodos } from "@/lib/types";
+import type { PocketBasePermissionsRecord, TodoListWithTodos } from "@/lib/types";
 import * as Y from 'yjs';
 import { PermissionsService } from '@/services/permissionsService';
 import AuthService from "@/services/authService";
 
-export type SharePerson = { email: string; permission: "edit" | "view" };
+// The shape of a collaborator in the Share Dialog
+export type SharePerson = {
+  id: string; // The ID of the permission record
+  userId: string;
+  email: string;
+  permission: "edit" | "view";
+};
 
-export function useShareOptions(listId: string | null, addNotification?: (n: { message: string; type: "error" | "success" | "info" | "warning"; duration?: number }) => void) {
-  // In a real app, fetch these from backend or Yjs doc metadata
+export function useShareOptions(
+  listId: string | null,
+  addNotification?: (n: { message: string; type: "error" | "success" | "info" | "warning"; duration?: number }) => void
+) {
   const [people, setPeople] = useState<SharePerson[]>([]);
   const [inviteEmail, setInviteEmail] = useState("");
   const [invitePermission, setInvitePermission] = useState<"edit" | "view">("edit");
-  const [isPublic, setIsPublic] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // TODO: Integrate with Yjs doc or backend for real sharing logic
+  const [authService] = useState(() => new AuthService());
+
+  // Fetches the current collaborators for the list from the backend
+  const fetchCollaborators = useCallback(async () => {
+    if (!listId) return;
+    setIsLoading(true);
+    try {
+      const perms = await PermissionsService.getAllPermissionsForList(listId);
+      const ownerId = authService.getUserId();
+
+      const collaborators = perms
+        .filter(p => p.user_id !== ownerId) // Don't show the owner in the collaborators list
+        .map((p: PocketBasePermissionsRecord) => ({
+          id: p.id!,
+          userId: p.user_id,
+          email: p.expand?.user_id?.email || 'Unknown User',
+          permission: p.permission as 'edit' | 'view',
+        }));
+      setPeople(collaborators);
+    } catch (e) {
+      console.error("Failed to fetch collaborators", e);
+      if (addNotification) {
+        addNotification({ message: "Could not load collaborators.", type: "error" });
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  }, [listId, addNotification, authService]);
+
+  // Fetch collaborators when the dialog is opened (listId changes)
+  useEffect(() => {
+    fetchCollaborators();
+  }, [fetchCollaborators]);
+
+  // Invite a new person to the list
   const addPerson = useCallback(async (email: string, permission: "edit" | "view") => {
     if (!email || people.some((p) => p.email === email)) {
       setInviteEmail("");
-      setInvitePermission("edit");
       return;
     }
-    let userId: string | null = null;
+    if (!listId) return;
+
     try {
-      userId = await PermissionsService.getUserIdByEmail(email);
-      if (!userId) throw new Error('User not found');
-    } catch (e) {
-      if (addNotification) {
-        addNotification({
-          message: "No user found with that email.",
-          type: "error",
-          duration: 2000,
-        });
-      }
-      setInviteEmail("");
-      setInvitePermission("edit");
-      return;
-    }
-    const authService = new AuthService();
-    const invitedBy = authService.getUserId();
-    const inviterEmail = authService.getUserEmail();
-    if (!listId || typeof listId !== 'string' || !userId || typeof userId !== 'string' || !invitedBy) {
-      setInviteEmail("");
-      setInvitePermission("edit");
-      return;
-    }
-    try {
+      const userId = await PermissionsService.getUserIdByEmail(email);
+      if (!userId) throw new Error('User not found with that email.');
+
+      const invitedBy = authService.getUserId();
+      const inviterEmail = authService.getUserEmail();
+      if (!invitedBy || !inviterEmail) throw new Error('Could not identify inviter.');
+
       await PermissionsService.inviteUserToList({
-        listId: listId as string,
-        userId: userId as string, 
+        listId,
+        userId,
         invitedBy,
-        inviterEmail: inviterEmail ?? "",
-        permission
+        inviterEmail,
+        permission,
       });
-      setPeople([...people, { email, permission }]);
-    } catch (err) {
+
       if (addNotification) {
-        addNotification({
-          message: 'Failed to invite user: ' + (err as Error).message,
-          type: 'error',
-          duration: 3000,
-        });
+        addNotification({ message: `Invitation sent to ${email}.`, type: "success" });
+      }
+      // Refresh the list of collaborators to show the new invite (if your rules allow it)
+      // Or you can add them to local state optimistically if your rules show pending invites.
+      fetchCollaborators();
+
+    } catch (err) {
+      console.error("Failed to invite user:", err);
+      if (addNotification) {
+        addNotification({ message: (err as Error).message, type: 'error' });
       }
     }
     setInviteEmail("");
     setInvitePermission("edit");
-  }, [people, listId, addNotification]);
+  }, [people, listId, addNotification, authService, fetchCollaborators]);
 
-  const removePerson = useCallback((email: string) => {
-    setPeople(people.filter((p) => p.email !== email));
-  }, [people]);
+  // Remove a person from the list
+  const removePerson = useCallback(async (permissionId: string) => {
+    try {
+      await PermissionsService.removeCollaborator(permissionId);
+      setPeople(prevPeople => prevPeople.filter(p => p.id !== permissionId));
+      if (addNotification) {
+        addNotification({ message: "Collaborator removed.", type: "info" });
+      }
+    } catch (e) {
+      console.error("Failed to remove collaborator", e);
+      if (addNotification) {
+        addNotification({ message: "Failed to remove collaborator.", type: "error" });
+      }
+    }
+  }, [addNotification]);
 
-  const changePermission = useCallback((email: string, permission: "edit" | "view") => {
-    setPeople(people.map((p) => (p.email === email ? { ...p, permission } : p)));
-  }, [people]);
-
-  const togglePublic = useCallback(() => setIsPublic((v) => !v), []);
-
-  // Optionally, sync with Yjs doc or backend here
+  // Change an existing person's permission
+  const changePermission = useCallback(async (permissionId: string, newPermission: "edit" | "view") => {
+    try {
+      await PermissionsService.changePermission(permissionId, newPermission);
+      setPeople(prevPeople =>
+        prevPeople.map(p => (p.id === permissionId ? { ...p, permission: newPermission } : p))
+      );
+      if (addNotification) {
+        addNotification({ message: "Permission updated.", type: "success", duration: 2000 });
+      }
+    } catch (e) {
+      console.error("Failed to change permission", e);
+      if (addNotification) {
+        addNotification({ message: "Failed to update permission.", type: "error" });
+      }
+    }
+  }, [addNotification]);
 
   return {
     people,
+    isLoading,
     inviteEmail,
     setInviteEmail,
     invitePermission,
@@ -88,8 +141,7 @@ export function useShareOptions(listId: string | null, addNotification?: (n: { m
     addPerson,
     removePerson,
     changePermission,
-    isPublic,
-    togglePublic,
+    refresh: fetchCollaborators,
   };
 }
 
@@ -128,7 +180,7 @@ export function useListExportImport() {
       throw new Error('Invalid file format');
     }
     // Validate minimal fields
-    if (!data || typeof data !== 'object' || !data.name || !data.color) {
+    if (!data || typeof data !== 'object' || !data.name || !data.tata.color) {
       throw new Error('Missing required fields in imported list');
     }
     // Create a new list in Yjs backend

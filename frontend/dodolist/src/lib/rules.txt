@@ -1,0 +1,70 @@
+'task_lists'
+
+list/search
+@request.auth.id != "" && deleted != true && (
+  user_id = @request.auth.id ||
+  id = @collection.permissions(user_id = @request.auth.id && (status = "active" || status = "invited")).task_list
+)
+
+view
+@request.auth.id != "" && deleted != true && (
+  user_id = @request.auth.id ||
+  id = @collection.permissions(user_id = @request.auth.id && (status = "active" || status = "invited")).task_list
+)
+
+create
+@request.auth.id != "" && @request.body.user_id = @request.auth.id
+
+update 
+@request.auth.id != "" && (
+  user_id = @request.auth.id ||
+  id = @collection.permissions(user_id = @request.auth.id && status = "active" && permission = "edit").task_list
+)
+
+delete
+@request.auth.id != "" && user_id = @request.auth.id
+
+=================================================================
+
+'permissions'
+
+list/search
+@request.auth.id != "" && (
+  user_id = @request.auth.id ||
+  task_list.user_id = @request.auth.id ||
+  invited_by = @request.auth.id
+)
+
+view
+@request.auth.id != "" && (
+  user_id = @request.auth.id ||
+  task_list.user_id = @request.auth.id ||
+  invited_by = @request.auth.id
+)
+
+create
+@request.auth.id != "" && 
+@collection.task_lists.user_id ?= @request.auth.id &&
+@request.body.invited_by = @request.auth.id &&
+@request.body.task_list != "" &&
+@request.body.user_id != "" &&
+(@request.body.status = "invited" || @request.body.status = "active") &&
+(@request.body.permission = "edit" || @request.body.permission = "view")
+
+update 
+@request.auth.id != "" && (
+  (task_list.user_id = @request.auth.id) ||
+  (user_id = @request.auth.id &&
+   @request.body.status:isset = true &&
+   (@request.body.status = "active" || @request.body.status = "rejected") &&
+   @request.body.user_id:isset = false &&
+   @request.body.task_list:isset = false &&
+   @request.body.invited_by:isset = false &&
+   @request.body.permission:isset = false &&
+   @request.body.inviter_email:isset = false)
+)
+
+delete 
+@request.auth.id != "" && (
+  task_list.user_id = @request.auth.id
+)

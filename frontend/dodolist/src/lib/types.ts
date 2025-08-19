@@ -64,6 +64,9 @@ export interface TodoList {
   yjsUpdate?: string;
   deleted?: boolean;
   readOnly?: boolean;
+  // True when the current user is NOT the original owner of the list
+  // (derived in runtime; optional to avoid breaking older objects)
+  shared?: boolean;
 }
 
 export interface TodoListWithTodos extends TodoList {

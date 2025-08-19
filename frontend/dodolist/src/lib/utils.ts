@@ -143,7 +143,10 @@ export function decodeYjsListDocFromMemory(listId: string): TodoListWithTodos | 
     const deleted = ylist.get("deleted") as boolean || false;
     const ytodos = ylist.get("todos") as Y.Array<Y.Map<any>>;
     const todos = ytodos ? ytodos.toArray().map((t) => t.toJSON() as Todo) : [];
-    const readOnly = provider.getReadOnlyStatus(listId);
+  const readOnly = provider.getReadOnlyStatus(listId);
+  const currentUserId = (window as any)?.__pb_auth_store?.model?.id || '';
+  const ownerId = provider.getOwnerId(listId);
+  const shared = ownerId ? ownerId !== currentUserId : undefined;
 
     return {
         id: listId,
@@ -154,6 +157,7 @@ export function decodeYjsListDocFromMemory(listId: string): TodoListWithTodos | 
         deleted,
         todos,
         readOnly,
+  shared,
         createdAt: '', // This info is not in the Y.Doc
         user_id: '', // This info is not in the Y.Doc
     };
@@ -263,9 +267,19 @@ export function getListPermissionLevel(
   if (isListOwner(list, currentUserId)) return 'owner';
   const perm = getCollaboratorPermission(permissions, currentUserId);
   if (perm) {
-    return perm.permission === 'read-write' ? 'edit' : 'view';
+    // PocketBase permissions use 'edit' | 'view'
+    return perm.permission === 'edit' ? 'edit' : 'view';
   }
   return null;
+}
+
+/**
+ * Centralized mapping from permission level to readOnly flag.
+ * - owner/edit => readOnly = false
+ * - view/null  => readOnly = true
+ */
+export function permissionLevelToReadOnly(level: 'owner' | 'edit' | 'view' | null): boolean {
+  return !(level === 'owner' || level === 'edit');
 }
 
 export interface PendingInvite {

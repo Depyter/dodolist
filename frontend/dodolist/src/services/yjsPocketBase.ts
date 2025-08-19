@@ -3,7 +3,7 @@ import * as Y from 'yjs';
 import { IndexeddbPersistence } from 'y-indexeddb';
 import type { PocketBaseTaskListRecord, PocketBasePermissionsRecord} from "@/lib/types";
 import { PermissionsService } from './permissionsService';
-import { getListPermissionLevel } from '@/lib/utils';
+import { getListPermissionLevel, permissionLevelToReadOnly } from '@/lib/utils';
 
 const DB_NAME_PREFIX = 'dodolist-yjs-';
 const KNOWN_LIST_IDS_KEY = 'dolist-known-list-ids';
@@ -50,6 +50,7 @@ interface DocumentInstance {
   statusListeners: Set<(status: SyncStatusInfo) => void>;
   updateHandler?: (update: Uint8Array, origin: any) => void;
   readOnlyStatus: boolean; // Add readOnlyStatus here
+  ownerId?: string; // Track original owner id for shared detection
 }
 
 // Individual document provider interface for external use
@@ -356,7 +357,7 @@ export class GlobalPocketBaseProvider {
         });
       }
 
-      const allRecords = [...ownedRecords, ...sharedRecords];
+  const allRecords = [...ownedRecords, ...sharedRecords];
       
       console.log(`[GlobalPocketBaseProvider] Found ${ownedRecords.length} owned and ${sharedRecords.length} shared lists on server.`);
 
@@ -372,6 +373,9 @@ export class GlobalPocketBaseProvider {
           if (!this.documents.has(record.id)) {
             this.getDocumentProvider(record.id);
           }
+          // Record ownerId for shared detection
+          const inst = this.documents.get(record.id);
+          if (inst) inst.ownerId = record.user_id;
         }
       }
       this.notifyDocumentListChange(); // Notify UI after initial fetch is processed
@@ -653,8 +657,10 @@ export class GlobalPocketBaseProvider {
       isSyncing: false,
       lastSyncTime: null,
       statusListeners: new Set(),
-      readOnlyStatus: false
+      readOnlyStatus: false,
+      ownerId: this.pb.authStore.model?.id
     };
+
     this.documents.set(listId, docInstance);
     this.setupDocumentHandlers(listId, docInstance);
 
@@ -728,7 +734,7 @@ export class GlobalPocketBaseProvider {
       const remoteDoc = await this.pb.collection(this.collectionName).getOne(listId, { requestKey: null });
       const userId = this.pb.authStore.model?.id;
 
-      if (remoteDoc.deleted) {
+  if (remoteDoc.deleted) {
         this.destroyDocument(listId);
         return;
       }
@@ -750,13 +756,22 @@ export class GlobalPocketBaseProvider {
         }
       }
 
-      if (userId) {
+  // Update known ownerId
+  const inst = this.documents.get(listId);
+  if (inst) inst.ownerId = remoteDoc.user_id;
+
+  if (userId) {
         // Fetch all permissions for this list
         const permissions: PocketBasePermissionsRecord[] = await PermissionsService.getPermissionsForList(listId);
+        // *** DEBUGGING: Log fetched permissions ***
+        console.log(`[GlobalPocketBaseProvider] Permissions check for list ${listId}:`, {
+          permissions,
+          currentUserId: userId,
+        });
         // Compose a minimal list object for utils
         const listObj = { id: listId, user_id: remoteDoc.user_id };
-        const permLevel = getListPermissionLevel(listObj as any, permissions, userId);
-        const readOnly = !(permLevel === 'owner' || permLevel === 'edit');
+  const permLevel = getListPermissionLevel(listObj as any, permissions, userId);
+  const readOnly = permissionLevelToReadOnly(permLevel);
         docInstance.readOnlyStatus = readOnly;
         console.log(`[GlobalPocketBaseProvider] Set readOnly status for list ${listId} to ${readOnly} (permLevel: ${permLevel})`);
         this.notifyDocumentListChange(listId);
@@ -1118,6 +1133,10 @@ export class GlobalPocketBaseProvider {
 
   public getReadOnlyStatus(listId: string): boolean {
     return this.documents.get(listId)?.readOnlyStatus ?? false;
+  }
+
+  public getOwnerId(listId: string): string | undefined {
+    return this.documents.get(listId)?.ownerId;
   }
 
   public isConnectedToServer(): boolean {

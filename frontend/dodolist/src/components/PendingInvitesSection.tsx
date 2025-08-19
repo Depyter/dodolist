@@ -2,24 +2,22 @@ import React, { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ListPreviewCard } from "@/components/ListPreviewCard";
-import { fetchInvites, type PendingInvite } from "@/lib/utils";
+import { type PendingInvite } from "@/lib/utils";
+import { useInvites } from "@/state/InvitesContext";
 
 interface PendingInvitesSectionProps {
-  onAccept: (inviteId: string) => void;
-  onDecline: (inviteId: string) => void;
+  onAccept?: (inviteId: string) => void;
+  onDecline?: (inviteId: string) => void;
 }
 
 export const PendingInvitesSection: React.FC<PendingInvitesSectionProps> = ({ onAccept, onDecline }) => {
+  const { invites, refresh, accept, decline, loading } = useInvites();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [previewInvite, setPreviewInvite] = useState<PendingInvite | null>(null);
-  const [invites, setInvites] = useState<PendingInvite[]>([]);
 
   useEffect(() => {
-    async function loadInvites() {
-      const result = await fetchInvites();
-      setInvites(result);
-    }
-    loadInvites();
+    // Ensure we have the latest on mount (background refresh).
+    refresh();
   }, []);
 
   return (
@@ -28,9 +26,13 @@ export const PendingInvitesSection: React.FC<PendingInvitesSectionProps> = ({ on
         variant="outline"
         className="w-full mb-2"
         onClick={() => setDialogOpen(true)}
-        disabled={invites.length === 0}
+        disabled={invites.length === 0 && !loading}
       >
-        {invites.length === 0 ? "No pending invites" : `View ${invites.length} Pending Invite${invites.length > 1 ? "s" : ""}`}
+        {loading
+          ? "Checking invites..."
+          : invites.length === 0
+            ? "No pending invites"
+            : `View ${invites.length} Pending Invite${invites.length > 1 ? "s" : ""}`}
       </Button>
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="max-w-md">
@@ -51,8 +53,28 @@ export const PendingInvitesSection: React.FC<PendingInvitesSectionProps> = ({ on
               </div>
               <DialogFooter>
                 <Button variant="outline" onClick={() => setPreviewInvite(null)}>Back</Button>
-                <Button variant="default" onClick={() => { onAccept(previewInvite.id); setDialogOpen(false); setPreviewInvite(null); }}>Accept</Button>
-                <Button variant="ghost" onClick={() => { onDecline(previewInvite.id); setDialogOpen(false); setPreviewInvite(null); }}>Decline</Button>
+                <Button
+                  variant="default"
+                  onClick={async () => {
+                    if (onAccept) onAccept(previewInvite.id);
+                    await accept(previewInvite.id);
+                    setDialogOpen(false);
+                    setPreviewInvite(null);
+                  }}
+                >
+                  Accept
+                </Button>
+                <Button
+                  variant="ghost"
+                  onClick={async () => {
+                    if (onDecline) onDecline(previewInvite.id);
+                    await decline(previewInvite.id);
+                    setDialogOpen(false);
+                    setPreviewInvite(null);
+                  }}
+                >
+                  Decline
+                </Button>
               </DialogFooter>
             </>
           ) : (

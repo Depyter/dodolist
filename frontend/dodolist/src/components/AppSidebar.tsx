@@ -20,7 +20,6 @@ import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle, Dialog
 import { Label } from "@/components/ui/label";
 import { useNavigate } from 'react-router-dom'
 import AuthService from '@/services/authService'
-import { PermissionsService } from '@/services/permissionsService';
 import type { TodoListWithTodos, UserProfile } from '@/lib/types'
 import DodoBirdIcon from "./DodoBirdIcon";
 import type { Color } from "@/lib/colors";
@@ -144,35 +143,21 @@ const AppSidebar = memo(({
   const navigate = useNavigate()
   const [authService] = useState(() => new AuthService())
   const [tempProfile, setTempProfile] = useState<UserProfile | null>(userProfile);
-  const [invitesKey, setInvitesKey] = useState(0);
-
-  const [sharedListIds, setSharedListIds] = useState<Set<string>>(new Set());
+  // Invites are handled via context; no local key management needed.
 
   useEffect(() => {
-    const fetchSharedLists = async () => {
-      try {
-        const permissions = await PermissionsService.getActivePermissionsForCurrentUser();
-        const listIds = new Set(permissions.map(p => p.task_list));
-        setSharedListIds(listIds);
-      } catch (error) {
-        console.error("Failed to fetch shared lists:", error);
-      }
-    };
-
-    fetchSharedLists();
-  }, [invitesKey]); // Refreshes when an invite is accepted
-
-  useEffect(() => {
+    // We no longer need to separately fetch permissions to detect shared lists;
+    // each list has a derived `shared` flag (true when current user != owner).
     setTempProfile(userProfile);
   }, [userProfile]);
 
   const handleLogout = () => {
     if (onLogout) {
-      onLogout()
+      onLogout();
     } else {
-      authService.logout()
-      navigate('/login')
+      authService.logout();
     }
+    navigate('/login');
   }
 
   const handleProfileSave = async () => {
@@ -204,8 +189,8 @@ const AppSidebar = memo(({
   const activeList = listsWithYjs.find((list) => list.id === activeListId);
   const activeColor = colors.find((color) => color.value === activeList?.color) || colors[0];
   
-  const ownedLists = listsWithYjs.filter(list => !sharedListIds.has(list.id));
-  const sharedLists = listsWithYjs.filter(list => sharedListIds.has(list.id));
+  const ownedLists = listsWithYjs.filter(list => !list.shared);
+  const sharedLists = listsWithYjs.filter(list => !!list.shared);
 
   const activeOwnedLists = ownedLists.filter((list) => !list.archived);
   const archivedOwnedLists = ownedLists.filter((list) => list.archived);
@@ -247,24 +232,7 @@ const AppSidebar = memo(({
     document.head.appendChild(style);
   }
 
-  const handleAcceptInvite = async (inviteId: string) => {
-    try {
-      await PermissionsService.acceptInvite(inviteId);
-      setInvitesKey(k => k + 1); // force PendingInvitesSection to reload
-    } catch (e) {
-      // Optionally show notification
-      // console.error(e);
-    }
-  };
-  const handleDeclineInvite = async (inviteId: string) => {
-    try {
-      await PermissionsService.rejectInvite(inviteId);
-      setInvitesKey(k => k + 1);
-    } catch (e) {
-      // Optionally show notification
-      // console.error(e);
-    }
-  };
+  // Accept/Decline are provided by PendingInvitesSection via context.
 
   return (
     <Sidebar className="border-r-0 overflow-hidden min-h-screen flex flex-col relative bg-white/90">
@@ -380,11 +348,7 @@ const AppSidebar = memo(({
       {/* Footer */}
       <SidebarFooter className="relative z-10 px-4 py-4 border-t border-white/15" style={{ background: 'rgba(0,0,0,0.05)' }}>
         {/* Pending Invites Section */}
-        <PendingInvitesSection
-          key={invitesKey}
-          onAccept={handleAcceptInvite}
-          onDecline={handleDeclineInvite}
-        />
+  <PendingInvitesSection />
         <SidebarMenu>
           <SidebarMenuItem>
             <Dialog open={isEditingProfile} onOpenChange={setIsEditingProfile}>

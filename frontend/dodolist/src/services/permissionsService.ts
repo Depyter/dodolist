@@ -37,6 +37,32 @@ export class PermissionsService {
   }
 
   /**
+   * Get all permission records for a given list (any status), with expanded user fields.
+   */
+  static async getAllPermissionsForList(listId: string): Promise<PocketBasePermissionsRecord[]> {
+    const result = await pb.collection(PermissionsService.collection).getFullList({
+      filter: `task_list = '${listId}'`,
+      expand: 'user_id,invited_by'
+    });
+
+    if (!Array.isArray(result)) {
+      console.error('[PermissionsService.getAllPermissionsForList] Expected array, got:', typeof result);
+      return [];
+    }
+
+    return result.map((r: any) => ({
+      id: r.id,
+      task_list: r.task_list,
+      user_id: r.user_id,
+      invited_by: r.invited_by,
+      status: r.status,
+      permission: r.permission,
+      inviter_email: r.inviter_email,
+      expand: r.expand
+    }));
+  }
+
+  /**
    * Get all permissions (invites) for the current user using PocketBase web API.
    */
   static async getPermissionsForCurrentUser(): Promise<PocketBasePermissionsRecord[]> {
@@ -119,6 +145,34 @@ export class PermissionsService {
   }
 
   /**
+   * Get all active permission records visible to the current user.
+   * This includes:
+   * - Collaborations where the current user is the invited user (shared with me)
+   * - All collaborators on lists the current user owns (shared by me)
+   * Relies on PocketBase collection rules to scope visibility.
+   */
+  static async getAllActiveVisiblePermissions(): Promise<PocketBasePermissionsRecord[]> {
+    const result = await pb.collection(PermissionsService.collection).getFullList({
+      filter: `status = 'active'`,
+    });
+
+    if (!Array.isArray(result)) {
+      console.error('[PermissionsService.getAllActiveVisiblePermissions] Expected array, got:', typeof result);
+      return [];
+    }
+
+    return result.map((r: any) => ({
+      id: r.id,
+      task_list: r.task_list,
+      user_id: r.user_id,
+      invited_by: r.invited_by,
+      status: r.status,
+      permission: r.permission,
+      inviter_email: r.inviter_email,
+    }));
+  }
+
+  /**
    * Invite a user to a list (creates a permission record with status 'invited').
    */
   static async inviteUserToList({
@@ -181,6 +235,22 @@ export class PermissionsService {
       const user = await res.json();
       return user?.id || null;
     } catch (e) {
+      return null;
+    }
+  }
+
+  /**
+   * Lookup a user by id via secure backend endpoint (returns basic public info).
+   */
+  static async getUserById(userId: string, listId?: string): Promise<{ id: string; email?: string; username?: string; name?: string } | null> {
+    try {
+      // Use PocketBase client so auth token is attached automatically
+      const user = await pb.send('/api/lookup-user-by-id', {
+        method: 'POST',
+        body: { id: userId, listId },
+      });
+      return (user as any) || null;
+    } catch {
       return null;
     }
   }

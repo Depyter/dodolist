@@ -64,9 +64,7 @@ export function useTodoLists() {
           // Full refresh
           const lists = getAllLocalYjsTodoLists().filter(l => !l.deleted);
           // Always get readOnly from provider for all lists
-          const listsWithReadOnly = lists.map(list => {
-            return { ...list, readOnly: provider.getReadOnlyStatus(list.id) };
-          });
+          const listsWithReadOnly = lists.map(list => ({ ...list, readOnly: provider.getReadOnlyStatus(list.id) }));
           setTodoLists(listsWithReadOnly);
           subscribeToAllYjsDocs(listsWithReadOnly);
 
